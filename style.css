@@ -197,3 +197,20 @@ footer div { display: flex; gap: 18px; }
   .gallery-grid { grid-template-columns: 1fr; }
   footer { flex-direction: column; }
 }
+.era-card {
+    display: block;
+    width: 260px;
+    margin: 40px auto 0;
+    text-decoration: none;
+}
+
+.era-card img {
+    width: 100%;
+    display: block;
+    border: 1px solid var(--line);
+    transition: transform .3s ease;
+}
+
+.era-card:hover img {
+    transform: scale(1.03);
+}
