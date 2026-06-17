@@ -255,3 +255,57 @@ footer div { display: flex; gap: 18px; }
     aspect-ratio:16/9;
     border:1px solid var(--line);
 }
+.centered-era {
+  text-align: center;
+  padding: 130px 5vw 90px;
+}
+
+.centered-era .artist-name {
+  font-size: 1rem;
+  letter-spacing: .35em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.centered-era h1 {
+  font-size: clamp(5rem, 15vw, 13rem);
+  line-height: .85;
+  margin: 0;
+}
+
+.stream-section {
+  text-align: center;
+}
+
+.stream-section h2 {
+  font-size: 2rem;
+  margin-bottom: 35px;
+}
+
+.stream-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 45px;
+}
+
+.stream-buttons a {
+  border: 1px solid var(--line);
+  padding: 14px 28px;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: var(--text);
+  font-size: .8rem;
+}
+
+.stream-buttons a:hover {
+  background: var(--text);
+  color: #000;
+}
+
+.spotify-embed {
+  max-width: 900px;
+  margin: 0 auto;
+}
