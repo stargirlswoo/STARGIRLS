@@ -219,10 +219,15 @@ footer div { display: flex; gap: 18px; }
 }
 
 .era-hero {
-  padding: 120px 5vw 80px;
-  border-bottom: 1px solid var(--line);
+    padding: 120px 5vw 80px;
+    border-bottom: 1px solid var(--line);
+    text-align: center;
 }
-
+.era-hero p {
+    letter-spacing: .35em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
 .era-hero h1 {
   font-size: clamp(5rem, 16vw, 13rem);
   line-height: .8;
