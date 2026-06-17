@@ -214,3 +214,32 @@ footer div { display: flex; gap: 18px; }
 .era-card:hover img {
     transform: scale(1.03);
 }
+.era-page .section {
+  padding: 90px 10vw;
+}
+
+.era-hero {
+  padding: 120px 5vw 80px;
+  border-bottom: 1px solid var(--line);
+}
+
+.era-hero h1 {
+  font-size: clamp(5rem, 16vw, 13rem);
+  line-height: .8;
+  margin: 0;
+}
+
+.photo-collage {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  align-items: center;
+}
+
+.photo-collage img {
+  width: 100%;
+  height: 360px;
+  object-fit: cover;
+  border: 1px solid var(--line);
+  display: block;
+}
