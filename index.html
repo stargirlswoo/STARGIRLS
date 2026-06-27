@@ -7,82 +7,54 @@
   <title>STARGIRLS</title>
   <meta name="description" content="Official website of STARGIRLS." />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
   <header class="site-header">
-    <a class="logo" href="#home">STARGIRLS</a>
+    <a class="logo" href="index.html">STARGIRLS</a>
 
     <nav>
+      <a href="#about">About STARGIRLS</a>
       <a href="#music">Music</a>
       <a href="#film">Film</a>
+      <a href="#maison">Maison</a>
       <a href="#archive">Archive</a>
-      <a href="#house">The House</a>
     </nav>
   </header>
 
-  <main>
-    <section class="hero" id="home">
-      <div class="hero-overlay"></div>
+  <main class="home-page">
 
-      <div class="hero-content">
-        <p class="eyebrow">Music</p>
-        <h1>ANEW</h1>
-
-        <div class="hero-buttons">
-          <a class="button primary" href="https://www.stargirls.maison/anew.html">Discover</a>
-          <a class="button secondary" href="https://youtu.be/TxIWsdGdkE8?si=GYpnFjP2R_fcwz9U" target="_blank" rel="noopener">Watch</a>
-        </div>
-      </div>
+    <section class="home-feature" id="about">
+      <p class="eyebrow">About STARGIRLS</p>
+      <h1>MAISON STARGIRLS</h1>
+      <a class="text-link" href="#archive">Meet STARGIRLS</a>
     </section>
 
-    <section class="section feature" id="music">
+    <section class="home-feature" id="music">
       <p class="eyebrow">Music</p>
       <h2>ANEW</h2>
-      <p>The first release from STARGIRLS.</p>
-      <a class="text-link" href="https://www.stargirls.world/anew.html">Listen now</a>
+      <a class="text-link" href="anew.html">Discover</a>
     </section>
 
-    <section class="section" id="film">
+    <section class="home-feature" id="film">
       <p class="eyebrow">Film</p>
       <h2>SIREN</h2>
-
-      <div class="video-frame">
-        <iframe
-          src="https://www.youtube.com/embed/TxIWsdGdkE8"
-          title="STARGIRLS - SIREN Official Music Video"
-          allowfullscreen>
-        </iframe>
-      </div>
+      <a class="text-link" href="https://youtu.be/TxIWsdGdkE8?si=GYpnFjP2R_fcwz9U" target="_blank" rel="noopener">See More</a>
     </section>
 
-    <section class="section" id="archive">
+    <section class="home-feature" id="maison">
+      <p class="eyebrow">Coming Soon</p>
+      <h2>MAISON STARGIRLS</h2>
+      <a class="text-link" href="#maison">Coming Soon</a>
+    </section>
+
+    <section class="home-feature" id="archive">
       <p class="eyebrow">Archive</p>
       <h2>ERAS</h2>
-
-      <div class="gallery-grid">
-        <a class="era-card" href="anew.html" aria-label="Open ANEW era">
-          <img src="images/anew/anew-era.png" alt="ANEW">
-          <span>ANEW</span>
-        </a>
-      </div>
+      <a class="text-link" href="anew.html">Explore</a>
     </section>
 
-    <section class="section split" id="house">
-      <div>
-        <p class="eyebrow">The House</p>
-        <h2>Moon and Sun</h2>
-      </div>
-
-      <div class="copy-block">
-        <p>STARGIRLS is built from two forces: Moon and Sun.</p>
-      </div>
-    </section>
   </main>
 
   <footer>
