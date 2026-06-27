@@ -1,89 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>ANEW | STARGIRLS</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="description" content="ANEW by STARGIRLS." />
+
+  <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
+  <header class="site-header">
+    <a class="logo" href="index.html">STARGIRLS</a>
 
-<header class="site-header">
-  <a class="logo" href="index.html">STARGIRLS</a>
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="#stream">Stream</a>
-    <a href="#video">Video</a>
-    <a href="#photos">Gallery</a>
-  </nav>
-</header>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="#film">Film</a>
+      <a href="#music">Music</a>
+      <a href="#making-of">Making Of</a>
+      <a href="#gallery">Gallery</a>
+    </nav>
+  </header>
 
-<main class="era-page">
+  <main class="era-page">
+    <section class="era-hero centered-era">
+      <p class="eyebrow">Era I</p>
+      <h1>ANEW</h1>
+    </section>
 
- <section class="era-hero centered-era">
-  <h1>ANEW</h1>
-</section>
-<section class="section" id="stream">
-    <p class="eyebrow">Stream</p>
+    <section class="section" id="film">
+      <p class="eyebrow">The Film</p>
+      <h2>SIREN</h2>
 
-  <div class="stream-buttons">
-    <a href="https://open.spotify.com/album/5sFtW9NjgkOvBZb5Ga4Zom?si=BfsCvjUAQ5GYxTZYIEzD_w" target="_blank">Spotify</a>
+      <div class="video-frame">
+        <iframe
+          src="https://www.youtube.com/embed/TxIWsdGdkE8"
+          title="STARGIRLS - SIREN"
+          allowfullscreen>
+        </iframe>
+      </div>
+    </section>
 
-    <a href="https://music.apple.com/us/album/anew-single/6775062691" target="_blank">Apple Music</a>
+    <section class="section" id="music">
+      <p class="eyebrow">The Music</p>
+      <h2>ANEW</h2>
 
-    <a href="https://music.amazon.com/albums/B0H3GJ1H6N?marketplaceId=ATVPDKIKX0DER&musicTerritory=US&ref=dm_sh_y7hvsaNwoAXy42dHOO1ZYZeY0" target="_blank">Amazon Music</a>
+      <div class="stream-buttons">
+        <a href="https://open.spotify.com/album/5sFtW9NjgkOvBZb5Ga4Zom?si=BfsCvjUAQ5GYxTZYIEzD_w" target="_blank" rel="noopener">Spotify</a>
+        <a href="https://music.apple.com/us/album/anew-single/6775062691" target="_blank" rel="noopener">Apple Music</a>
+        <a href="https://music.amazon.com/albums/B0H3GJ1H6N?marketplaceId=ATVPDKIKX0DER&musicTerritory=US&ref=dm_sh_y7hvsaNwoAXy42dHOO1ZYZeY0" target="_blank" rel="noopener">Amazon Music</a>
+        <a href="https://www.youtube.com/@stargirlswoo" target="_blank" rel="noopener">YouTube</a>
+      </div>
 
-    <a href="https://www.youtube.com/@stargirlswoo" target="_blank">Youtube</a>
-</div>
+      <iframe
+        class="spotify-frame"
+        src="https://open.spotify.com/embed/album/5sFtW9NjgkOvBZb5Ga4Zom"
+        width="100%"
+        height="352"
+        frameborder="0"
+        allowfullscreen
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+        loading="lazy">
+      </iframe>
+    </section>
 
-   <iframe
-style="border-radius:12px"
-src="https://open.spotify.com/embed/album/5sFtW9NjgkOvBZb5Ga4Zom"
-width="100%"
-height="352"
-frameBorder="0"
-allowfullscreen=""
-allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-loading="lazy">
-</iframe>
-</section>
- <section class="section" id="video">
-  <p class="eyebrow">Visuals</p>
-  <h2>Music Videos & BTS</h2>
+    <section class="section" id="making-of">
+      <p class="eyebrow">The Making Of</p>
+      <h2>ON SET</h2>
 
-  <div class="video-grid">
+      <div class="video-frame">
+        <iframe
+          src="https://www.youtube.com/embed/3CRSoQPvGgs"
+          title="STARGIRLS - SIREN Making Of"
+          allowfullscreen>
+        </iframe>
+      </div>
+    </section>
 
-    <iframe
-      src="https://www.youtube.com/embed/TxIWsdGdkE8"
-      title="Siren Official MV"
-      allowfullscreen>
-    </iframe>
+    <section class="section" id="gallery">
+      <p class="eyebrow">Gallery</p>
+      <h2>ARCHIVE</h2>
 
-    <iframe
-      src="https://www.youtube.com/embed/3CRSoQPvGgs"
-      title="Siren BTS"
-      allowfullscreen>
-    </iframe>
+      <div class="photo-collage">
+        <img src="images/anew/siren.jpg" alt="SIREN">
+        <img src="images/anew/risen.jpg" alt="RISEN">
+        <img src="images/anew/stargirls.jpg" alt="STARGIRLS">
+      </div>
+    </section>
+  </main>
 
-  </div>
-</section>
-
-  <section class="section" id="photos">
-    <p class="eyebrow">Archive</p>
-    <h2>Photos</h2>
-
-  <div class="photo-collage">
-    <img src="images/anew/siren.jpg" alt="Siren">
-    <img src="images/anew/risen.jpg" alt="Risen">
-    <img src="images/anew/stargirls.jpg" alt="STARGIRLS">
-</div>
-  </section>
-
-</main>
-
-<footer>
-  <p>© 2026 STARGIRLS</p>
-</footer>
-
+  <footer>
+    <p>© 2026 STARGIRLS</p>
+  </footer>
 </body>
 </html>
