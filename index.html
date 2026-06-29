@@ -55,21 +55,36 @@
     </div>
   </header>
 
-  <aside class="mobile-menu" id="mobileMenu">
-    <div class="mobile-menu-top">
-      <button class="menu-back" aria-label="Back">‹</button>
-      <p>STARGIRLS</p>
-      <button class="menu-close" aria-label="Close menu">×</button>
-    </div>
+<aside class="mobile-menu" id="mobileMenu">
+  <div class="mobile-menu-top">
+    <button class="menu-back" aria-label="Back">‹</button>
+    <p id="mobileMenuTitle">STARGIRLS</p>
+    <button class="menu-close" aria-label="Close menu">×</button>
+  </div>
 
-    <nav class="mobile-nav">
-      <a href="music.html">Music <span>›</span></a>
-      <a href="maison.html">Maison <span>›</span></a>
-      <a href="about.html">About <span>›</span></a>
-    </nav>
-  </aside>
+  <nav class="mobile-nav mobile-panel active" id="mobile-main">
+    <a href="#" data-mobile-panel="music">Music <span>›</span></a>
+    <a href="#" data-mobile-panel="maison">Maison <span>›</span></a>
+    <a href="#" data-mobile-panel="about">About <span>›</span></a>
+  </nav>
 
-  <div class="menu-overlay"></div>
+  <nav class="mobile-nav mobile-panel" id="mobile-music">
+    <a href="music.html">Music Home <span>›</span></a>
+    <a href="anew.html">ANEW <span>›</span></a>
+  </nav>
+
+  <nav class="mobile-nav mobile-panel" id="mobile-maison">
+    <a href="maison.html">Maison Home <span>›</span></a>
+    <a href="maison.html">Launching Soon <span>›</span></a>
+  </nav>
+
+  <nav class="mobile-nav mobile-panel" id="mobile-about">
+    <a href="about.html">About STARGIRLS <span>›</span></a>
+    <a href="founders.html">The Founders <span>›</span></a>
+  </nav>
+</aside>
+
+<div class="menu-overlay"></div>
 
   <main class="home-page">
     <section class="home-feature">
