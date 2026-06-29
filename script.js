@@ -14,6 +14,8 @@ const mobilePanels = document.querySelectorAll(".mobile-panel");
 const mobileMainPanel = document.querySelector("#mobile-main");
 const mobilePanelTriggers = document.querySelectorAll("[data-mobile-panel]");
 
+let currentPanel = null;
+
 function openMenu() {
   mobileMenu.classList.add("active");
   menuOverlay.classList.add("active");
@@ -69,6 +71,7 @@ function closeMega() {
   megaMenu.classList.remove("active");
   navButtons.forEach(button => button.classList.remove("active"));
   megaPanels.forEach(panel => panel.classList.remove("active"));
+  currentPanel = null;
 }
 
 if (menuToggle && mobileMenu && menuClose && menuBack && menuOverlay) {
@@ -87,7 +90,15 @@ mobilePanelTriggers.forEach(trigger => {
 
 navButtons.forEach(button => {
   button.addEventListener("click", () => {
-    openMega(button.dataset.panel);
+    const panel = button.dataset.panel;
+
+    if (currentPanel === panel && megaMenu.classList.contains("active")) {
+      closeMega();
+      return;
+    }
+
+    currentPanel = panel;
+    openMega(panel);
   });
 });
 
