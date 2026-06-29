@@ -18,15 +18,15 @@ function closeMenu() {
   menuToggle.setAttribute("aria-expanded", "false");
 }
 
-if (
-  menuToggle &&
-  mobileMenu &&
-  menuClose &&
-  menuBack &&
-  menuOverlay
-) {
+if (menuToggle && mobileMenu && menuClose && menuBack && menuOverlay) {
   menuToggle.addEventListener("click", openMenu);
   menuClose.addEventListener("click", closeMenu);
   menuBack.addEventListener("click", closeMenu);
   menuOverlay.addEventListener("click", closeMenu);
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") {
+      closeMenu();
+    }
+  });
 }
