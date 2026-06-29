@@ -717,3 +717,20 @@ footer div {
     justify-content: center;
   }
 }
+/* FIX MOBILE HEADER + SUBNAV STACKING */
+
+@media (max-width: 800px) {
+  .site-header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 3000 !important;
+    display: block !important;
+    background: #fff !important;
+  }
+
+  .era-subnav {
+    top: 81px !important;
+    z-index: 1500 !important;
+    justify-content: flex-start !important;
+  }
+}
