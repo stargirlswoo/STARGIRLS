@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,80 +11,112 @@
 </head>
 
 <body>
+  <header class="site-header">
+    <button class="menu-toggle" aria-label="Open menu" aria-expanded="false">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
 
-<header class="site-header">
+    <a class="logo" href="index.html" aria-label="STARGIRLS Home">STARGIRLS</a>
 
-  <button class="menu-toggle" aria-label="Open menu" aria-expanded="false">
-    <span></span>
-    <span></span>
-    <span></span>
-  </button>
+    <nav class="desktop-nav">
+      <button class="nav-button" data-panel="music">Music</button>
+      <button class="nav-button" data-panel="fragrance">Fragrance</button>
+      <button class="nav-button" data-panel="about">About</button>
+    </nav>
 
-  <a class="logo" href="index.html">STARGIRLS</a>
+    <div class="mega-menu" id="megaMenu">
+      <button class="mega-close" aria-label="Close menu">×</button>
 
-  <nav class="desktop-nav">
-    <a href="music.html">Music</a>
-    <a href="maison.html">Maison</a>
-    <a href="about.html">About</a>
-  </nav>
+      <div class="mega-panel" id="music-panel">
+        <div>
+          <h4>Music</h4>
+          <a href="music.html">Music Home</a>
+          <a href="anew.html">ANEW</a>
+        </div>
+      </div>
 
-</header>
+      <div class="mega-panel" id="fragrance-panel">
+        <div>
+          <h4>Fragrance</h4>
+          <a href="fragrance.html">Fragrance Home</a>
+          <a href="fragrance.html#sun">SUN</a>
+          <a href="fragrance.html#moon">MOON</a>
+        </div>
+      </div>
 
-<aside class="mobile-menu" id="mobileMenu">
+      <div class="mega-panel" id="about-panel">
+        <div>
+          <h4>About</h4>
+          <a href="about.html">About STARGIRLS</a>
+          <a href="founders.html">The Founders</a>
+        </div>
+      </div>
+    </div>
+  </header>
 
-  <div class="mobile-menu-top">
-    <button class="menu-back">‹</button>
-    <p>STARGIRLS</p>
-    <button class="menu-close">×</button>
-  </div>
+  <aside class="mobile-menu" id="mobileMenu">
+    <div class="mobile-menu-top">
+      <button class="menu-back" aria-label="Back">‹</button>
+      <p id="mobileMenuTitle">STARGIRLS</p>
+      <button class="menu-close" aria-label="Close menu">×</button>
+    </div>
 
-  <nav class="mobile-nav">
-    <a href="music.html">Music <span>›</span></a>
-    <a href="maison.html">Maison <span>›</span></a>
-    <a href="about.html">About <span>›</span></a>
-  </nav>
+    <nav class="mobile-nav mobile-panel active" id="mobile-main">
+      <a href="#" data-mobile-panel="music">Music <span>›</span></a>
+      <a href="#" data-mobile-panel="fragrance">Fragrance <span>›</span></a>
+      <a href="#" data-mobile-panel="about">About <span>›</span></a>
+    </nav>
 
-</aside>
+    <nav class="mobile-nav mobile-panel" id="mobile-music">
+      <a href="music.html">Music Home</a>
+      <a href="anew.html">ANEW</a>
+    </nav>
 
-<div class="menu-overlay"></div>
+    <nav class="mobile-nav mobile-panel" id="mobile-fragrance">
+      <a href="fragrance.html">Fragrance Home</a>
+      <a href="fragrance.html#sun">SUN</a>
+      <a href="fragrance.html#moon">MOON</a>
+    </nav>
 
-<main class="home-page">
+    <nav class="mobile-nav mobile-panel" id="mobile-about">
+      <a href="about.html">About STARGIRLS</a>
+      <a href="founders.html">The Founders</a>
+    </nav>
+  </aside>
 
-<section class="home-feature">
+  <div class="menu-overlay"></div>
 
-    <p class="eyebrow">Music</p>
+  <main class="home-page">
+    <section class="home-feature">
+      <p class="eyebrow">Music</p>
+      <h1>MUSIC</h1>
+    </section>
 
-    <h1>MUSIC</h1>
+    <section class="home-feature">
+      <p class="eyebrow">Latest Era</p>
+      <h2>ANEW</h2>
+      <a class="text-link" href="anew.html">Discover</a>
+    </section>
 
-</section>
+    <section class="home-feature">
+      <p class="eyebrow">Streaming</p>
+      <h2>LISTEN NOW</h2>
+      <a class="text-link" href="anew.html#music">Explore</a>
+    </section>
+  </main>
 
-<section class="home-feature">
+  <footer>
+    <p>© 2026 STARGIRLS</p>
 
-    <p class="eyebrow">Latest Era</p>
+    <div>
+      <a href="https://www.instagram.com/stargirlswoo/" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://www.youtube.com/@stargirlswoo" target="_blank" rel="noopener">YouTube</a>
+      <a href="https://www.tiktok.com/@stargirlswoo" target="_blank" rel="noopener">TikTok</a>
+    </div>
+  </footer>
 
-    <h2>ANEW</h2>
-
-    <a class="text-link" href="anew.html">Discover</a>
-
-</section>
-
-</main>
-
-<footer>
-
-  <p>© 2026 STARGIRLS</p>
-
-  <div>
-    <a href="https://www.instagram.com/stargirlswoo/" target="_blank">Instagram</a>
-    <a href="https://www.youtube.com/@stargirlswoo" target="_blank">YouTube</a>
-    <a href="https://www.tiktok.com/@stargirlswoo" target="_blank">TikTok</a>
-  </div>
-
-</footer>
-
-<script src="script.js"></script>
-
+  <script src="script.js"></script>
 </body>
 </html>
-```
-
