@@ -688,3 +688,21 @@ footer div {
     justify-content: center;
   }
 }
+@media (max-width: 800px) {
+  .site-header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 2000 !important;
+    background: #fff !important;
+  }
+
+  .menu-toggle {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .menu-toggle span {
+    background: #000 !important;
+  }
+}
