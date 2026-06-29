@@ -54,19 +54,57 @@ a {
   display: flex;
   justify-content: center;
   gap: 44px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.14em;
 }
 
-.desktop-nav a {
+.nav-item {
+  position: relative;
+  padding-bottom: 18px;
+}
+
+.nav-item > a {
   opacity: 0.78;
 }
 
-.desktop-nav a:hover {
+.nav-item:hover > a {
   opacity: 1;
+}
+
+.nav-dropdown {
+  position: absolute;
+  top: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 220px;
+  padding: 22px 24px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  display: none;
+  flex-direction: column;
+  gap: 18px;
+  text-align: center;
+  z-index: 1200;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
+}
+
+.nav-dropdown a {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  opacity: 0.78;
+  white-space: nowrap;
+}
+
+.nav-dropdown a:hover {
+  opacity: 1;
+}
+
+.nav-item:hover .nav-dropdown,
+.nav-item:focus-within .nav-dropdown {
+  display: flex;
 }
 
 /* MOBILE MENU */
@@ -265,6 +303,22 @@ h3 {
   font-size: clamp(70px, 16vw, 180px);
   letter-spacing: 0.16em;
   line-height: 0.85;
+}
+
+.era-subnav {
+  position: sticky;
+  top: 103px;
+  z-index: 900;
+  display: flex;
+  justify-content: center;
+  gap: 34px;
+  padding: 14px 20px;
+  background: var(--white);
+  border-bottom: 1px solid var(--line);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
 }
 
 .stream-buttons {
@@ -548,6 +602,15 @@ footer div {
   .mobile-nav span {
     font-size: 26px;
     line-height: 1;
+  }
+
+  .era-subnav {
+    top: 95px;
+    justify-content: flex-start;
+    gap: 24px;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 16px 22px;
   }
 
   .home-feature {
