@@ -876,3 +876,20 @@ footer div {
     background: #000 !important;
   }
 }
+.mobile-menu {
+  pointer-events: auto !important;
+}
+
+.mobile-nav a {
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 4001;
+}
+
+.menu-overlay {
+  pointer-events: none;
+}
+
+.menu-overlay.active {
+  pointer-events: auto;
+}
