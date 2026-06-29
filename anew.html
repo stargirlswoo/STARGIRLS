@@ -12,16 +12,47 @@
 
 <body>
   <header class="site-header">
-    <a class="logo" href="index.html">STARGIRLS</a>
+    <button class="menu-toggle" aria-label="Open menu" aria-expanded="false">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
 
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="#film">Film</a>
-      <a href="#music">Music</a>
-      <a href="#making-of">Studio</a>
-      <a href="#gallery">Gallery</a>
+    <a class="logo" href="index.html" aria-label="STARGIRLS Home">STARGIRLS</a>
+
+    <nav class="desktop-nav">
+      <a href="music.html">Music</a>
+      <a href="maison.html">Maison</a>
+      <a href="about.html">About</a>
     </nav>
   </header>
+
+  <aside class="mobile-menu" id="mobileMenu">
+    <div class="mobile-menu-top">
+      <button class="menu-back" aria-label="Back">‹</button>
+      <p>ANEW</p>
+      <button class="menu-close" aria-label="Close menu">×</button>
+    </div>
+
+    <nav class="mobile-nav">
+      <a href="music.html">Music <span>›</span></a>
+      <a href="maison.html">Maison <span>›</span></a>
+      <a href="about.html">About <span>›</span></a>
+      <a href="#film">Films <span>›</span></a>
+      <a href="#music">The Music <span>›</span></a>
+      <a href="#making-of">Studio <span>›</span></a>
+      <a href="#gallery">Gallery <span>›</span></a>
+    </nav>
+  </aside>
+
+  <div class="menu-overlay"></div>
+
+  <nav class="era-subnav">
+    <a href="#film">Films</a>
+    <a href="#music">Music</a>
+    <a href="#making-of">Studio</a>
+    <a href="#gallery">Gallery</a>
+  </nav>
 
   <main class="era-page">
     <section class="era-hero centered-era">
@@ -93,5 +124,7 @@
   <footer>
     <p>© 2026 STARGIRLS</p>
   </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>
