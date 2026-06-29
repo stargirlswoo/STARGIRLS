@@ -893,3 +893,18 @@ footer div {
 .menu-overlay.active {
   pointer-events: auto;
 }
+.mobile-panel {
+  display: none !important;
+}
+
+.mobile-panel.active {
+  display: flex !important;
+}
+
+.menu-back {
+  visibility: hidden;
+}
+
+.mobile-menu.submenu-open .menu-back {
+  visibility: visible;
+}
