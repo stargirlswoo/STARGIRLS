@@ -1,8 +1,12 @@
 :root {
   --black: #000;
   --white: #fff;
-  --muted: #767676;
-  --line: #d9d9d9;
+  --muted: #6f6f6f;
+  --line: #e3e3e3;
+  --soft-bg: #fafafa;
+
+  --display: "Spectral", Georgia, serif;
+  --body: "Inter", Arial, Helvetica, sans-serif;
 }
 
 * {
@@ -17,7 +21,9 @@ body {
   margin: 0;
   background: var(--white);
   color: var(--black);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--body);
+  font-weight: 300;
+  letter-spacing: 0.015em;
 }
 
 body.menu-open {
@@ -38,27 +44,30 @@ a {
   background: #fff;
   border-bottom: 1px solid var(--line);
   text-align: center;
-  padding: 28px 20px 18px;
+  padding: 30px 20px 18px;
 }
 
 .logo {
   display: inline-block;
-  font-size: 28px;
-  font-weight: 700;
-  letter-spacing: 0.32em;
+  font-family: var(--display);
+  font-size: 30px;
+  font-weight: 400;
+  letter-spacing: 0.28em;
   line-height: 1;
   margin-bottom: 24px;
+  text-transform: uppercase;
 }
 
 .desktop-nav {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 54px;
-  font-size: 11px;
-  font-weight: 700;
+  gap: 58px;
+  font-family: var(--body);
+  font-size: 10px;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.2em;
 }
 
 .nav-button {
@@ -72,7 +81,7 @@ a {
   cursor: pointer;
   appearance: none;
   -webkit-appearance: none;
-  opacity: 0.75;
+  opacity: 0.62;
 }
 
 .nav-button:hover,
@@ -91,10 +100,10 @@ a {
   background: #fff;
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
-  padding: 48px 8vw 58px;
+  padding: 54px 8vw 64px;
   z-index: 1500;
   text-align: left;
-  box-shadow: 0 22px 45px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 22px 45px rgba(0, 0, 0, 0.04);
 }
 
 .mega-menu.active {
@@ -111,6 +120,7 @@ a {
   font-size: 28px;
   line-height: 1;
   cursor: pointer;
+  font-weight: 300;
 }
 
 .mega-panel {
@@ -126,9 +136,10 @@ a {
 }
 
 .mega-panel h4 {
-  margin: 0 0 22px;
-  font-size: 11px;
-  font-weight: 700;
+  margin: 0 0 24px;
+  font-family: var(--display);
+  font-size: 15px;
+  font-weight: 400;
   letter-spacing: 0.18em;
   text-transform: uppercase;
 }
@@ -136,11 +147,11 @@ a {
 .mega-panel a {
   display: block;
   margin-bottom: 16px;
-  font-size: 15px;
-  font-weight: 400;
-  letter-spacing: 0.01em;
+  font-family: var(--body);
+  font-size: 13px;
+  font-weight: 300;
+  letter-spacing: 0.03em;
   color: #555;
-  text-transform: none;
 }
 
 .mega-panel a:hover {
@@ -164,9 +175,9 @@ a {
 .menu-toggle span {
   display: block;
   width: 22px;
-  height: 2px;
+  height: 1px;
   background: #000;
-  border-radius: 2px;
+  border-radius: 0;
 }
 
 .mobile-menu-top,
@@ -181,48 +192,49 @@ a {
 }
 
 .home-feature {
-  min-height: 82vh;
+  min-height: 84vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 22px;
-  padding: 90px 24px;
+  gap: 24px;
+  padding: 100px 24px;
   text-align: center;
   border-bottom: 1px solid var(--line);
 }
 
 .home-feature:nth-child(even) {
-  background: #fafafa;
+  background: var(--soft-bg);
 }
 
 .eyebrow {
   margin: 0;
   color: var(--muted);
-  font-size: 11px;
-  font-weight: 700;
+  font-family: var(--body);
+  font-size: 10px;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.26em;
+  letter-spacing: 0.28em;
 }
 
 h1,
 h2,
 h3 {
   margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
-  font-weight: 700;
+  font-family: var(--display);
+  font-weight: 400;
   text-transform: uppercase;
 }
 
 h1 {
-  font-size: clamp(58px, 12vw, 150px);
-  letter-spacing: 0.16em;
-  line-height: 0.9;
+  font-size: clamp(62px, 12vw, 150px);
+  letter-spacing: 0.14em;
+  line-height: 0.88;
 }
 
 h2 {
   font-size: clamp(46px, 9vw, 118px);
-  letter-spacing: 0.14em;
+  letter-spacing: 0.13em;
   line-height: 0.9;
 }
 
@@ -235,15 +247,16 @@ h3 {
 .button,
 .stream-buttons a {
   display: inline-block;
-  margin-top: 4px;
-  padding: 14px 32px;
+  margin-top: 6px;
+  padding: 14px 34px;
   border: 1px solid var(--black);
   background: transparent;
   color: var(--black);
-  font-size: 11px;
-  font-weight: 700;
+  font-family: var(--body);
+  font-size: 10px;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.18em;
   transition: background 0.2s ease, color 0.2s ease;
 }
 
@@ -257,23 +270,25 @@ h3 {
 /* GENERAL SECTIONS */
 
 .section {
-  padding: 115px 8vw;
+  padding: 120px 8vw;
   border-bottom: 1px solid var(--line);
   text-align: center;
 }
 
 .section p {
   max-width: 620px;
-  margin: 24px auto 0;
+  margin: 26px auto 0;
   color: var(--muted);
+  font-family: var(--body);
   font-size: 14px;
-  line-height: 1.8;
+  font-weight: 300;
+  line-height: 1.9;
 }
 
 /* VIDEO */
 
 .video-frame {
-  margin: 44px auto 0;
+  margin: 46px auto 0;
   max-width: 1100px;
   aspect-ratio: 16 / 9;
   border: 1px solid var(--line);
@@ -289,12 +304,12 @@ h3 {
 /* ERA PAGE */
 
 .era-page .section {
-  padding: 115px 8vw;
+  padding: 120px 8vw;
 }
 
 .era-hero,
 .centered-era {
-  padding: 170px 5vw 105px;
+  padding: 175px 5vw 110px;
   text-align: center;
   border-bottom: 1px solid var(--line);
   background: var(--white);
@@ -303,12 +318,12 @@ h3 {
 
 .era-hero h1,
 .centered-era h1 {
-  font-size: clamp(70px, 16vw, 180px);
-  letter-spacing: 0.16em;
+  font-size: clamp(74px, 16vw, 180px);
+  letter-spacing: 0.14em;
   line-height: 0.85;
 }
 
-/* CHANEL-STYLE PAGE SUBNAV */
+/* PAGE SUBNAV */
 
 .era-subnav {
   position: sticky;
@@ -317,18 +332,19 @@ h3 {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 42px;
+  gap: 44px;
   padding: 15px 20px;
   background: #fff;
   border-bottom: 1px solid var(--line);
-  font-size: 11px;
-  font-weight: 700;
+  font-family: var(--body);
+  font-size: 10px;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.2em;
 }
 
 .era-subnav a {
-  opacity: 0.72;
+  opacity: 0.62;
 }
 
 .era-subnav a:hover {
@@ -340,7 +356,7 @@ h3 {
   justify-content: center;
   gap: 12px;
   flex-wrap: wrap;
-  margin: 38px 0 44px;
+  margin: 40px 0 46px;
 }
 
 .spotify-frame,
@@ -351,7 +367,7 @@ h3 {
 
 .photo-collage {
   max-width: 1180px;
-  margin: 48px auto 0;
+  margin: 50px auto 0;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 18px;
@@ -373,29 +389,30 @@ h3 {
 }
 
 .story-hero {
-  padding: 150px 24px 80px;
+  padding: 155px 24px 84px;
   text-align: center;
   border-bottom: 1px solid var(--line);
 }
 
 .story-hero h1 {
-  font-size: clamp(54px, 11vw, 140px);
-  letter-spacing: 0.16em;
+  font-size: clamp(56px, 11vw, 140px);
+  letter-spacing: 0.14em;
 }
 
 .story-quote {
   max-width: 760px;
-  margin: 34px auto 0;
-  font-size: clamp(18px, 2.6vw, 34px);
+  margin: 36px auto 0;
+  font-family: var(--display);
+  font-size: clamp(20px, 2.8vw, 36px);
   line-height: 1.35;
-  font-weight: 700;
+  font-weight: 400;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
 .story-image {
   max-width: 980px;
-  margin: 80px auto;
+  margin: 84px auto;
   padding: 0 24px;
 }
 
@@ -415,16 +432,17 @@ h3 {
 figcaption {
   margin-top: 14px;
   color: var(--muted);
+  font-family: var(--body);
   font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
+  font-weight: 500;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   text-align: center;
 }
 
 .story-intro {
   max-width: 780px;
-  margin: 110px auto;
+  margin: 115px auto;
   padding: 0 24px;
   text-align: center;
 }
@@ -433,22 +451,24 @@ figcaption {
 .story-chapter p {
   margin: 0 auto 24px;
   color: #1f1f1f;
-  font-size: 16px;
-  line-height: 1.9;
+  font-family: var(--body);
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.95;
   max-width: 720px;
 }
 
 .story-chapter {
   max-width: 940px;
-  margin: 130px auto;
+  margin: 135px auto;
   padding: 0 24px;
   text-align: center;
 }
 
 .story-chapter h2 {
-  margin-bottom: 42px;
-  font-size: clamp(38px, 7vw, 86px);
-  letter-spacing: 0.16em;
+  margin-bottom: 44px;
+  font-size: clamp(40px, 7vw, 86px);
+  letter-spacing: 0.15em;
 }
 
 .story-chapter figure {
@@ -457,10 +477,11 @@ figcaption {
 
 .story-chapter blockquote {
   max-width: 760px;
-  margin: 42px auto 0;
-  font-size: clamp(20px, 3vw, 38px);
+  margin: 44px auto 0;
+  font-family: var(--display);
+  font-size: clamp(22px, 3vw, 38px);
   line-height: 1.35;
-  font-weight: 700;
+  font-weight: 400;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -473,7 +494,7 @@ figcaption {
 
 .story-chapter.principles blockquote {
   margin: 26px auto;
-  font-size: clamp(18px, 2.3vw, 34px);
+  font-size: clamp(20px, 2.3vw, 34px);
 }
 
 /* FOOTER */
@@ -482,17 +503,18 @@ footer {
   display: flex;
   justify-content: space-between;
   gap: 20px;
-  padding: 34px 44px;
+  padding: 36px 44px;
   color: var(--muted);
-  font-size: 11px;
-  font-weight: 700;
+  font-family: var(--body);
+  font-size: 10px;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.16em;
 }
 
 footer div {
   display: flex;
-  gap: 22px;
+  gap: 24px;
 }
 
 /* REMOVE OLD ELEMENTS */
@@ -509,14 +531,16 @@ footer div {
 
 @media (max-width: 800px) {
   .site-header {
-    position: relative;
-    padding: 34px 16px 26px;
-    background: #fff;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 2000 !important;
+    padding: 32px 16px 24px;
+    background: #fff !important;
   }
 
   .logo {
-    font-size: 24px;
-    letter-spacing: 0.24em;
+    font-size: 25px;
+    letter-spacing: 0.22em;
     margin-bottom: 0;
   }
 
@@ -526,13 +550,15 @@ footer div {
   }
 
   .menu-toggle {
-    display: flex;
+    display: flex !important;
     position: absolute;
     left: 22px;
     top: 39px;
     flex-direction: column;
-    gap: 5px;
+    gap: 6px;
     z-index: 1001;
+    opacity: 1 !important;
+    visibility: visible !important;
   }
 
   .menu-toggle span {
@@ -588,8 +614,9 @@ footer div {
 
   .mobile-menu-top p {
     margin: 0;
+    font-family: var(--display);
     font-size: 16px;
-    font-weight: 700;
+    font-weight: 400;
     letter-spacing: 0.18em;
     text-transform: uppercase;
   }
@@ -603,6 +630,7 @@ footer div {
     line-height: 1;
     padding: 0;
     cursor: pointer;
+    font-weight: 300;
   }
 
   .menu-back {
@@ -614,13 +642,14 @@ footer div {
   }
 
   .mobile-nav {
-    padding: 34px 26px;
+    padding: 36px 26px;
     flex-direction: column;
     gap: 32px;
-    font-size: 17px;
-    font-weight: 700;
+    font-family: var(--body);
+    font-size: 14px;
+    font-weight: 400;
     text-transform: uppercase;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.16em;
   }
 
   .mobile-nav a {
@@ -653,7 +682,7 @@ footer div {
     overflow-x: auto;
     white-space: nowrap;
     padding: 16px 18px;
-    font-size: 11px;
+    font-size: 10px;
     background: #fff;
     border-top: 0;
     border-bottom: 1px solid var(--line);
@@ -661,7 +690,7 @@ footer div {
 
   .home-feature {
     min-height: 72vh;
-    padding: 80px 20px;
+    padding: 84px 20px;
   }
 
   h1 {
@@ -686,23 +715,5 @@ footer div {
   footer div {
     flex-wrap: wrap;
     justify-content: center;
-  }
-}
-@media (max-width: 800px) {
-  .site-header {
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 2000 !important;
-    background: #fff !important;
-  }
-
-  .menu-toggle {
-    display: flex !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-  }
-
-  .menu-toggle span {
-    background: #000 !important;
   }
 }
