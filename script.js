@@ -9,11 +9,17 @@ const megaMenu = document.querySelector("#megaMenu");
 const megaClose = document.querySelector(".mega-close");
 const megaPanels = document.querySelectorAll(".mega-panel");
 
+const mobileTitle = document.querySelector("#mobileMenuTitle");
+const mobilePanels = document.querySelectorAll(".mobile-panel");
+const mobileMainPanel = document.querySelector("#mobile-main");
+const mobilePanelTriggers = document.querySelectorAll("[data-mobile-panel]");
+
 function openMenu() {
   mobileMenu.classList.add("active");
   menuOverlay.classList.add("active");
   document.body.classList.add("menu-open");
   menuToggle.setAttribute("aria-expanded", "true");
+  showMobilePanel("main");
 }
 
 function closeMenu() {
@@ -21,9 +27,31 @@ function closeMenu() {
   menuOverlay.classList.remove("active");
   document.body.classList.remove("menu-open");
   menuToggle.setAttribute("aria-expanded", "false");
+  showMobilePanel("main");
+}
+
+function showMobilePanel(panelName) {
+  mobilePanels.forEach(panel => panel.classList.remove("active"));
+
+  const nextPanel =
+    panelName === "main"
+      ? mobileMainPanel
+      : document.querySelector(`#mobile-${panelName}`);
+
+  if (nextPanel) nextPanel.classList.add("active");
+
+  if (panelName === "main") {
+    mobileMenu.classList.remove("submenu-open");
+    mobileTitle.textContent = "STARGIRLS";
+  } else {
+    mobileMenu.classList.add("submenu-open");
+    mobileTitle.textContent = panelName.toUpperCase();
+  }
 }
 
 function openMega(panelName) {
+  if (!megaMenu) return;
+
   megaMenu.classList.add("active");
 
   navButtons.forEach(button => {
@@ -36,6 +64,8 @@ function openMega(panelName) {
 }
 
 function closeMega() {
+  if (!megaMenu) return;
+
   megaMenu.classList.remove("active");
   navButtons.forEach(button => button.classList.remove("active"));
   megaPanels.forEach(panel => panel.classList.remove("active"));
@@ -44,9 +74,16 @@ function closeMega() {
 if (menuToggle && mobileMenu && menuClose && menuBack && menuOverlay) {
   menuToggle.addEventListener("click", openMenu);
   menuClose.addEventListener("click", closeMenu);
-  menuBack.addEventListener("click", closeMenu);
+  menuBack.addEventListener("click", () => showMobilePanel("main"));
   menuOverlay.addEventListener("click", closeMenu);
 }
+
+mobilePanelTriggers.forEach(trigger => {
+  trigger.addEventListener("click", event => {
+    event.preventDefault();
+    showMobilePanel(trigger.dataset.mobilePanel);
+  });
+});
 
 navButtons.forEach(button => {
   button.addEventListener("click", () => {
