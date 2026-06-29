@@ -20,29 +20,34 @@
 
     <a class="logo" href="index.html" aria-label="STARGIRLS Home">STARGIRLS</a>
 
-    <nav class="desktop-nav">
-      <div class="nav-item">
-        <a href="music.html">Music</a>
-        <div class="nav-dropdown">
-          <a href="music.html">Music Home</a>
-          <a href="anew.html">ANEW</a>
-        </div>
-      </div>
+  <nav class="desktop-nav">
+  <div class="nav-item">
+    <button class="nav-button" data-menu="music">Music</button>
+  </div>
 
-      <div class="nav-item">
-        <a href="maison.html">Maison</a>
-        <div class="nav-dropdown">
-          <a href="maison.html">Maison Home</a>
-          <a href="maison.html">Launching Soon</a>
-        </div>
-      </div>
+  <div class="nav-item">
+    <button class="nav-button" data-menu="maison">Maison</button>
+  </div>
 
-      <div class="nav-item">
-        <a href="about.html">About</a>
-        <div class="nav-dropdown">
-          <a href="about.html">About STARGIRLS</a>
-          <a href="founders.html">The Founders</a>
-        </div>
+  <div class="nav-item">
+    <button class="nav-button" data-menu="about">About</button>
+  </div>
+</nav>
+
+<div class="desktop-menu-panel" id="music-panel">
+  <a href="music.html">Music Home</a>
+  <a href="anew.html">ANEW</a>
+</div>
+
+<div class="desktop-menu-panel" id="maison-panel">
+  <a href="maison.html">Maison Home</a>
+  <a href="maison.html">Launching Soon</a>
+</div>
+
+<div class="desktop-menu-panel" id="about-panel">
+  <a href="about.html">About STARGIRLS</a>
+  <a href="founders.html">The Founders</a>
+</div>
       </div>
     </nav>
   </header>
