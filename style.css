@@ -1,4 +1,4 @@
-Replace your full `style.css` with this fixed version:
+
 
 ```css
 :root {
@@ -686,3 +686,82 @@ footer div {
   }
 }
 ```
+.nav-button {
+  background: none;
+  border: 0;
+  font: inherit;
+  text-transform: uppercase;
+  letter-spacing: inherit;
+  cursor: pointer;
+  opacity: 0.78;
+}
+
+.nav-button.active,
+.nav-button:hover {
+  opacity: 1;
+}
+
+.mega-menu {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 100%;
+  width: 100%;
+  background: #fff;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 46px 10vw 60px;
+  z-index: 1500;
+  text-align: left;
+}
+
+.mega-menu.active {
+  display: block;
+}
+
+.mega-close {
+  position: absolute;
+  right: 42px;
+  top: 28px;
+  background: none;
+  border: 0;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.mega-panel {
+  display: none;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.mega-panel.active {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 70px;
+}
+
+.mega-panel h4 {
+  margin: 0 0 24px;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.mega-panel a {
+  display: block;
+  margin-bottom: 18px;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  color: #555;
+}
+
+.mega-panel a:hover {
+  color: #000;
+}
+
+@media (max-width: 800px) {
+  .mega-menu {
+    display: none !important;
+  }
+}
