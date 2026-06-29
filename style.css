@@ -765,3 +765,114 @@ footer div {
     display: none !important;
   }
 }
+/* FINAL NAV FIX */
+
+.nav-button {
+  background: transparent !important;
+  border: 0 !important;
+  outline: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  color: #000 !important;
+  font: inherit !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.18em !important;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  opacity: 0.75;
+}
+
+.nav-button:hover,
+.nav-button.active {
+  opacity: 1;
+}
+
+.mega-menu {
+  display: none !important;
+  position: absolute;
+  left: 0;
+  top: 100%;
+  width: 100%;
+  background: #fff;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 48px 8vw 58px;
+  z-index: 1500;
+  text-align: left;
+  box-shadow: 0 22px 45px rgba(0, 0, 0, 0.06);
+}
+
+.mega-menu.active {
+  display: block !important;
+}
+
+.mega-close {
+  position: absolute;
+  right: 42px;
+  top: 26px;
+  background: transparent !important;
+  border: 0 !important;
+  color: #000;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mega-panel {
+  display: none !important;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.mega-panel.active {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 72px;
+}
+
+.mega-panel h4 {
+  margin: 0 0 22px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.mega-panel a {
+  display: block;
+  margin-bottom: 16px;
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  color: #555;
+  text-transform: none;
+}
+
+.mega-panel a:hover {
+  color: #000;
+}
+
+.menu-toggle span {
+  display: block !important;
+  width: 22px;
+  height: 2px;
+  background: #000 !important;
+  border-radius: 2px;
+}
+
+@media (max-width: 800px) {
+  .mega-menu {
+    display: none !important;
+  }
+
+  .desktop-nav {
+    display: none !important;
+  }
+
+  .menu-toggle span {
+    background: #000 !important;
+  }
+}
