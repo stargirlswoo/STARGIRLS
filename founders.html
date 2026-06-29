@@ -4,32 +4,97 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>SUN & MOON | STARGIRLS</title>
-  <meta name="description" content="Sun and Moon. The story of STARGIRLS." />
+  <title>The Founders | STARGIRLS</title>
+  <meta name="description" content="The founders of STARGIRLS." />
 
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
   <header class="site-header">
-    <a class="logo" href="index.html">STARGIRLS</a>
+    <button class="menu-toggle" aria-label="Open menu" aria-expanded="false">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
 
-    <nav>
-      <a href="index.html#music">Music</a>
-      <a href="index.html#film">Film</a>
-      <a href="index.html#maison">Maison</a>
-      <a href="index.html#archive">Archive</a>
-      <a href="sun-and-moon.html">About</a>
+    <a class="logo" href="index.html" aria-label="STARGIRLS Home">STARGIRLS</a>
+
+    <nav class="desktop-nav">
+      <button class="nav-button" data-panel="music">Music</button>
+      <button class="nav-button" data-panel="fragrance">Fragrance</button>
+      <button class="nav-button" data-panel="about">About</button>
     </nav>
+
+    <div class="mega-menu" id="megaMenu">
+      <button class="mega-close" aria-label="Close menu">×</button>
+
+      <div class="mega-panel" id="music-panel">
+        <div>
+          <h4>Music</h4>
+          <a href="music.html">Music Home</a>
+          <a href="anew.html">ANEW</a>
+        </div>
+      </div>
+
+      <div class="mega-panel" id="fragrance-panel">
+        <div>
+          <h4>Fragrance</h4>
+          <a href="fragrance.html">Fragrance Home</a>
+          <a href="fragrance.html#sun">SUN</a>
+          <a href="fragrance.html#moon">MOON</a>
+        </div>
+      </div>
+
+      <div class="mega-panel" id="about-panel">
+        <div>
+          <h4>About</h4>
+          <a href="about.html">About STARGIRLS</a>
+          <a href="founders.html">The Founders</a>
+        </div>
+      </div>
+    </div>
   </header>
+
+  <aside class="mobile-menu" id="mobileMenu">
+    <div class="mobile-menu-top">
+      <button class="menu-back" aria-label="Back">‹</button>
+      <p id="mobileMenuTitle">STARGIRLS</p>
+      <button class="menu-close" aria-label="Close menu">×</button>
+    </div>
+
+    <nav class="mobile-nav mobile-panel active" id="mobile-main">
+      <a href="#" data-mobile-panel="music">Music <span>›</span></a>
+      <a href="#" data-mobile-panel="fragrance">Fragrance <span>›</span></a>
+      <a href="#" data-mobile-panel="about">About <span>›</span></a>
+    </nav>
+
+    <nav class="mobile-nav mobile-panel" id="mobile-music">
+      <a href="music.html">Music Home</a>
+      <a href="anew.html">ANEW</a>
+    </nav>
+
+    <nav class="mobile-nav mobile-panel" id="mobile-fragrance">
+      <a href="fragrance.html">Fragrance Home</a>
+      <a href="fragrance.html#sun">SUN</a>
+      <a href="fragrance.html#moon">MOON</a>
+    </nav>
+
+    <nav class="mobile-nav mobile-panel" id="mobile-about">
+      <a href="about.html">About STARGIRLS</a>
+      <a href="founders.html">The Founders</a>
+    </nav>
+  </aside>
+
+  <div class="menu-overlay"></div>
 
   <main class="story-page">
 
-    <section class="story-hero">
-      <p class="eyebrow">The Founders</p>
-      <h1>SUN & MOON</h1>
+    <section class="story-hero" id="founders">
+      <p class="eyebrow">About</p>
+      <h1>THE FOUNDERS</h1>
       <p class="story-quote">
-        “Every House begins with a story. Ours began long before it had a name.”
+        Sun and Moon, sisters and creative directors of STARGIRLS.
       </p>
     </section>
 
@@ -40,168 +105,97 @@
 
     <section class="story-intro">
       <p>
-        Sun and Moon grew up between New York, New Jersey and Florida. Their childhood
-        was marked by frequent change, music, and the search for stability. They
-        performed together from an early age, first as members of a family band and
-        later through work they pursued independently.
+        STARGIRLS was founded by two sisters whose creative instincts developed side by side, but never in the same way. One moved first through emotion. The other moved first through observation. Their difference became the foundation of the work.
       </p>
 
       <p>
-        Although raised under the same roof, the sisters rarely experienced the world in
-        the same way. Sun responded instinctively, guided by feeling and imagination.
-        Moon questioned everything, preferring observation before conclusion. What
-        appeared to be opposition would eventually become the foundation of their
-        creative partnership.
-      </p>
-
-      <p>
-        STARGIRLS was founded on the belief that creation should not be divided into
-        disciplines. Music, fragrance, beauty, film and objects would each belong to
-        the same universe and speak the same language.
+        Sun and Moon began creating together before they had a name for what they were building. Music, image, performance, beauty and atmosphere were never separate interests. They were fragments of the same language.
       </p>
     </section>
 
     <section class="story-chapter">
-      <h2>DEVOTED</h2>
-      <figure>
-        <img src="images/sun-and-moon/beginning.jpg" alt="Sun and Moon as children">
-        <figcaption>Sun and Moon, childhood archive</figcaption>
-      </figure>
-
-      <p>
-        Music entered their lives before either sister imagined it could become a
-        profession. Childhood performances, rehearsals and recording sessions formed
-        part of daily life. Performing was never approached as spectacle, but as routine.
-      </p>
-
-      <p>
-        As they grew older, music remained the constant element through changing homes,
-        schools and cities. What began as childhood participation gradually became
-        deliberate practice.
-      </p>
-
-      <blockquote>
-        “We never learned how to separate life from creation.”
-      </blockquote>
-    </section>
-
-    <section class="story-chapter">
-      <h2>DISTINCT</h2>
-      <figure>
-        <img src="images/sun-and-moon/two-sisters.jpg" alt="Sun and Moon together">
-        <figcaption>Sun and Moon, New York</figcaption>
-      </figure>
-
-      <p>
-        The sisters did not always understand one another. Sun trusted intuition. Moon
-        trusted analysis. One searched for feeling before certainty. The other searched
-        for certainty before feeling.
-      </p>
-
-      <p>
-        What once appeared to create disagreement gradually revealed itself as complement.
-        Rather than attempting to think alike, they learned to preserve the difference
-        between them.
-      </p>
-
-      <p>
-        That distinction continues to define every decision made within the House.
-      </p>
-    </section>
-
-    <section class="story-chapter">
-      <h2>INDEPENDENT</h2>
-      <figure>
-        <img src="images/sun-and-moon/leaving.jpg" alt="Sun and Moon in New York">
-        <figcaption>Sun and Moon, New York</figcaption>
-      </figure>
-
-      <p>
-        There came a point when Sun and Moon decided to rely upon their own work rather
-        than wait for opportunity.
-      </p>
-
-      <p>
-        They learned production, photography, editing, recording, design and creative
-        direction themselves, investing in their own equipment before expanding their
-        projects. Building slowly became preferable to building quickly.
-      </p>
-
-      <p>
-        The House developed through discipline as much as imagination.
-      </p>
-    </section>
-
-    <section class="story-chapter">
-      <h2>OBSERVANT</h2>
-      <figure>
-        <img src="images/sun-and-moon/moon.jpg" alt="Moon">
-        <figcaption>Moon, New York, 2026</figcaption>
-      </figure>
-
-      <p>
-        Moon approaches creation through observation. Ideas are examined before they are
-        accepted. Every detail must justify its existence. Structure is not regarded as
-        limitation, but as clarity.
-      </p>
-
-      <p>
-        Her interest extends beyond music into systems, design and the architecture of a
-        brand. She believes coherence gives objects permanence.
-      </p>
-    </section>
-
-    <section class="story-chapter">
-      <h2>INSTINCTIVE</h2>
+      <h2>SUN</h2>
       <figure>
         <img src="images/sun-and-moon/sun.jpg" alt="Sun">
         <figcaption>Sun, New York, 2026</figcaption>
       </figure>
 
       <p>
-        Sun creates through feeling. Emotion precedes explanation. She approaches music,
-        image and performance through instinct rather than calculation.
+        Sun creates through instinct. Her work begins with feeling before explanation, with atmosphere before structure. She is drawn to memory, intimacy, performance and the emotional charge of a moment.
       </p>
 
       <p>
-        Memory, intimacy and atmosphere remain recurring themes throughout her work. Her
-        belief that beauty should first be experienced before it is understood continues
-        to influence the identity of the House.
+        Her presence brings warmth, movement and immediacy to STARGIRLS. She is the impulse, the voice, the first spark of sensation.
       </p>
+
+      <blockquote>
+        “Beauty should be felt before it is understood.”
+      </blockquote>
     </section>
 
     <section class="story-chapter">
-      <h2>THE HOUSE</h2>
+      <h2>MOON</h2>
       <figure>
-        <img src="images/sun-and-moon/house.jpg" alt="STARGIRLS">
-        <figcaption>STARGIRLS, 2026</figcaption>
+        <img src="images/sun-and-moon/moon.jpg" alt="Moon">
+        <figcaption>Moon, New York, 2026</figcaption>
       </figure>
 
       <p>
-        STARGIRLS was never conceived solely as a musical project.
+        Moon creates through observation. Every detail is considered, questioned and placed with intention. For her, structure is not restriction; it is what allows a world to become permanent.
       </p>
 
       <p>
-        From its beginning, it was imagined as a House where music, fragrance, beauty,
-        moving image and objects would be developed according to a shared philosophy.
+        Her work gives STARGIRLS its architecture. She is the editor, the strategist, the eye that searches for coherence.
+      </p>
+
+      <blockquote>
+        “Every object should have a reason to exist.”
+      </blockquote>
+    </section>
+
+    <section class="story-chapter">
+      <h2>DUALITY</h2>
+      <figure>
+        <img src="images/sun-and-moon/two-sisters.jpg" alt="Sun and Moon together">
+        <figcaption>Sun and Moon, New York</figcaption>
+      </figure>
+
+      <p>
+        The dialogue between Sun and Moon defines the identity of STARGIRLS. Their contrast is not softened or hidden. It is preserved.
       </p>
 
       <p>
-        Rather than existing as separate ventures, each discipline contributes to a
-        single creative language. The House continues to evolve, while remaining faithful
-        to the principles upon which it was founded.
+        Feeling and analysis. Instinct and construction. Performance and restraint. Together, these opposing forces create the visual and musical language of the project.
+      </p>
+
+      <blockquote>
+        “We do not create from sameness. We create from contrast.”
+      </blockquote>
+    </section>
+
+    <section class="story-chapter">
+      <h2>BEGINNING</h2>
+      <figure>
+        <img src="images/sun-and-moon/beginning.jpg" alt="Sun and Moon as children">
+        <figcaption>Childhood archive</figcaption>
+      </figure>
+
+      <p>
+        Their creative history began in childhood, through performance, rehearsal, recording and constant movement between cities. Music was present before it became a profession.
+      </p>
+
+      <p>
+        What began as habit became discipline. What began as expression became a shared direction.
       </p>
     </section>
 
     <section class="story-chapter principles">
       <h2>IN THEIR WORDS</h2>
 
-      <blockquote>“Beauty is everlasting.”</blockquote>
-      <blockquote>“Success is built.”</blockquote>
       <blockquote>“Creation begins with intention.”</blockquote>
-      <blockquote>“Freedom begins within.”</blockquote>
+      <blockquote>“Success is built.”</blockquote>
       <blockquote>“Nothing replaces craftsmanship.”</blockquote>
-      <blockquote>“Every object should have a reason to exist.”</blockquote>
+      <blockquote>“Beauty is everlasting.”</blockquote>
     </section>
 
   </main>
@@ -215,5 +209,7 @@
       <a href="https://www.tiktok.com/@stargirlswoo" target="_blank" rel="noopener">TikTok</a>
     </div>
   </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>
