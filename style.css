@@ -778,3 +778,12 @@ footer div {
   background: #fff;
   color: #000;
 }
+/* MUSIC LANDING FIX */
+
+.music-landing {
+  background: #000;
+}
+
+.music-landing .visual-feature {
+  min-height: 88vh;
+  background-size
