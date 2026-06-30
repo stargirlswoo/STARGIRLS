@@ -786,4 +786,57 @@ footer div {
 
 .music-landing .visual-feature {
   min-height: 88vh;
-  background-size
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  text-align: center;
+  padding: 90px 24px;
+  color: #fff;
+  overflow: hidden;
+}
+
+.music-landing .visual-feature::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.music-landing .visual-content {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+}
+
+.music-landing .visual-content h1,
+.music-landing .visual-content h2,
+.music-landing .visual-content .eyebrow {
+  color: #fff;
+}
+
+.music-landing .text-link.light {
+  border-color: #fff;
+  color: #fff;
+}
+
+.music-landing .text-link.light:hover {
+  background: #fff;
+  color: #000;
+}
+
+@media (max-width: 800px) {
+  .music-landing .visual-feature {
+    min-height: 78vh;
+    padding: 110px 22px 70px;
+  }
+
+  .music-landing .visual-content h1,
+  .music-landing .visual-content h2 {
+    font-size: clamp(54px, 16vw, 92px);
+    letter-spacing: 0.12em;
+    line-height: 0.9;
+  }
+}
