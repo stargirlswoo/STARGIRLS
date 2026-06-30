@@ -897,9 +897,9 @@ footer div {
   inset: 0;
   background-image: url("images/anew/campaign.jpg");
   background-repeat: no-repeat;
-  background-position: center;
-  background-size: 55%;
-  opacity: 0.08;
+  background-position: center 57%;
+  background-size: 72%;
+  opacity: 0.055;
   z-index: 1;
   pointer-events: none;
 }
