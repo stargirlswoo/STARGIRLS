@@ -734,3 +734,47 @@ footer div {
     justify-content: flex-start !important;
   }
 }
+.music-landing {
+  background: #000;
+}
+
+.visual-feature {
+  min-height: 88vh;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  text-align: center;
+  padding: 90px 24px;
+  color: #fff;
+}
+
+.visual-feature::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.visual-content {
+  position: relative;
+  z-index: 1;
+}
+
+.visual-content h1,
+.visual-content h2,
+.visual-content .eyebrow {
+  color: #fff;
+}
+
+.text-link.light {
+  border-color: #fff;
+  color: #fff;
+}
+
+.text-link.light:hover {
+  background: #fff;
+  color: #000;
+}
