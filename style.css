@@ -840,44 +840,41 @@ footer div {
     line-height: 0.9;
   }
 }
-.home-feature {
-  position: relative;
-  overflow: hidden;
+.home-feature{
+    position:relative;
+    min-height:520px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
 }
 
-.home-feature > * {
-  position: relative;
-  z-index: 2;
+.home-music{
+    background-image:
+        linear-gradient(rgba(255,255,255,.72),rgba(255,255,255,.72)),
+        url("images/anew/campaign.jpg");
 }
 
-.home-music {
-  background:
-    linear-gradient(rgba(255,255,255,.82), rgba(255,255,255,.82)),
-    url("images/stargirls-symbol.png") center center / 58% no-repeat;
+.home-fragrance{
+    background:#f4f1ec;
 }
 
-.home-fragrance {
-  background: #f4f1ec;
-}
-
-.home-founders {
-  background:
-    linear-gradient(rgba(0,0,0,.38), rgba(0,0,0,.38)),
-    url("images/founders/house.jpg") center center / cover no-repeat;
-  color: #fff;
+.home-founders{
+    background-image:
+        linear-gradient(rgba(0,0,0,.38),rgba(0,0,0,.38)),
+        url("images/founders/house.jpg");
 }
 
 .home-founders .eyebrow,
 .home-founders h2,
-.home-founders .text-link {
-  color: #fff;
+.home-founders .text-link{
+    color:#fff;
 }
 
-.home-founders .text-link {
-  border-color: #fff;
-}
-
-.home-founders .text-link:hover {
-  background: #fff;
-  color: #000;
+.home-founders .text-link{
+    border-color:#fff;
 }
