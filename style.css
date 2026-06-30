@@ -878,3 +878,60 @@ footer div {
 .home-founders .text-link{
     border-color:#fff;
 }
+/* HOMEPAGE BACKGROUND SECTIONS */
+
+.home-feature {
+  position: relative;
+  overflow: hidden;
+}
+
+.home-feature > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Music symbol watermark */
+.home-music::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("images/anew/campaign.jpg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 55%;
+  opacity: 0.08;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.home-music {
+  background: #fff;
+}
+
+/* Fragrance soft background */
+.home-fragrance {
+  background: #eee7dc;
+}
+
+/* Founders photo background */
+.home-founders {
+  background:
+    linear-gradient(rgba(0,0,0,.38), rgba(0,0,0,.38)),
+    url("images/founders/house.jpg") center center / cover no-repeat;
+  color: #fff;
+}
+
+.home-founders .eyebrow,
+.home-founders h2,
+.home-founders .text-link {
+  color: #fff;
+}
+
+.home-founders .text-link {
+  border-color: #fff;
+}
+
+.home-founders .text-link:hover {
+  background: #fff;
+  color: #000;
+}
