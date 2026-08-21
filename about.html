@@ -4,146 +4,407 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>MAISON STARGIRLS — STARGIRLS</title>
-  <meta name="description" content="MAISON STARGIRLS. Music, beauty, fragrance and objects." />
+  <title>About — STARGIRLS</title>
+  <meta
+    name="description"
+    content="Get to know STARGIRLS, the music, the girls, and the world we're creating together."
+  />
 
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
+
+  <!-- HEADER -->
   <header class="site-header">
-    <button class="menu-toggle" aria-label="Open menu" aria-expanded="false">
+
+    <a class="logo" href="index.html" aria-label="STARGIRLS Home">
+      STARGIRLS
+    </a>
+
+    <nav class="desktop-nav">
+      <a href="music.html">MUSIC</a>
+      <a href="videos.html">VIDEOS</a>
+      <a href="shop.html">SHOP</a>
+      <a href="world.html">OUR WORLD</a>
+      <a href="signup.html">JOIN</a>
+    </nav>
+
+    <button
+      class="menu-toggle"
+      aria-label="Open menu"
+      aria-expanded="false"
+    >
       <span></span>
       <span></span>
       <span></span>
     </button>
 
-    <a class="logo" href="index.html" aria-label="STARGIRLS Home">STARGIRLS</a>
-
-    <nav class="desktop-nav">
-      <button class="nav-button" data-panel="music">Music</button>
-      <button class="nav-button" data-panel="fragrance">Fragrance</button>
-      <button class="nav-button" data-panel="about">About</button>
-    </nav>
-
-    <div class="mega-menu" id="megaMenu">
-      <button class="mega-close" aria-label="Close menu">×</button>
-
-      <div class="mega-panel" id="music-panel">
-        <div>
-          <h4>Music</h4>
-          <a href="music.html">Music Home</a>
-          <a href="anew.html">ANEW</a>
-        </div>
-      </div>
-
-      <div class="mega-panel" id="fragrance-panel">
-        <div>
-          <h4>Fragrance</h4>
-          <a href="fragrance.html">Fragrance Home</a>
-          <a href="fragrance.html#sun">SUN</a>
-          <a href="fragrance.html#moon">MOON</a>
-        </div>
-      </div>
-
-      <div class="mega-panel" id="about-panel">
-        <div>
-          <h4>About</h4>
-          <a href="about.html">MAISON STARGIRLS</a>
-          <a href="founders.html">The Founders</a>
-        </div>
-      </div>
-    </div>
   </header>
 
+
+  <!-- MOBILE MENU -->
   <aside class="mobile-menu" id="mobileMenu">
+
     <div class="mobile-menu-top">
-      <button class="menu-back" aria-label="Back">‹</button>
-      <p id="mobileMenuTitle">STARGIRLS</p>
-      <button class="menu-close" aria-label="Close menu">×</button>
+      <a class="mobile-logo" href="index.html">
+        STARGIRLS
+      </a>
+
+      <button class="menu-close" aria-label="Close menu">
+        ×
+      </button>
     </div>
 
-    <nav class="mobile-nav mobile-panel active" id="mobile-main">
-      <a href="#" data-mobile-panel="music">Music <span>›</span></a>
-      <a href="#" data-mobile-panel="fragrance">Fragrance <span>›</span></a>
-      <a href="#" data-mobile-panel="about">About <span>›</span></a>
+    <nav class="mobile-nav">
+      <a href="music.html">MUSIC</a>
+      <a href="videos.html">VIDEOS</a>
+      <a href="shop.html">SHOP</a>
+      <a href="world.html">OUR WORLD</a>
+      <a href="signup.html">JOIN</a>
     </nav>
 
-    <nav class="mobile-nav mobile-panel" id="mobile-music">
-      <a href="music.html">Music Home</a>
-      <a href="anew.html">ANEW</a>
-    </nav>
+    <div class="mobile-socials">
+      <a href="https://instagram.com/maisonstargirls" target="_blank" rel="noopener">
+        INSTAGRAM
+      </a>
 
-    <nav class="mobile-nav mobile-panel" id="mobile-fragrance">
-      <a href="fragrance.html">Fragrance Home</a>
-      <a href="fragrance.html#sun">SUN</a>
-      <a href="fragrance.html#moon">MOON</a>
-    </nav>
+      <a href="https://tiktok.com/@maisonstargirls" target="_blank" rel="noopener">
+        TIKTOK
+      </a>
 
-    <nav class="mobile-nav mobile-panel" id="mobile-about">
-      <a href="about.html">MAISON STARGIRLS</a>
-      <a href="founders.html">The Founders</a>
-    </nav>
+      <a href="https://www.youtube.com/@maisonstargirls" target="_blank" rel="noopener">
+        YOUTUBE
+      </a>
+
+      <a href="https://facebook.com/maisonstargirls" target="_blank" rel="noopener">
+        FACEBOOK
+      </a>
+    </div>
+
   </aside>
 
   <div class="menu-overlay"></div>
 
-  <main class="home-page">
-    <section class="home-feature">
-      <p class="eyebrow">About the House</p>
-      <h1>MAISON<br>STARGIRLS</h1>
-      <p style="max-width:620px; color:#767676; font-size:15px; line-height:1.8; margin:0 auto;">
-        Music. Beauty. Fragrance. Objects.
+
+  <main class="about-page">
+
+    <!-- HERO -->
+    <section class="about-hero">
+
+      <!--
+        Put a REAL photo of the two of you here.
+        Preferably something beautiful but not too posed:
+        laughing, getting ready, sitting together, studio,
+        backstage, traveling, etc.
+      -->
+
+      <div class="about-hero-copy">
+        <p class="eyebrow">HI :)</p>
+
+        <h1>WE'RE<br>STARGIRLS</h1>
+
+        <p class="about-hero-note">
+          just two girls who love making music together ☾ ☀︎ 💗
+        </p>
+      </div>
+
+    </section>
+
+
+    <!-- INTRO -->
+    <section class="about-intro">
+
+      <div class="about-intro-inner">
+
+        <p class="eyebrow">OUR STORY</p>
+
+        <h2>
+          SUN + MOON
+        </h2>
+
+        <div class="about-copy">
+
+          <p>
+            STARGIRLS is the world we've been creating together through
+            music, visuals, clothes, beauty, late nights, random ideas
+            and everything in between.
+          </p>
+
+          <p>
+            We don't really like putting ourselves into one box.
+            Sometimes we're making music. Sometimes we're getting ready
+            together. Sometimes we're traveling, streaming, filming
+            something, or just turning the camera on and letting you
+            come along with us.
+          </p>
+
+          <p>
+            That's really what STARGIRLS is to us — our little universe,
+            and now you get to be a part of it too.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- PERSONAL PHOTO BREAK -->
+    <section class="about-photo-break">
+
+      <!--
+        Use a candid horizontal photo here.
+        This should NOT look like an ad campaign.
+      -->
+
+    </section>
+
+
+    <!-- SUN + MOON -->
+    <section class="about-us">
+
+      <div class="section-heading">
+        <p class="eyebrow">THE GIRLS</p>
+        <h2>SUN + MOON</h2>
+      </div>
+
+      <div class="girl-grid">
+
+        <article class="girl-card">
+
+          <!-- REAL SUN PHOTO -->
+          <div class="girl-image sun-about-image"></div>
+
+          <div class="girl-copy">
+            <p class="girl-symbol">☀︎</p>
+            <h3>SUN</h3>
+          </div>
+
+        </article>
+
+
+        <article class="girl-card">
+
+          <!-- REAL MOON PHOTO -->
+          <div class="girl-image moon-about-image"></div>
+
+          <div class="girl-copy">
+            <p class="girl-symbol">☾</p>
+            <h3>MOON</h3>
+          </div>
+
+        </article>
+
+      </div>
+
+      <p class="together-note">
+        different in almost every way.<br>
+        somehow it works.
       </p>
+
     </section>
 
-    <section class="home-feature">
-      <p class="eyebrow">Collections</p>
-      <h2>WORLDS</h2>
-      <p style="max-width:620px; color:#767676; font-size:15px; line-height:1.8; margin:0 auto;">
-        Each era extends beyond sound.
+
+    <!-- MUSIC STORY -->
+    <section class="about-music">
+
+      <div class="about-music-copy">
+
+        <p class="eyebrow">THE MUSIC</p>
+
+        <h2>ANEW</h2>
+
+        <p>
+          This is where our story begins.
+        </p>
+
+        <p>
+          SIREN. RISEN. STARGIRLS.
+        </p>
+
+        <p>
+          Three videos. Two worlds. And eventually, one.
+        </p>
+
+        <a href="anew.html" class="section-link">
+          ENTER ANEW
+        </a>
+
+      </div>
+
+    </section>
+
+
+    <!-- CAMERA ROLL / PERSONAL -->
+    <section class="about-camera-roll">
+
+      <div class="section-heading">
+        <p class="eyebrow">LIFE LATELY</p>
+        <h2>WITH US</h2>
+      </div>
+
+      <div class="camera-grid">
+
+        <div class="camera-photo camera-photo-1"></div>
+        <div class="camera-photo camera-photo-2"></div>
+        <div class="camera-photo camera-photo-3"></div>
+        <div class="camera-photo camera-photo-4"></div>
+        <div class="camera-photo camera-photo-5"></div>
+        <div class="camera-photo camera-photo-6"></div>
+
+      </div>
+
+      <a href="world.html" class="section-link">
+        MORE FROM OUR WORLD
+      </a>
+
+    </section>
+
+
+    <!-- LITTLE NOTE -->
+    <section class="about-note">
+
+      <div class="note-inner">
+
+        <p class="symbols">☾ ★ ☀︎</p>
+
+        <p class="note-copy">
+          whether you found us through a song, a video,
+          a random stream or somewhere in between —
+          we're happy you're here.
+        </p>
+
+        <p class="note-signature">
+          love,<br>
+          STARGIRLS ♡
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- FOLLOW -->
+    <section class="about-follow">
+
+      <p class="eyebrow">COME HANG OUT</p>
+
+      <h2>FOLLOW STARGIRLS</h2>
+
+      <div class="about-social-links">
+
+        <a
+          href="https://instagram.com/maisonstargirls"
+          target="_blank"
+          rel="noopener"
+        >
+          INSTAGRAM
+        </a>
+
+        <a
+          href="https://tiktok.com/@maisonstargirls"
+          target="_blank"
+          rel="noopener"
+        >
+          TIKTOK
+        </a>
+
+        <a
+          href="https://www.youtube.com/@maisonstargirls"
+          target="_blank"
+          rel="noopener"
+        >
+          YOUTUBE
+        </a>
+
+        <a
+          href="https://facebook.com/maisonstargirls"
+          target="_blank"
+          rel="noopener"
+        >
+          FACEBOOK
+        </a>
+
+      </div>
+
+    </section>
+
+
+    <!-- JOIN -->
+    <section class="home-join">
+
+      <h2>STAY CLOSE ♡</h2>
+
+      <p>
+        Sign up for music, videos and little updates from us.
       </p>
+
+      <form class="signup-form">
+
+        <label for="email" class="sr-only">
+          Email Address
+        </label>
+
+        <input
+          id="email"
+          name="email"
+          type="email"
+          placeholder="EMAIL ADDRESS"
+          required
+        />
+
+        <button type="submit">
+          SIGN UP
+        </button>
+
+      </form>
+
     </section>
 
-    <section class="home-feature">
-      <p class="eyebrow">Beauty</p>
-      <h2>COLOR</h2>
-      <p style="max-width:620px; color:#767676; font-size:15px; line-height:1.8; margin:0 auto;">
-        Texture. Ritual. Light.
-      </p>
-    </section>
-
-    <section class="home-feature">
-      <p class="eyebrow">Fragrance</p>
-      <h2>SCENT</h2>
-      <p style="max-width:620px; color:#767676; font-size:15px; line-height:1.8; margin:0 auto;">
-        Memory preserved through atmosphere.
-      </p>
-    </section>
-
-    <section class="home-feature">
-      <p class="eyebrow">Era I</p>
-      <h2>ANEW</h2>
-      <a class="text-link" href="anew.html">Discover</a>
-    </section>
-
-    <section class="home-feature" id="founders">
-      <p class="eyebrow">The Founders</p>
-      <h2>SUN & MOON</h2>
-      <a class="text-link" href="founders.html">Discover</a>
-    </section>
   </main>
 
-  <footer>
-    <p>© 2026 STARGIRLS</p>
 
-    <div>
-      <a href="https://www.instagram.com/maisonstargirls/" target="_blank" rel="noopener">Instagram</a>
-      <a href="https://www.youtube.com/@maisonstargirls" target="_blank" rel="noopener">YouTube</a>
-      <a href="https://www.tiktok.com/@maisonstargirls" target="_blank" rel="noopener">TikTok</a>
+  <!-- FOOTER -->
+  <footer class="site-footer">
+
+    <a href="index.html" class="footer-logo">
+      STARGIRLS
+    </a>
+
+    <div class="footer-socials">
+
+      <a href="https://instagram.com/maisonstargirls" target="_blank" rel="noopener">
+        INSTAGRAM
+      </a>
+
+      <a href="https://tiktok.com/@maisonstargirls" target="_blank" rel="noopener">
+        TIKTOK
+      </a>
+
+      <a href="https://www.youtube.com/@maisonstargirls" target="_blank" rel="noopener">
+        YOUTUBE
+      </a>
+
+      <a href="https://facebook.com/maisonstargirls" target="_blank" rel="noopener">
+        FACEBOOK
+      </a>
+
     </div>
+
+    <div class="footer-legal">
+      <a href="privacy.html">PRIVACY</a>
+      <a href="terms.html">TERMS</a>
+    </div>
+
+    <p class="copyright">
+      © 2026 STARGIRLS
+    </p>
+
   </footer>
 
   <script src="script.js"></script>
+
 </body>
 </html>
