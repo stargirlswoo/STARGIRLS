@@ -1,114 +1,97 @@
 const menuToggle = document.querySelector(".menu-toggle");
 const mobileMenu = document.querySelector(".mobile-menu");
 const menuClose = document.querySelector(".menu-close");
-const menuBack = document.querySelector(".menu-back");
 const menuOverlay = document.querySelector(".menu-overlay");
+const mobileLinks = document.querySelectorAll(".mobile-nav a");
 
-const navButtons = document.querySelectorAll(".nav-button");
-const megaMenu = document.querySelector("#megaMenu");
-const megaClose = document.querySelector(".mega-close");
-const megaPanels = document.querySelectorAll(".mega-panel");
-
-const mobileTitle = document.querySelector("#mobileMenuTitle");
-const mobilePanels = document.querySelectorAll(".mobile-panel");
-const mobileMainPanel = document.querySelector("#mobile-main");
-const mobilePanelTriggers = document.querySelectorAll("[data-mobile-panel]");
-
-let currentPanel = null;
-
+/* OPEN MOBILE MENU */
 function openMenu() {
+  if (!mobileMenu) return;
+
   mobileMenu.classList.add("active");
-  menuOverlay.classList.add("active");
+
+  if (menuOverlay) {
+    menuOverlay.classList.add("active");
+  }
+
   document.body.classList.add("menu-open");
-  menuToggle.setAttribute("aria-expanded", "true");
-  showMobilePanel("main");
-}
 
-function closeMenu() {
-  mobileMenu.classList.remove("active");
-  menuOverlay.classList.remove("active");
-  document.body.classList.remove("menu-open");
-  menuToggle.setAttribute("aria-expanded", "false");
-  showMobilePanel("main");
-}
-
-function showMobilePanel(panelName) {
-  mobilePanels.forEach(panel => panel.classList.remove("active"));
-
-  const nextPanel =
-    panelName === "main"
-      ? mobileMainPanel
-      : document.querySelector(`#mobile-${panelName}`);
-
-  if (nextPanel) nextPanel.classList.add("active");
-
-  if (panelName === "main") {
-    mobileMenu.classList.remove("submenu-open");
-    mobileTitle.textContent = "STARGIRLS";
-  } else {
-    mobileMenu.classList.add("submenu-open");
-    mobileTitle.textContent = panelName.toUpperCase();
+  if (menuToggle) {
+    menuToggle.setAttribute("aria-expanded", "true");
   }
 }
 
-function openMega(panelName) {
-  if (!megaMenu) return;
 
-  megaMenu.classList.add("active");
+/* CLOSE MOBILE MENU */
+function closeMenu() {
+  if (!mobileMenu) return;
 
-  navButtons.forEach(button => {
-    button.classList.toggle("active", button.dataset.panel === panelName);
-  });
+  mobileMenu.classList.remove("active");
 
-  megaPanels.forEach(panel => {
-    panel.classList.toggle("active", panel.id === `${panelName}-panel`);
-  });
+  if (menuOverlay) {
+    menuOverlay.classList.remove("active");
+  }
+
+  document.body.classList.remove("menu-open");
+
+  if (menuToggle) {
+    menuToggle.setAttribute("aria-expanded", "false");
+  }
 }
 
-function closeMega() {
-  if (!megaMenu) return;
 
-  megaMenu.classList.remove("active");
-  navButtons.forEach(button => button.classList.remove("active"));
-  megaPanels.forEach(panel => panel.classList.remove("active"));
-  currentPanel = null;
-}
-
-if (menuToggle && mobileMenu && menuClose && menuBack && menuOverlay) {
+/* MENU BUTTON */
+if (menuToggle) {
   menuToggle.addEventListener("click", openMenu);
+}
+
+
+/* CLOSE BUTTON */
+if (menuClose) {
   menuClose.addEventListener("click", closeMenu);
-  menuBack.addEventListener("click", () => showMobilePanel("main"));
+}
+
+
+/* CLICK OUTSIDE MENU */
+if (menuOverlay) {
   menuOverlay.addEventListener("click", closeMenu);
 }
 
-mobilePanelTriggers.forEach(trigger => {
-  trigger.addEventListener("click", event => {
-    event.preventDefault();
-    showMobilePanel(trigger.dataset.mobilePanel);
-  });
+
+/* CLOSE MENU AFTER SELECTING A PAGE */
+mobileLinks.forEach(link => {
+  link.addEventListener("click", closeMenu);
 });
 
-navButtons.forEach(button => {
-  button.addEventListener("click", () => {
-    const panel = button.dataset.panel;
 
-    if (currentPanel === panel && megaMenu.classList.contains("active")) {
-      closeMega();
-      return;
-    }
-
-    currentPanel = panel;
-    openMega(panel);
-  });
-});
-
-if (megaClose) {
-  megaClose.addEventListener("click", closeMega);
-}
-
-document.addEventListener("keydown", function (event) {
+/* ESCAPE KEY CLOSES MENU */
+document.addEventListener("keydown", event => {
   if (event.key === "Escape") {
     closeMenu();
-    closeMega();
   }
+});
+
+
+/* SMOOTH SCROLL FOR LINKS TO SECTIONS ON THE SAME PAGE */
+document.querySelectorAll('a[href^="#"]').forEach(link => {
+
+  link.addEventListener("click", event => {
+
+    const targetId = link.getAttribute("href");
+
+    if (!targetId || targetId === "#") return;
+
+    const target = document.querySelector(targetId);
+
+    if (!target) return;
+
+    event.preventDefault();
+
+    target.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+
+  });
+
 });
