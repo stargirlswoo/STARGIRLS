@@ -1,4 +1,10 @@
 {
   "hero": "",
-  "photos": []
+  "photos": [
+    {
+      "image": "/images/world/img_2409.jpeg",
+      "caption": "",
+      "alt": ""
+    }
+  ]
 }
