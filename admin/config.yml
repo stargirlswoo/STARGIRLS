@@ -1,0 +1,55 @@
+backend:
+  name: github
+  repo: stargirlswoo/STARGIRLS
+  branch: main
+  auth_methods: [token]
+
+media_folder: /images/world
+public_folder: /images/world
+
+media_libraries:
+  default:
+    config:
+      slugify_filename: true
+
+collections:
+  - name: site
+    label: STARGIRLS
+    files:
+
+      - name: world
+        label: Our World
+        file: content/world.json
+        format: json
+
+        media_folder: /images/world
+        public_folder: /images/world
+
+        fields:
+
+          - name: hero
+            label: Our World Hero Photo
+            widget: image
+            required: false
+
+          - name: photos
+            label: Camera Roll
+            label_singular: Photo
+            widget: list
+            summary: "{{fields.caption}}"
+
+            fields:
+
+              - name: image
+                label: Photo
+                widget: image
+
+              - name: caption
+                label: Caption
+                widget: string
+                required: false
+
+              - name: alt
+                label: Photo Description
+                widget: string
+                required: false
