@@ -47,21 +47,17 @@ if (menuToggle) {
   menuToggle.addEventListener("click", openMenu);
 }
 
-
 if (menuClose) {
   menuClose.addEventListener("click", closeMenu);
 }
-
 
 if (menuOverlay) {
   menuOverlay.addEventListener("click", closeMenu);
 }
 
-
 mobileLinks.forEach(link => {
   link.addEventListener("click", closeMenu);
 });
-
 
 document.addEventListener("keydown", event => {
   if (event.key === "Escape") {
@@ -99,126 +95,284 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
 
 
 /* =========================================================
+   CMS HELPERS
+========================================================= */
+
+async function getCMSContent(file) {
+
+  const response = await fetch(
+    `content/${file}?v=${Date.now()}`,
+    {
+      cache: "no-store"
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(`Could not load ${file}`);
+  }
+
+  return response.json();
+}
+
+
+function setBackground(selector, image, gradient = "") {
+
+  const element = document.querySelector(selector);
+
+  if (!element || !image) return;
+
+  const imageURL = `url(${JSON.stringify(image)})`;
+
+  element.style.backgroundImage = gradient
+    ? `${gradient}, ${imageURL}`
+    : imageURL;
+}
+
+
+function renderPhotoGrid(selector, photos, defaultAlt) {
+
+  const grid = document.querySelector(selector);
+
+  if (!grid || !Array.isArray(photos)) return;
+
+  /*
+    The CMS becomes the source of truth,
+    so remove old placeholder boxes.
+  */
+
+  grid.innerHTML = "";
+
+
+  photos.forEach(photo => {
+
+    if (!photo.image) return;
+
+    const item = document.createElement("figure");
+
+    item.className = "world-cms-photo";
+
+
+    const image = document.createElement("img");
+
+    image.src = photo.image;
+
+    image.alt =
+      photo.alt ||
+      photo.caption ||
+      defaultAlt;
+
+    image.loading = "lazy";
+
+
+    item.appendChild(image);
+
+
+    if (photo.caption) {
+
+      const caption = document.createElement("figcaption");
+
+      caption.textContent = photo.caption;
+
+      item.appendChild(caption);
+
+    }
+
+
+    grid.appendChild(item);
+
+  });
+
+}
+
+
+/* =========================================================
+   HOMEPAGE CMS
+========================================================= */
+
+async function loadHomepage() {
+
+  const homepage = document.querySelector(".hero");
+
+  if (!homepage) return;
+
+
+  try {
+
+    const home = await getCMSContent("home.json");
+
+
+    setBackground(
+      ".hero",
+      home.hero,
+      `linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.08),
+        rgba(0, 0, 0, 0.52)
+      )`
+    );
+
+
+    setBackground(
+      ".siren-panel",
+      home.siren
+    );
+
+
+    setBackground(
+      ".risen-panel",
+      home.risen
+    );
+
+
+    setBackground(
+      ".stargirls-panel",
+      home.stargirls
+    );
+
+
+    setBackground(
+      ".world-bts",
+      home.world_bts
+    );
+
+
+    setBackground(
+      ".world-life",
+      home.world_life
+    );
+
+
+    setBackground(
+      ".world-studio",
+      home.world_studio
+    );
+
+
+    setBackground(
+      ".world-travel",
+      home.world_travel
+    );
+
+
+    setBackground(
+      ".home-shop",
+      home.shop,
+      `linear-gradient(
+        rgba(0, 0, 0, 0.18),
+        rgba(0, 0, 0, 0.55)
+      )`
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "STARGIRLS Homepage CMS:",
+      error
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   ABOUT CMS
+========================================================= */
+
+async function loadAbout() {
+
+  const aboutPage = document.querySelector(".about-page");
+
+  if (!aboutPage) return;
+
+
+  try {
+
+    const about = await getCMSContent("about.json");
+
+
+    setBackground(
+      ".about-hero",
+      about.hero,
+      `linear-gradient(
+        rgba(0, 0, 0, 0.08),
+        rgba(0, 0, 0, 0.55)
+      )`
+    );
+
+
+    setBackground(
+      ".about-photo-break",
+      about.photo_break
+    );
+
+
+    setBackground(
+      ".sun-about-image",
+      about.sun
+    );
+
+
+    setBackground(
+      ".moon-about-image",
+      about.moon
+    );
+
+
+    renderPhotoGrid(
+      ".camera-grid",
+      about.photos,
+      "STARGIRLS life lately"
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "STARGIRLS About CMS:",
+      error
+    );
+
+  }
+
+}
+
+
+/* =========================================================
    OUR WORLD CMS
 ========================================================= */
 
 async function loadOurWorld() {
 
-  const worldGrid = document.querySelector(".world-camera-grid");
-  const worldHero = document.querySelector(".world-hero");
+  const worldPage =
+    document.querySelector(".world-hero") ||
+    document.querySelector(".world-camera-grid");
 
-  /*
-    If we are not on the Our World page,
-    there is nothing to load.
-  */
-
-  if (!worldGrid && !worldHero) return;
+  if (!worldPage) return;
 
 
   try {
 
-    /*
-      Add a timestamp so the browser does not keep
-      showing an old cached version of the photo list.
-    */
+    const world = await getCMSContent("world.json");
 
-    const response = await fetch(
-      `content/world.json?v=${Date.now()}`,
-      {
-        cache: "no-store"
-      }
+
+    setBackground(
+      ".world-hero",
+      world.hero,
+      `linear-gradient(
+        rgba(0, 0, 0, 0.08),
+        rgba(0, 0, 0, 0.55)
+      )`
     );
 
 
-    if (!response.ok) {
-      throw new Error("Could not load Our World content.");
-    }
+    renderPhotoGrid(
+      ".world-camera-grid",
+      world.photos,
+      "STARGIRLS camera roll"
+    );
 
-
-    const world = await response.json();
-
-
-    /* =====================================================
-       HERO PHOTO
-    ===================================================== */
-
-    if (worldHero && world.hero) {
-
-      worldHero.style.backgroundImage = `
-        linear-gradient(
-          rgba(0, 0, 0, 0.08),
-          rgba(0, 0, 0, 0.55)
-        ),
-        url("${world.hero}")
-      `;
-
-    }
-
-
-    /* =====================================================
-       CAMERA ROLL
-    ===================================================== */
-
-    if (worldGrid && Array.isArray(world.photos)) {
-
-      /*
-        Remove the old placeholder photo boxes.
-      */
-
-      worldGrid.innerHTML = "";
-
-
-      /*
-        Build one photo tile for every photo
-        you added through Sveltia.
-      */
-
-      world.photos.forEach(photo => {
-
-        if (!photo.image) return;
-
-
-        const photoItem = document.createElement("figure");
-
-        photoItem.className = "world-cms-photo";
-
-
-        const image = document.createElement("img");
-
-        image.src = photo.image;
-
-        image.alt =
-          photo.alt ||
-          photo.caption ||
-          "STARGIRLS camera roll";
-
-        image.loading = "lazy";
-
-
-        photoItem.appendChild(image);
-
-
-        /*
-          Caption is optional.
-          Nothing appears if you leave it blank.
-        */
-
-        if (photo.caption) {
-
-          const caption = document.createElement("figcaption");
-
-          caption.textContent = photo.caption;
-
-          photoItem.appendChild(caption);
-
-        }
-
-
-        worldGrid.appendChild(photoItem);
-
-      });
-
-    }
 
   } catch (error) {
 
@@ -232,4 +386,138 @@ async function loadOurWorld() {
 }
 
 
+/* =========================================================
+   JUNOON CMS
+========================================================= */
+
+async function loadJunoon() {
+
+  const junoonPage = document.querySelector(".junoon-page");
+
+  if (!junoonPage) return;
+
+
+  try {
+
+    const junoon = await getCMSContent("junoon.json");
+
+
+    setBackground(
+      ".junoon-hero",
+      junoon.hero,
+      `linear-gradient(
+        rgba(0, 0, 0, 0.08),
+        rgba(0, 0, 0, 0.55)
+      )`
+    );
+
+
+    setBackground(
+      ".junoon-photo-break",
+      junoon.photo_break
+    );
+
+
+    setBackground(
+      ".junoon-juno",
+      junoon.juno_image,
+      `linear-gradient(
+        rgba(0, 0, 0, 0.15),
+        rgba(0, 0, 0, 0.55)
+      )`
+    );
+
+
+    renderPhotoGrid(
+      ".junoon-camera-grid",
+      junoon.photos,
+      "Making JUNOON with STARGIRLS"
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "STARGIRLS JUNOON CMS:",
+      error
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   JUNO CMS
+========================================================= */
+
+async function loadJuno() {
+
+  const junoPage = document.querySelector(".juno-page");
+
+  if (!junoPage) return;
+
+
+  try {
+
+    const juno = await getCMSContent("juno.json");
+
+
+    setBackground(
+      ".juno-hero",
+      juno.hero,
+      `linear-gradient(
+        rgba(0, 0, 0, 0.08),
+        rgba(0, 0, 0, 0.55)
+      )`
+    );
+
+
+    const productImage =
+      document.querySelector(".juno-product-image img");
+
+
+    if (productImage && juno.product) {
+
+      productImage.src = juno.product;
+
+      productImage.alt =
+        "JUNO Eau de Parfum by STARGIRLS";
+
+    }
+
+
+    setBackground(
+      ".juno-photo-break",
+      juno.photo_break
+    );
+
+
+    renderPhotoGrid(
+      ".juno-camera-grid",
+      juno.photos,
+      "Making JUNO Eau de Parfum"
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "STARGIRLS JUNO CMS:",
+      error
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   LOAD CMS
+========================================================= */
+
+loadHomepage();
+loadAbout();
 loadOurWorld();
+loadJunoon();
+loadJuno();
