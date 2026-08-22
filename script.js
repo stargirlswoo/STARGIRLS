@@ -129,16 +129,25 @@ function setBackground(selector, image, gradient = "") {
 }
 
 
+function setImage(selector, image, alt = "") {
+
+  const element = document.querySelector(selector);
+
+  if (!element || !image) return;
+
+  element.src = image;
+
+  if (alt) {
+    element.alt = alt;
+  }
+}
+
+
 function renderPhotoGrid(selector, photos, defaultAlt) {
 
   const grid = document.querySelector(selector);
 
   if (!grid || !Array.isArray(photos)) return;
-
-  /*
-    The CMS becomes the source of truth,
-    so remove old placeholder boxes.
-  */
 
   grid.innerHTML = "";
 
@@ -146,6 +155,7 @@ function renderPhotoGrid(selector, photos, defaultAlt) {
   photos.forEach(photo => {
 
     if (!photo.image) return;
+
 
     const item = document.createElement("figure");
 
@@ -185,15 +195,69 @@ function renderPhotoGrid(selector, photos, defaultAlt) {
 }
 
 
+function renderANEWPhotoGrid(photos) {
+
+  const grid = document.querySelector(".anew-photo-grid");
+
+  if (!grid || !Array.isArray(photos)) return;
+
+  grid.innerHTML = "";
+
+
+  photos.forEach(photo => {
+
+    if (!photo.image) return;
+
+
+    const item = document.createElement("figure");
+
+    item.style.margin = "0";
+
+
+    const image = document.createElement("img");
+
+    image.src = photo.image;
+
+    image.alt =
+      photo.alt ||
+      photo.caption ||
+      "STARGIRLS during the ANEW era";
+
+    image.loading = "lazy";
+
+
+    item.appendChild(image);
+
+
+    if (photo.caption) {
+
+      const caption = document.createElement("figcaption");
+
+      caption.textContent = photo.caption;
+
+      caption.style.padding = "10px 4px 20px";
+      caption.style.fontSize = "10px";
+      caption.style.letterSpacing = "0.08em";
+
+      item.appendChild(caption);
+
+    }
+
+
+    grid.appendChild(item);
+
+  });
+
+}
+
+
 /* =========================================================
-   HOMEPAGE CMS
+   HOMEPAGE
 ========================================================= */
 
 async function loadHomepage() {
 
-  const homepage = document.querySelector(".hero");
-
-  if (!homepage) return;
+  if (!document.querySelector(".hero")) return;
 
 
   try {
@@ -212,46 +276,14 @@ async function loadHomepage() {
     );
 
 
-    setBackground(
-      ".siren-panel",
-      home.siren
-    );
+    setBackground(".siren-panel", home.siren);
+    setBackground(".risen-panel", home.risen);
+    setBackground(".stargirls-panel", home.stargirls);
 
-
-    setBackground(
-      ".risen-panel",
-      home.risen
-    );
-
-
-    setBackground(
-      ".stargirls-panel",
-      home.stargirls
-    );
-
-
-    setBackground(
-      ".world-bts",
-      home.world_bts
-    );
-
-
-    setBackground(
-      ".world-life",
-      home.world_life
-    );
-
-
-    setBackground(
-      ".world-studio",
-      home.world_studio
-    );
-
-
-    setBackground(
-      ".world-travel",
-      home.world_travel
-    );
+    setBackground(".world-bts", home.world_bts);
+    setBackground(".world-life", home.world_life);
+    setBackground(".world-studio", home.world_studio);
+    setBackground(".world-travel", home.world_travel);
 
 
     setBackground(
@@ -266,10 +298,7 @@ async function loadHomepage() {
 
   } catch (error) {
 
-    console.error(
-      "STARGIRLS Homepage CMS:",
-      error
-    );
+    console.error("STARGIRLS Homepage CMS:", error);
 
   }
 
@@ -277,14 +306,12 @@ async function loadHomepage() {
 
 
 /* =========================================================
-   ABOUT CMS
+   ABOUT
 ========================================================= */
 
 async function loadAbout() {
 
-  const aboutPage = document.querySelector(".about-page");
-
-  if (!aboutPage) return;
+  if (!document.querySelector(".about-page")) return;
 
 
   try {
@@ -302,22 +329,9 @@ async function loadAbout() {
     );
 
 
-    setBackground(
-      ".about-photo-break",
-      about.photo_break
-    );
-
-
-    setBackground(
-      ".sun-about-image",
-      about.sun
-    );
-
-
-    setBackground(
-      ".moon-about-image",
-      about.moon
-    );
+    setBackground(".about-photo-break", about.photo_break);
+    setBackground(".sun-about-image", about.sun);
+    setBackground(".moon-about-image", about.moon);
 
 
     renderPhotoGrid(
@@ -329,10 +343,7 @@ async function loadAbout() {
 
   } catch (error) {
 
-    console.error(
-      "STARGIRLS About CMS:",
-      error
-    );
+    console.error("STARGIRLS About CMS:", error);
 
   }
 
@@ -340,16 +351,16 @@ async function loadAbout() {
 
 
 /* =========================================================
-   OUR WORLD CMS
+   OUR WORLD
 ========================================================= */
 
 async function loadOurWorld() {
 
-  const worldPage =
+  const page =
     document.querySelector(".world-hero") ||
     document.querySelector(".world-camera-grid");
 
-  if (!worldPage) return;
+  if (!page) return;
 
 
   try {
@@ -376,10 +387,7 @@ async function loadOurWorld() {
 
   } catch (error) {
 
-    console.error(
-      "STARGIRLS Our World CMS:",
-      error
-    );
+    console.error("STARGIRLS Our World CMS:", error);
 
   }
 
@@ -387,14 +395,58 @@ async function loadOurWorld() {
 
 
 /* =========================================================
-   JUNOON CMS
+   ANEW PAGE
+========================================================= */
+
+async function loadAnew() {
+
+  if (!document.querySelector(".anew-page")) return;
+
+
+  try {
+
+    const anew = await getCMSContent("anew.json");
+
+
+    setBackground(
+      ".anew-hero",
+      anew.hero,
+      `linear-gradient(
+        rgba(0, 0, 0, 0.08),
+        rgba(0, 0, 0, 0.55)
+      )`
+    );
+
+
+    setBackground(
+      ".anew-personal-break",
+      anew.personal_break,
+      `linear-gradient(
+        rgba(0, 0, 0, 0.08),
+        rgba(0, 0, 0, 0.48)
+      )`
+    );
+
+
+    renderANEWPhotoGrid(anew.photos);
+
+
+  } catch (error) {
+
+    console.error("STARGIRLS ANEW CMS:", error);
+
+  }
+
+}
+
+
+/* =========================================================
+   JUNOON
 ========================================================= */
 
 async function loadJunoon() {
 
-  const junoonPage = document.querySelector(".junoon-page");
-
-  if (!junoonPage) return;
+  if (!document.querySelector(".junoon-page")) return;
 
 
   try {
@@ -412,10 +464,7 @@ async function loadJunoon() {
     );
 
 
-    setBackground(
-      ".junoon-photo-break",
-      junoon.photo_break
-    );
+    setBackground(".junoon-photo-break", junoon.photo_break);
 
 
     setBackground(
@@ -437,10 +486,7 @@ async function loadJunoon() {
 
   } catch (error) {
 
-    console.error(
-      "STARGIRLS JUNOON CMS:",
-      error
-    );
+    console.error("STARGIRLS JUNOON CMS:", error);
 
   }
 
@@ -448,14 +494,12 @@ async function loadJunoon() {
 
 
 /* =========================================================
-   JUNO CMS
+   JUNO
 ========================================================= */
 
 async function loadJuno() {
 
-  const junoPage = document.querySelector(".juno-page");
-
-  if (!junoPage) return;
+  if (!document.querySelector(".juno-page")) return;
 
 
   try {
@@ -473,24 +517,14 @@ async function loadJuno() {
     );
 
 
-    const productImage =
-      document.querySelector(".juno-product-image img");
-
-
-    if (productImage && juno.product) {
-
-      productImage.src = juno.product;
-
-      productImage.alt =
-        "JUNO Eau de Parfum by STARGIRLS";
-
-    }
-
-
-    setBackground(
-      ".juno-photo-break",
-      juno.photo_break
+    setImage(
+      ".juno-product-image img",
+      juno.product,
+      "JUNO Eau de Parfum by STARGIRLS"
     );
+
+
+    setBackground(".juno-photo-break", juno.photo_break);
 
 
     renderPhotoGrid(
@@ -502,10 +536,7 @@ async function loadJuno() {
 
   } catch (error) {
 
-    console.error(
-      "STARGIRLS JUNO CMS:",
-      error
-    );
+    console.error("STARGIRLS JUNO CMS:", error);
 
   }
 
@@ -513,11 +544,159 @@ async function loadJuno() {
 
 
 /* =========================================================
-   LOAD CMS
+   SHOP
+========================================================= */
+
+async function loadShop() {
+
+  if (!document.querySelector(".shop-page")) return;
+
+
+  try {
+
+    const shop = await getCMSContent("shop.json");
+
+
+    setBackground(
+      ".shop-juno",
+      shop.feature,
+      `linear-gradient(
+        rgba(0, 0, 0, 0.10),
+        rgba(0, 0, 0, 0.55)
+      )`
+    );
+
+
+    setImage(
+      ".shop-product-image img",
+      shop.product,
+      "JUNO Eau de Parfum by STARGIRLS"
+    );
+
+
+    setBackground(
+      ".shop-junoon",
+      shop.junoon,
+      `linear-gradient(
+        rgba(0, 0, 0, 0.10),
+        rgba(0, 0, 0, 0.55)
+      )`
+    );
+
+
+    renderPhotoGrid(
+      ".shop-camera-grid",
+      shop.photos,
+      "Making JUNO with STARGIRLS"
+    );
+
+
+  } catch (error) {
+
+    console.error("STARGIRLS Shop CMS:", error);
+
+  }
+
+}
+
+
+/* =========================================================
+   MUSIC PAGE
+   Reuses ANEW + JUNOON + Homepage content
+========================================================= */
+
+async function loadMusic() {
+
+  if (!document.querySelector(".music-page")) return;
+
+
+  try {
+
+    const [anew, junoon, home] = await Promise.all([
+      getCMSContent("anew.json"),
+      getCMSContent("junoon.json"),
+      getCMSContent("home.json")
+    ]);
+
+
+    /* JUNOON */
+
+    setBackground(
+      ".music-project-junoon",
+      junoon.hero,
+      `linear-gradient(
+        rgba(0, 0, 0, 0.10),
+        rgba(0, 0, 0, 0.55)
+      )`
+    );
+
+
+    /* ANEW ALBUM COVER */
+
+    setBackground(
+      ".music-project-anew",
+      anew.cover,
+      `linear-gradient(
+        rgba(0, 0, 0, 0.10),
+        rgba(0, 0, 0, 0.55)
+      )`
+    );
+
+
+    /* SIREN / RISEN / STARGIRLS */
+
+    const storyImages =
+      document.querySelectorAll(
+        ".music-story-card img"
+      );
+
+
+    const storySources = [
+      home.siren,
+      home.risen,
+      home.stargirls
+    ];
+
+
+    storyImages.forEach((image, index) => {
+
+      if (storySources[index]) {
+        image.src = storySources[index];
+      }
+
+    });
+
+
+    /* BEHIND THE MUSIC */
+
+    setBackground(
+      ".music-bts",
+      anew.personal_break,
+      `linear-gradient(
+        rgba(0, 0, 0, 0.10),
+        rgba(0, 0, 0, 0.55)
+      )`
+    );
+
+
+  } catch (error) {
+
+    console.error("STARGIRLS Music CMS:", error);
+
+  }
+
+}
+
+
+/* =========================================================
+   LOAD EVERYTHING
 ========================================================= */
 
 loadHomepage();
 loadAbout();
 loadOurWorld();
+loadAnew();
 loadJunoon();
 loadJuno();
+loadShop();
+loadMusic();
