@@ -12,7 +12,6 @@ media_libraries:
     config:
       slugify_filename: true
 
-
 collections:
 
   - name: site
@@ -20,11 +19,7 @@ collections:
 
     files:
 
-
-      # =====================================================
       # HOMEPAGE
-      # =====================================================
-
       - name: home
         label: Homepage
         file: content/home.json
@@ -34,7 +29,6 @@ collections:
         public_folder: /images/home
 
         fields:
-
           - name: hero
             label: Homepage Hero
             widget: image
@@ -81,11 +75,7 @@ collections:
             required: false
 
 
-
-      # =====================================================
       # ABOUT
-      # =====================================================
-
       - name: about
         label: About
         file: content/about.json
@@ -95,7 +85,6 @@ collections:
         public_folder: /images/about
 
         fields:
-
           - name: hero
             label: About Hero Photo
             widget: image
@@ -123,7 +112,6 @@ collections:
             summary: "{{fields.caption}}"
 
             fields:
-
               - name: image
                 label: Photo
                 widget: image
@@ -139,11 +127,7 @@ collections:
                 required: false
 
 
-
-      # =====================================================
       # OUR WORLD
-      # =====================================================
-
       - name: world
         label: Our World
         file: content/world.json
@@ -153,7 +137,6 @@ collections:
         public_folder: /images/world
 
         fields:
-
           - name: hero
             label: Our World Hero Photo
             widget: image
@@ -166,7 +149,6 @@ collections:
             summary: "{{fields.caption}}"
 
             fields:
-
               - name: image
                 label: Photo
                 widget: image
@@ -182,11 +164,54 @@ collections:
                 required: false
 
 
+      # ANEW
+      - name: anew
+        label: ANEW
+        file: content/anew.json
+        format: json
 
-      # =====================================================
+        media_folder: /images/anew
+        public_folder: /images/anew
+
+        fields:
+          - name: hero
+            label: ANEW Hero Photo
+            widget: image
+            required: false
+
+          - name: cover
+            label: ANEW Cover
+            widget: image
+            required: false
+
+          - name: personal_break
+            label: Behind-the-Scenes Candid
+            widget: image
+            required: false
+
+          - name: photos
+            label: ANEW Photo Diary
+            label_singular: Photo
+            widget: list
+            summary: "{{fields.caption}}"
+
+            fields:
+              - name: image
+                label: Photo
+                widget: image
+
+              - name: caption
+                label: Caption
+                widget: string
+                required: false
+
+              - name: alt
+                label: Photo Description
+                widget: string
+                required: false
+
+
       # JUNOON
-      # =====================================================
-
       - name: junoon
         label: JUNOON
         file: content/junoon.json
@@ -196,7 +221,6 @@ collections:
         public_folder: /images/junoon
 
         fields:
-
           - name: hero
             label: JUNOON Hero Photo
             widget: image
@@ -219,7 +243,6 @@ collections:
             summary: "{{fields.caption}}"
 
             fields:
-
               - name: image
                 label: Photo
                 widget: image
@@ -235,11 +258,7 @@ collections:
                 required: false
 
 
-
-      # =====================================================
       # JUNO
-      # =====================================================
-
       - name: juno
         label: JUNO
         file: content/juno.json
@@ -249,7 +268,6 @@ collections:
         public_folder: /images/juno
 
         fields:
-
           - name: hero
             label: JUNO Hero Photo
             widget: image
@@ -272,7 +290,53 @@ collections:
             summary: "{{fields.caption}}"
 
             fields:
+              - name: image
+                label: Photo
+                widget: image
 
+              - name: caption
+                label: Caption
+                widget: string
+                required: false
+
+              - name: alt
+                label: Photo Description
+                widget: string
+                required: false
+
+
+      # SHOP
+      - name: shop
+        label: Shop
+        file: content/shop.json
+        format: json
+
+        media_folder: /images/shop
+        public_folder: /images/shop
+
+        fields:
+          - name: feature
+            label: JUNO Shop Feature
+            widget: image
+            required: false
+
+          - name: product
+            label: JUNO Product Photo
+            widget: image
+            required: false
+
+          - name: junoon
+            label: JUNOON Shop Photo
+            widget: image
+            required: false
+
+          - name: photos
+            label: Making JUNO
+            label_singular: Photo
+            widget: list
+            summary: "{{fields.caption}}"
+
+            fields:
               - name: image
                 label: Photo
                 widget: image
