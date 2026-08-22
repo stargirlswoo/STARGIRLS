@@ -1,6 +1,12 @@
 {
-  "hero": "",
+  "hero": "/images/anew/img_3146.jpeg",
   "cover": "",
   "personal_break": "",
-  "photos": []
+  "photos": [
+    {
+      "image": "/images/anew/img_3157.jpeg",
+      "caption": "",
+      "alt": ""
+    }
+  ]
 }
