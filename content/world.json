@@ -2,7 +2,22 @@
   "hero": "/images/world/img_3144.jpeg",
   "photos": [
     {
-      "image": "/images/world/img_2409.jpeg",
+      "image": "/images/world/img_3145.jpeg",
+      "caption": "",
+      "alt": ""
+    },
+    {
+      "image": "/images/world/img_3146.jpeg",
+      "caption": "",
+      "alt": ""
+    },
+    {
+      "image": "/images/world/img_3147.jpeg",
+      "caption": "",
+      "alt": ""
+    },
+    {
+      "image": "/images/world/img_3148.jpeg",
       "caption": "",
       "alt": ""
     }
