@@ -1,7 +1,13 @@
 {
-  "hero": "",
+  "hero": "/images/about/img_3168.jpeg",
   "photo_break": "",
   "sun": "",
   "moon": "",
-  "photos": []
+  "photos": [
+    {
+      "image": "/images/about/img_3145.jpeg",
+      "caption": "",
+      "alt": ""
+    }
+  ]
 }
