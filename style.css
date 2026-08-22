@@ -2688,3 +2688,36 @@ footer.site-footer {
   }
 
 }
+/* =========================================================
+   OUR WORLD CMS PHOTOS
+========================================================= */
+
+.world-cms-photo {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.world-cms-photo img {
+  display: block;
+  width: 100%;
+  height: 40vw;
+  max-height: 600px;
+  object-fit: cover;
+}
+
+.world-cms-photo figcaption {
+  padding: 12px 4px 22px;
+  color: var(--grey);
+  font-family: var(--body);
+  font-size: 10px;
+  line-height: 1.5;
+  letter-spacing: 0.08em;
+  text-align: left;
+}
+
+@media (max-width: 800px) {
+  .world-cms-photo img {
+    height: 64vw;
+  }
+}
