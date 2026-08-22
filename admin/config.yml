@@ -4,18 +4,145 @@ backend:
   branch: main
   auth_methods: [token]
 
-media_folder: /images/world
-public_folder: /images/world
+media_folder: /images
+public_folder: /images
 
 media_libraries:
   default:
     config:
       slugify_filename: true
 
+
 collections:
+
   - name: site
     label: STARGIRLS
+
     files:
+
+
+      # =====================================================
+      # HOMEPAGE
+      # =====================================================
+
+      - name: home
+        label: Homepage
+        file: content/home.json
+        format: json
+
+        media_folder: /images/home
+        public_folder: /images/home
+
+        fields:
+
+          - name: hero
+            label: Homepage Hero
+            widget: image
+            required: false
+
+          - name: siren
+            label: SIREN Photo
+            widget: image
+            required: false
+
+          - name: risen
+            label: RISEN Photo
+            widget: image
+            required: false
+
+          - name: stargirls
+            label: STARGIRLS Photo
+            widget: image
+            required: false
+
+          - name: world_bts
+            label: Our World — Behind The Scenes
+            widget: image
+            required: false
+
+          - name: world_life
+            label: Our World — Life
+            widget: image
+            required: false
+
+          - name: world_studio
+            label: Our World — Studio
+            widget: image
+            required: false
+
+          - name: world_travel
+            label: Our World — Travel
+            widget: image
+            required: false
+
+          - name: shop
+            label: Shop Photo
+            widget: image
+            required: false
+
+
+
+      # =====================================================
+      # ABOUT
+      # =====================================================
+
+      - name: about
+        label: About
+        file: content/about.json
+        format: json
+
+        media_folder: /images/about
+        public_folder: /images/about
+
+        fields:
+
+          - name: hero
+            label: About Hero Photo
+            widget: image
+            required: false
+
+          - name: photo_break
+            label: Candid Photo Break
+            widget: image
+            required: false
+
+          - name: sun
+            label: Sun Photo
+            widget: image
+            required: false
+
+          - name: moon
+            label: Moon Photo
+            widget: image
+            required: false
+
+          - name: photos
+            label: Life Lately
+            label_singular: Photo
+            widget: list
+            summary: "{{fields.caption}}"
+
+            fields:
+
+              - name: image
+                label: Photo
+                widget: image
+
+              - name: caption
+                label: Caption
+                widget: string
+                required: false
+
+              - name: alt
+                label: Photo Description
+                widget: string
+                required: false
+
+
+
+      # =====================================================
+      # OUR WORLD
+      # =====================================================
 
       - name: world
         label: Our World
@@ -34,6 +161,112 @@ collections:
 
           - name: photos
             label: Camera Roll
+            label_singular: Photo
+            widget: list
+            summary: "{{fields.caption}}"
+
+            fields:
+
+              - name: image
+                label: Photo
+                widget: image
+
+              - name: caption
+                label: Caption
+                widget: string
+                required: false
+
+              - name: alt
+                label: Photo Description
+                widget: string
+                required: false
+
+
+
+      # =====================================================
+      # JUNOON
+      # =====================================================
+
+      - name: junoon
+        label: JUNOON
+        file: content/junoon.json
+        format: json
+
+        media_folder: /images/junoon
+        public_folder: /images/junoon
+
+        fields:
+
+          - name: hero
+            label: JUNOON Hero Photo
+            widget: image
+            required: false
+
+          - name: photo_break
+            label: JUNOON Second Photo
+            widget: image
+            required: false
+
+          - name: juno_image
+            label: JUNO Fragrance Photo
+            widget: image
+            required: false
+
+          - name: photos
+            label: Making JUNOON
+            label_singular: Photo
+            widget: list
+            summary: "{{fields.caption}}"
+
+            fields:
+
+              - name: image
+                label: Photo
+                widget: image
+
+              - name: caption
+                label: Caption
+                widget: string
+                required: false
+
+              - name: alt
+                label: Photo Description
+                widget: string
+                required: false
+
+
+
+      # =====================================================
+      # JUNO
+      # =====================================================
+
+      - name: juno
+        label: JUNO
+        file: content/juno.json
+        format: json
+
+        media_folder: /images/juno
+        public_folder: /images/juno
+
+        fields:
+
+          - name: hero
+            label: JUNO Hero Photo
+            widget: image
+            required: false
+
+          - name: product
+            label: Main Product Photo
+            widget: image
+            required: false
+
+          - name: photo_break
+            label: JUNO Campaign Photo
+            widget: image
+            required: false
+
+          - name: photos
+            label: Making JUNO
             label_singular: Photo
             widget: list
             summary: "{{fields.caption}}"
