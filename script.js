@@ -748,3 +748,213 @@ loadJunoon();
 loadJuno();
 loadShop();
 loadMusic();
+/* =========================================================
+   BREVO — STAY CLOSE SIGNUP
+========================================================= */
+
+const BREVO_SIGNUP_URL =
+  "https://4f91725b.sibforms.com/serve/MUIFABK2uNLRQcki4e-Qq149f_zusNJ0-mwCeXoEO-IMUHMOdzBmgVaxYXIagi2-0H1di_hzFNRu6LWB0etAaRFbchmq1rIRvjxqcbI5tA40XMg6oUJx7zyO9c3l0hKaIeMqa8LKqcdPk7CHQfCUXNndc15U4VEJhS7EPLo9w0VmE_8HjGotOZcxgE_zVZ98shwbI2IKBqP89FtUDQ==";
+
+
+document.querySelectorAll(".signup-form").forEach((form, index) => {
+
+  if (form.dataset.brevoConnected === "true") return;
+
+
+  const emailInput =
+    form.querySelector('input[type="email"]');
+
+
+  if (!emailInput) return;
+
+
+  form.dataset.brevoConnected = "true";
+
+
+  /* Connect this existing STARGIRLS form to Brevo */
+
+  form.method = "POST";
+  form.action = BREVO_SIGNUP_URL;
+  form.setAttribute("data-type", "subscription");
+
+
+  /*
+    Brevo specifically expects the email field
+    to be named EMAIL.
+  */
+
+  emailInput.name = "EMAIL";
+
+
+  /* =====================================================
+     BREVO HIDDEN FIELDS
+  ===================================================== */
+
+  if (!form.querySelector('[name="email_address_check"]')) {
+
+    const honeypot = document.createElement("input");
+
+    honeypot.type = "text";
+    honeypot.name = "email_address_check";
+    honeypot.value = "";
+    honeypot.tabIndex = -1;
+    honeypot.autocomplete = "off";
+    honeypot.setAttribute("aria-hidden", "true");
+
+    honeypot.style.position = "absolute";
+    honeypot.style.left = "-9999px";
+
+    form.appendChild(honeypot);
+
+  }
+
+
+  if (!form.querySelector('[name="locale"]')) {
+
+    const locale = document.createElement("input");
+
+    locale.type = "hidden";
+    locale.name = "locale";
+    locale.value = "en";
+
+    form.appendChild(locale);
+
+  }
+
+
+  /* =====================================================
+     HIDDEN BREVO RESPONSE WINDOW
+     Keeps visitors on stargirls.maison
+  ===================================================== */
+
+  const frameName =
+    `stargirls-brevo-${index}`;
+
+
+  const responseFrame =
+    document.createElement("iframe");
+
+
+  responseFrame.name = frameName;
+  responseFrame.title = "Newsletter signup response";
+  responseFrame.style.display = "none";
+
+
+  form.target = frameName;
+
+
+  /* =====================================================
+     STARGIRLS SUCCESS MESSAGE
+  ===================================================== */
+
+  const status =
+    document.createElement("p");
+
+
+  status.setAttribute("role", "status");
+  status.setAttribute("aria-live", "polite");
+
+  status.style.display = "none";
+  status.style.maxWidth = "650px";
+  status.style.margin = "28px auto 0";
+  status.style.textAlign = "center";
+  status.style.fontFamily = "var(--display)";
+  status.style.fontSize = "clamp(21px, 3vw, 30px)";
+  status.style.lineHeight = "1.4";
+
+
+  form.insertAdjacentElement(
+    "afterend",
+    status
+  );
+
+
+  status.insertAdjacentElement(
+    "afterend",
+    responseFrame
+  );
+
+
+  /* =====================================================
+     FRIENDLIER EMAIL ERRORS
+  ===================================================== */
+
+  emailInput.addEventListener("invalid", () => {
+
+    emailInput.setCustomValidity("");
+
+
+    if (emailInput.validity.valueMissing) {
+
+      emailInput.setCustomValidity(
+        "don't forget your email ♡"
+      );
+
+    } else if (emailInput.validity.typeMismatch) {
+
+      emailInput.setCustomValidity(
+        "hmm, something looks a little off — check your email and try again ♡"
+      );
+
+    }
+
+  });
+
+
+  emailInput.addEventListener("input", () => {
+
+    emailInput.setCustomValidity("");
+
+  });
+
+
+  /* =====================================================
+     SUBMISSION
+  ===================================================== */
+
+  let waitingForBrevo = false;
+
+
+  form.addEventListener("submit", () => {
+
+    waitingForBrevo = true;
+
+
+    const button =
+      form.querySelector('button[type="submit"]');
+
+
+    if (button) {
+
+      button.dataset.originalText =
+        button.textContent;
+
+      button.textContent =
+        "JOINING...";
+
+      button.disabled = true;
+
+    }
+
+  });
+
+
+  responseFrame.addEventListener("load", () => {
+
+    if (!waitingForBrevo) return;
+
+
+    waitingForBrevo = false;
+
+
+    form.style.display = "none";
+
+
+    status.textContent =
+      "you're officially one of our stars ♡ stay close :)";
+
+    status.style.display = "block";
+
+  });
+
+});
