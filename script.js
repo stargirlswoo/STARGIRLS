@@ -2,7 +2,55 @@ const menuToggle = document.querySelector(".menu-toggle");
 const mobileMenu = document.querySelector(".mobile-menu");
 const menuClose = document.querySelector(".menu-close");
 const menuOverlay = document.querySelector(".menu-overlay");
-const mobileLinks = document.querySelectorAll(".mobile-nav a");
+
+
+/* =========================================================
+   ADD ABOUT TO EVERY NAV
+========================================================= */
+
+function addAboutLink(navSelector) {
+
+  const nav = document.querySelector(navSelector);
+
+  if (!nav) return;
+
+
+  // Don't add it twice
+  if (nav.querySelector('a[href="about.html"]')) return;
+
+
+  const aboutLink = document.createElement("a");
+
+  aboutLink.href = "about.html";
+  aboutLink.textContent = "ABOUT";
+
+
+  const joinLink =
+    nav.querySelector('a[href="signup.html"]');
+
+
+  if (joinLink) {
+
+    nav.insertBefore(
+      aboutLink,
+      joinLink
+    );
+
+  } else {
+
+    nav.appendChild(aboutLink);
+
+  }
+
+}
+
+
+addAboutLink(".desktop-nav");
+addAboutLink(".mobile-nav");
+
+
+const mobileLinks =
+  document.querySelectorAll(".mobile-nav a");
 
 
 /* =========================================================
