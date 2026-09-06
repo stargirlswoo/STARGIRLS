@@ -3,322 +3,96 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <title>STARGIRLS</title>
-  <meta name="description" content="Official website of STARGIRLS." />
-
+  <title>STARGIRLS — Official Shop</title>
+  <meta name="description" content="Shop STARGIRLS clothing, merch, beauty and drops from Moon + Sun." />
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="storefront.css" />
 </head>
+<body class="storefront-home">
+  <div class="drop-bar">★ STARGIRLS — NEW ERA LOADING ★</div>
 
-<body>
-
-  <!-- HEADER -->
-  <header class="site-header">
-
-    <a class="logo" href="index.html" aria-label="STARGIRLS Home">
-      STARGIRLS
-    </a>
-
+  <header class="site-header store-header">
+    <a class="logo" href="index.html" aria-label="STARGIRLS Home">STARGIRLS</a>
     <nav class="desktop-nav">
-      <a href="music.html">MUSIC</a>
-      <a href="videos.html">VIDEOS</a>
       <a href="shop.html">SHOP</a>
-      <a href="world.html">OUR WORLD</a>
-      <a href="signup.html">JOIN</a>
+      <a href="shop.html#new">NEW</a>
+      <a href="shop.html#clothing">CLOTHING</a>
+      <a href="shop.html#merch">MERCH</a>
+      <a href="shop.html#beauty">BEAUTY</a>
     </nav>
-
-    <button
-      class="menu-toggle"
-      aria-label="Open menu"
-      aria-expanded="false"
-    >
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
-
+    <a class="header-shop" href="shop.html" aria-label="Shop STARGIRLS">SHOP →</a>
+    <button class="menu-toggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
   </header>
 
-
-  <!-- MOBILE MENU -->
   <aside class="mobile-menu" id="mobileMenu">
-
-    <div class="mobile-menu-top">
-
-      <a class="mobile-logo" href="index.html">
-        STARGIRLS
-      </a>
-
-      <button class="menu-close" aria-label="Close menu">
-        ×
-      </button>
-
-    </div>
-
+    <div class="mobile-menu-top"><a class="mobile-logo" href="index.html">STARGIRLS</a><button class="menu-close" aria-label="Close menu">×</button></div>
     <nav class="mobile-nav">
-      <a href="music.html">MUSIC</a>
-      <a href="videos.html">VIDEOS</a>
-      <a href="shop.html">SHOP</a>
-      <a href="world.html">OUR WORLD</a>
-      <a href="signup.html">JOIN</a>
+      <a href="shop.html">SHOP ALL</a><a href="shop.html#new">NEW</a><a href="shop.html#clothing">CLOTHING</a><a href="shop.html#merch">MERCH</a><a href="shop.html#beauty">BEAUTY</a>
     </nav>
-
     <div class="mobile-socials">
-      <a href="https://instagram.com/maisonstargirls" target="_blank">INSTAGRAM</a>
-      <a href="https://tiktok.com/@maisonstargirls" target="_blank">TIKTOK</a>
-      <a href="https://www.youtube.com/@maisonstargirls" target="_blank">YOUTUBE</a>
-      <a href="https://facebook.com/maisonstargirls" target="_blank">FACEBOOK</a>
+      <a href="https://instagram.com/maisonstargirls" target="_blank" rel="noopener">INSTAGRAM</a>
+      <a href="https://tiktok.com/@maisonstargirls" target="_blank" rel="noopener">TIKTOK</a>
+      <a href="https://www.youtube.com/@maisonstargirls" target="_blank" rel="noopener">YOUTUBE</a>
+      <a href="https://twitch.tv/maisonstargirls" target="_blank" rel="noopener">TWITCH</a>
+      <a href="https://kick.com/maisonstargirls" target="_blank" rel="noopener">KICK</a>
+      <a href="https://discord.gg/yKSeYDfZxN" target="_blank" rel="noopener">DISCORD</a>
     </div>
-
   </aside>
-
   <div class="menu-overlay"></div>
 
-
   <main>
-
-    <!-- CURRENT ERA -->
-    <section class="hero">
-
-      <!--
-        Use a REAL STARGIRLS ANEW campaign image/video here.
-        Full screen. Very little text.
-      -->
-
-      <div class="hero-content">
-
-        <p class="era-label">STARGIRLS</p>
-
-        <h1>ANEW</h1>
-
-        <p>OUT NOW</p>
-
-        <a
-          href="https://music.lnk.to/q1d93n"
-          target="_blank"
-          rel="noopener"
-          class="hero-link"
-        >
-          LISTEN
-        </a>
-
+    <section class="store-hero">
+      <div class="store-hero-copy">
+        <p class="store-kicker">MOON + SUN PRESENT</p>
+        <h1>STARGIRLS</h1>
+        <p class="store-hero-line">WE MADE STUFF. YOU SHOULD PROBABLY WEAR IT.</p>
+        <a class="store-cta store-cta-light" href="shop.html">SHOP THE DROP →</a>
       </div>
-
     </section>
 
-
-    <!-- THE THREE VIDEOS / STORY -->
-    <section class="story">
-
-      <a
-        href="https://youtu.be/TxIWsdGdkE8"
-        target="_blank"
-        rel="noopener"
-        class="story-panel siren-panel"
-      >
-        <div class="story-copy">
-          <p>I</p>
-          <h2>SIREN</h2>
-          <span>WATCH</span>
-        </div>
-      </a>
-
-
-      <a
-        href="https://youtu.be/ehLzHQ-aQOo"
-        target="_blank"
-        rel="noopener"
-        class="story-panel risen-panel"
-      >
-        <div class="story-copy">
-          <p>II</p>
-          <h2>RISEN</h2>
-          <span>WATCH</span>
-        </div>
-      </a>
-
-
-      <a
-        href="https://youtu.be/Mw7W-_4zu6o"
-        target="_blank"
-        rel="noopener"
-        class="story-panel stargirls-panel"
-      >
-        <div class="story-copy">
-          <p>III</p>
-          <h2>STARGIRLS</h2>
-          <span>WATCH</span>
-        </div>
-      </a>
-
-    </section>
-
-
-    <!-- PERSONAL / CAMERA ROLL -->
-    <section class="our-world">
-
-      <div class="section-title">
-        <h2>OUR WORLD</h2>
+    <section class="shop-priority" id="new">
+      <div class="store-section-head"><div><p class="store-kicker">01 / THE IMPORTANT PART</p><h2>SHOP STARGIRLS</h2></div><a href="shop.html">VIEW EVERYTHING →</a></div>
+      <div class="product-tease-grid">
+        <a class="product-tease" href="shop.html#merch"><div class="product-tease-image product-tease-one"></div><div class="product-tease-info"><strong>STARGIRLS MERCH</strong><span>COMING SOON</span></div></a>
+        <a class="product-tease" href="shop.html#clothing"><div class="product-tease-image product-tease-two"></div><div class="product-tease-info"><strong>THE CLOSET</strong><span>COMING SOON</span></div></a>
+        <a class="product-tease" href="shop.html#beauty"><div class="product-tease-image product-tease-three"></div><div class="product-tease-info"><strong>BEAUTY + JUNO</strong><span>COMING SOON</span></div></a>
       </div>
-
-      <div class="world-grid">
-
-        <a href="world.html#bts" class="world-card world-bts">
-          <div class="world-copy">
-            <p>BEHIND THE SCENES</p>
-          </div>
-        </a>
-
-        <a href="world.html#life" class="world-card world-life">
-          <div class="world-copy">
-            <p>LIFE</p>
-          </div>
-        </a>
-
-        <a href="world.html#studio" class="world-card world-studio">
-          <div class="world-copy">
-            <p>STUDIO</p>
-          </div>
-        </a>
-
-        <a href="world.html#travel" class="world-card world-travel">
-          <div class="world-copy">
-            <p>TRAVEL</p>
-          </div>
-        </a>
-
-      </div>
-
-      <a href="world.html" class="section-link">
-        ENTER OUR WORLD
-      </a>
-
     </section>
 
-
-    <!-- SHOP -->
-    <section class="home-shop">
-
-      <!--
-        Eventually use an actual photo of you wearing/using
-        a STARGIRLS product here rather than a clean product
-        packshot only.
-      -->
-
-      <div class="shop-copy">
-
-        <p>STARGIRLS</p>
-
-        <h2>SHOP</h2>
-
-        <a href="shop.html">
-          ENTER SHOP
-        </a>
-
-      </div>
-
+    <section class="chaos-break">
+      <div class="chaos-photo chaos-photo-one"></div>
+      <div class="chaos-copy"><p class="store-kicker">TWO SISTERS. ONE BRAND. BAD DECISIONS.</p><h2>MOON<br><span>VS</span><br>SUN</h2><p>the clothes are serious. we are not.</p><a class="store-cta" href="shop.html">SHOP WHAT WE'RE WEARING →</a></div>
+      <div class="chaos-photo chaos-photo-two"></div>
     </section>
 
-
-    <!-- PERSONAL FAN MOMENT -->
-    <section class="home-note">
-
-      <p class="symbols">☾ ★ ☀︎</p>
-
-      <p class="note">
-        just two girls who love making music together
-      </p>
-
+    <section class="creator-strip">
+      <a href="https://www.youtube.com/@maisonstargirls" target="_blank" rel="noopener"><small>WATCH</small><strong>YOUTUBE ↗</strong></a>
+      <a href="shop.html"><small>GET DRESSED</small><strong>SHOP ↗</strong></a>
+      <a href="https://discord.gg/yKSeYDfZxN" target="_blank" rel="noopener"><small>JOIN US</small><strong>DISCORD ↗</strong></a>
     </section>
 
-
-    <!-- EMAIL -->
-    <section class="home-join">
-
-      <h2>JOIN</h2>
-
-      <p>
-        Sign up for our latest updates.
-      </p>
-
-      <form class="signup-form">
-
-        <label for="email" class="sr-only">
-          Email Address
-        </label>
-
-        <input
-          id="email"
-          name="email"
-          type="email"
-          placeholder="EMAIL ADDRESS"
-          required
-        />
-
-        <button type="submit">
-          SIGN UP
-        </button>
-
-      </form>
-
-    </section>
-
+    <section class="last-call"><p>YOU CAME ALL THE WAY DOWN HERE.</p><h2>JUST BUY<br>THE OUTFIT.</h2><a class="store-cta store-cta-light" href="shop.html">SHOP ALL →</a></section>
   </main>
 
-
-  <!-- FOOTER -->
-  <footer class="site-footer">
-
-    <a href="index.html" class="footer-logo">
-      STARGIRLS
-    </a>
-
+  <footer class="store-footer">
+    <a class="footer-logo" href="index.html">STARGIRLS</a>
     <div class="footer-socials">
-      <a
-        href="https://instagram.com/maisonstargirls"
-        target="_blank"
-        rel="noopener"
-      >
-        INSTAGRAM
-      </a>
-
-      <a
-        href="https://tiktok.com/@maisonstargirls"
-        target="_blank"
-        rel="noopener"
-      >
-        TIKTOK
-      </a>
-
-      <a
-        href="https://www.youtube.com/@maisonstargirls"
-        target="_blank"
-        rel="noopener"
-      >
-        YOUTUBE
-      </a>
-
-      <a
-        href="https://facebook.com/maisonstargirls"
-        target="_blank"
-        rel="noopener"
-      >
-        FACEBOOK
-      </a>
+      <a href="https://instagram.com/maisonstargirls" target="_blank" rel="noopener">INSTAGRAM</a>
+      <a href="https://www.instagram.com/channel/ckxf-b6DwdsgcNKN/" target="_blank" rel="noopener">BROADCAST</a>
+      <a href="https://tiktok.com/@maisonstargirls" target="_blank" rel="noopener">TIKTOK</a>
+      <a href="https://x.com/maisonstargirls" target="_blank" rel="noopener">X</a>
+      <a href="https://www.snapchat.com/add/maisonstargirls" target="_blank" rel="noopener">SNAPCHAT</a>
+      <a href="https://www.youtube.com/@maisonstargirls" target="_blank" rel="noopener">YOUTUBE</a>
+      <a href="https://twitch.tv/maisonstargirls" target="_blank" rel="noopener">TWITCH</a>
+      <a href="https://kick.com/maisonstargirls" target="_blank" rel="noopener">KICK</a>
+      <a href="https://reddit.com/r/maisonstargirls" target="_blank" rel="noopener">REDDIT</a>
+      <a href="https://discord.gg/yKSeYDfZxN" target="_blank" rel="noopener">DISCORD</a>
+      <a href="https://streamlabs.com/maisonstargirls" target="_blank" rel="noopener">TTS / SUPPORT</a>
+      <a href="music.html">MUSIC</a>
+      <a href="about.html">ABOUT</a>
     </div>
-
-    <div class="footer-legal">
-      <a href="privacy.html">PRIVACY</a>
-      <a href="terms.html">TERMS</a>
-    </div>
-
-    <p class="copyright">
-      © 2026 STARGIRLS
-    </p>
-
+    <div class="footer-legal"><a href="privacy.html">PRIVACY</a><a href="terms.html">TERMS</a></div><p class="copyright">© 2026 STARGIRLS</p>
   </footer>
-
   <script src="script.js"></script>
-
 </body>
 </html>
