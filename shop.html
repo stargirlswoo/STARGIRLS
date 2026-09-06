@@ -14,20 +14,23 @@
   <header class="site-header store-header">
     <a class="logo" href="index.html" aria-label="STARGIRLS Home">STARGIRLS</a>
     <nav class="desktop-nav">
-      <a href="#all">SHOP</a>
-      <a href="#new">NEW</a>
-      <a href="#clothing">CLOTHING</a>
-      <a href="#merch">MERCH</a>
-      <a href="#beauty">BEAUTY</a>
+      <a href="#catalog" data-shop-filter="all" class="active">SHOP</a>
+      <a href="#catalog" data-shop-filter="clothing">CLOTHING</a>
+      <a href="#catalog" data-shop-filter="merch">MERCH</a>
+      <a href="#catalog" data-shop-filter="beauty">BEAUTY</a>
     </nav>
-    <a class="header-shop" href="#all">SHOP →</a>
+    <button class="header-shop cart-trigger" type="button" data-cart-open>CART (<span data-cart-count>0</span>)</button>
     <button class="menu-toggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
   </header>
 
   <aside class="mobile-menu" id="mobileMenu">
     <div class="mobile-menu-top"><a class="mobile-logo" href="index.html">STARGIRLS</a><button class="menu-close" aria-label="Close menu">×</button></div>
     <nav class="mobile-nav">
-      <a href="#all">SHOP ALL</a><a href="#new">NEW</a><a href="#clothing">CLOTHING</a><a href="#merch">MERCH</a><a href="#beauty">BEAUTY</a>
+      <a href="#catalog" data-shop-filter="all">SHOP ALL</a>
+      <a href="#catalog" data-shop-filter="clothing">CLOTHING</a>
+      <a href="#catalog" data-shop-filter="merch">MERCH</a>
+      <a href="#catalog" data-shop-filter="beauty">BEAUTY</a>
+      <button class="mobile-cart-button" type="button" data-cart-open>CART (<span data-cart-count>0</span>)</button>
     </nav>
     <div class="mobile-socials">
       <a href="https://instagram.com/maisonstargirls" target="_blank" rel="noopener">INSTAGRAM</a>
@@ -38,7 +41,7 @@
   </aside>
   <div class="menu-overlay"></div>
 
-  <main class="shop-storefront" id="all">
+  <main class="shop-storefront">
     <section class="shop-storefront-hero">
       <p class="store-kicker">STARGIRLS STORE</p>
       <h1>SHOP</h1>
@@ -46,40 +49,43 @@
     </section>
 
     <nav class="shop-tabs" aria-label="Shop categories">
-      <a href="#all">ALL</a><a href="#new">NEW</a><a href="#clothing">CLOTHING</a><a href="#merch">MERCH</a><a href="#beauty">BEAUTY</a>
+      <a href="#catalog" data-shop-filter="all" class="active">ALL</a>
+      <a href="#catalog" data-shop-filter="clothing">CLOTHING</a>
+      <a href="#catalog" data-shop-filter="merch">MERCH</a>
+      <a href="#catalog" data-shop-filter="beauty">BEAUTY</a>
     </nav>
 
-    <section class="catalog-section" id="new">
-      <p class="store-kicker">FIRST LOOK</p>
-      <h2>COMING IN</h2>
-      <div class="catalog-grid">
-        <a class="catalog-card" href="#merch"><div class="catalog-card-image"></div><div class="catalog-meta"><span>STARGIRLS MERCH</span><span>COMING SOON</span></div></a>
-        <a class="catalog-card" href="#clothing"><div class="catalog-card-image"></div><div class="catalog-meta"><span>THE CLOSET</span><span>COMING SOON</span></div></a>
-        <a class="catalog-card" href="#clothing"><div class="catalog-card-image"></div><div class="catalog-meta"><span>NEW CLOTHING</span><span>COMING SOON</span></div></a>
-        <a class="catalog-card" href="#beauty"><div class="catalog-card-image"></div><div class="catalog-meta"><span>JUNO + BEAUTY</span><span>COMING SOON</span></div></a>
+    <section class="catalog-section" id="catalog">
+      <div class="catalog-heading-row">
+        <div>
+          <p class="store-kicker">THE ACTUAL STUFF</p>
+          <h2>ALL PRODUCTS</h2>
+        </div>
+        <p class="catalog-explainer">The catalog is now wired to one product data file, so real prices, sizes and inventory can drop in without rebuilding the page.</p>
       </div>
+      <div class="catalog-grid" data-product-grid aria-live="polite"></div>
     </section>
 
-    <section class="catalog-section" id="clothing">
-      <p class="store-kicker">STARGIRLS CLOTHING</p>
-      <h2>THE CLOSET</h2>
-      <div class="shop-note-box"><h3>REAL CLOTHES. REAL DROP.</h3><p>This section is reserved for the inventory you're actually bringing in. Once the product photos, names, sizes and prices are final, these cards become the live clothing collection and checkout inventory.</p></div>
-    </section>
-
-    <section class="catalog-section" id="merch">
-      <p class="store-kicker">WEAR THE PROBLEM</p>
-      <h2>MERCH</h2>
-      <div class="shop-note-box"><h3>STARGIRLS, BUT ON A SHIRT.</h3><p>This is where the logo pieces, hoodies, tees and creator merch will live. No fake prices or fake checkout buttons until the actual fulfillment catalog is connected.</p></div>
-    </section>
-
-    <section class="catalog-section" id="beauty">
-      <p class="store-kicker">MOON + SUN BEAUTY</p>
-      <h2>BEAUTY</h2>
-      <div class="catalog-grid">
-        <a class="catalog-card" href="fragrance.html"><div class="catalog-card-image"></div><div class="catalog-meta"><span>JUNO EAU DE PARFUM</span><span>COMING SOON</span></div></a>
-      </div>
+    <section class="store-ready-note">
+      <p class="store-kicker">BUILT FOR THE REAL LAUNCH</p>
+      <h2>NO FAKE<br>CHECKOUT.</h2>
+      <p>Products stay marked coming soon until the real catalog is ready. When a product is switched live in the store data, its price and add-to-cart button appear automatically. Checkout stays disabled until the payment backend is connected.</p>
     </section>
   </main>
+
+  <div class="cart-backdrop" data-cart-backdrop></div>
+  <aside class="cart-drawer" data-cart-drawer aria-label="Shopping cart" aria-live="polite">
+    <div class="cart-head">
+      <div><p class="store-kicker">STARGIRLS</p><h2>YOUR CART</h2></div>
+      <button type="button" class="cart-close" data-cart-close aria-label="Close cart">×</button>
+    </div>
+    <div class="cart-items" data-cart-items></div>
+    <div class="cart-footer">
+      <div class="cart-subtotal"><span>SUBTOTAL</span><strong data-cart-subtotal>$0.00</strong></div>
+      <button class="checkout-button" type="button" data-checkout disabled>CHECKOUT</button>
+      <p data-checkout-note>Checkout activates when purchasable products and the payment backend are connected.</p>
+    </div>
+  </aside>
 
   <footer class="store-footer">
     <a class="footer-logo" href="index.html">STARGIRLS</a>
@@ -100,5 +106,6 @@
     <div class="footer-legal"><a href="privacy.html">PRIVACY</a><a href="terms.html">TERMS</a></div><p class="copyright">© 2026 STARGIRLS</p>
   </footer>
   <script src="script.js"></script>
+  <script src="store.js"></script>
 </body>
 </html>
