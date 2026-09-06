@@ -1,0 +1,13 @@
+name = "stargirls-store"
+main = "index.js"
+compatibility_date = "2026-09-01"
+
+# Copy this file to wrangler.toml when deploying.
+# Keep STRIPE_SECRET_KEY as a Worker secret, never in this file.
+
+[vars]
+ALLOWED_ORIGIN = "https://stargirls.maison"
+PUBLIC_SITE_URL = "https://stargirls.maison/"
+CATALOG_URL = "https://stargirls.maison/content/products.json"
+SUCCESS_URL = "https://stargirls.maison/checkout-success.html"
+CANCEL_URL = "https://stargirls.maison/checkout-cancelled.html"

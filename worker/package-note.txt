@@ -1,0 +1,1 @@
+The checkout Worker uses native fetch/Web APIs and does not require a Node package install for the current Stripe Checkout scaffold.
