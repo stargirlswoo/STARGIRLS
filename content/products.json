@@ -1,0 +1,41 @@
+{
+  "products": [
+    {
+      "id": "stargirls-merch",
+      "name": "STARGIRLS MERCH",
+      "category": "merch",
+      "status": "COMING SOON",
+      "price": null,
+      "image": "images/home/img_1571.jpeg",
+      "available": false
+    },
+    {
+      "id": "the-closet",
+      "name": "THE CLOSET",
+      "category": "clothing",
+      "status": "COMING SOON",
+      "price": null,
+      "image": "images/home/img_2410.jpeg",
+      "available": false
+    },
+    {
+      "id": "new-clothing",
+      "name": "NEW CLOTHING",
+      "category": "clothing",
+      "status": "COMING SOON",
+      "price": null,
+      "image": "images/shop/img_1725.jpeg",
+      "available": false
+    },
+    {
+      "id": "juno-edp",
+      "name": "JUNO EAU DE PARFUM",
+      "category": "beauty",
+      "status": "COMING SOON",
+      "price": null,
+      "image": "images/juno/juno-bottle.jpg",
+      "available": false,
+      "href": "fragrance.html"
+    }
+  ]
+}
