@@ -1,0 +1,1 @@
+.product-tease-grid{grid-template-columns:repeat(4,1fr)}.product-tease-four{background-image:url('images/home/img_1573.jpeg')}@media(max-width:800px){.product-tease-grid{grid-template-columns:1fr 1fr}.product-tease-grid .product-tease:last-child{grid-column:auto}.product-tease-grid .product-tease:last-child .product-tease-image{aspect-ratio:4/5}}
