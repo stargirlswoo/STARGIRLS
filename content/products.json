@@ -1,13 +1,26 @@
 {
   "products": [
     {
-      "id": "stargirls-merch",
-      "name": "STARGIRLS MERCH",
+      "id": "stargirls-heavyweight-tee-black",
+      "name": "STARGIRLS HEAVYWEIGHT TEE — BLACK",
       "category": "merch",
       "status": "COMING SOON",
       "price": null,
       "image": "images/home/img_1571.jpeg",
-      "available": false
+      "available": false,
+      "color": "Black",
+      "fulfillment": "apliiq",
+      "description": "Our signature oversized heavyweight tee. Black with the chrome-pink STARGIRLS logo on the left chest and a statement STARGIRLS graphic across the back.",
+      "variants": [
+        {"size":"S","sku":"APQ-6070911S6A1"},
+        {"size":"M","sku":"APQ-6070911S7A1"},
+        {"size":"L","sku":"APQ-6070911S8A1"},
+        {"size":"XL","sku":"APQ-6070911S1A1"},
+        {"size":"XXL","sku":"APQ-6070911S2A1"},
+        {"size":"XXXL","sku":"APQ-6070911S21A1"},
+        {"size":"4XL","sku":"APQ-6070911S61A1"},
+        {"size":"5XL","sku":"APQ-6070911S62A1"}
+      ]
     },
     {
       "id": "the-closet",
