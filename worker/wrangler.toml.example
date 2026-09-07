@@ -3,7 +3,7 @@ main = "index.js"
 compatibility_date = "2026-09-01"
 
 # Copy this file to wrangler.toml when deploying.
-# Keep STRIPE_SECRET_KEY as a Worker secret, never in this file.
+# Keep STRIPE_SECRET_KEY and APLIIQ_SHARED_SECRET as Worker secrets, never in this file.
 
 [vars]
 ALLOWED_ORIGIN = "https://stargirls.maison"
@@ -11,3 +11,9 @@ PUBLIC_SITE_URL = "https://stargirls.maison/"
 CATALOG_URL = "https://stargirls.maison/content/products.json"
 SUCCESS_URL = "https://stargirls.maison/checkout-success.html"
 CANCEL_URL = "https://stargirls.maison/checkout-cancelled.html"
+APLIIQ_APP_ID = "replace-with-your-apliiq-app-id"
+
+# Create a KV namespace in Cloudflare and replace this placeholder with its real ID.
+[[kv_namespaces]]
+binding = "APLIIQ_PRODUCTS"
+id = "replace-with-kv-namespace-id"
