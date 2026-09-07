@@ -1,0 +1,10 @@
+name = "stargirls"
+main = "index.js"
+compatibility_date = "2026-09-01"
+keep_vars = true
+
+# Keep dashboard-managed variables and secrets intact while making bindings
+# part of the deployment source of truth.
+
+[[kv_namespaces]]
+binding = "APLIIQ_PRODUCTS"
