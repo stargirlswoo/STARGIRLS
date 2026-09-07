@@ -244,6 +244,18 @@ export async function receiveStripeWebhook(request, env) {
     });
   }
 
+  // Apliiq does not provide a sandbox. Never let a Stripe test-mode event
+  // create a real production order at Apliiq.
+  if (event.livemode === false) {
+    return new Response(JSON.stringify({
+      received: true,
+      testMode: true,
+      fulfillmentSkipped: true
+    }), {
+      headers: { "content-type": "application/json; charset=utf-8" }
+    });
+  }
+
   if (!["checkout.session.completed", "checkout.session.async_payment_succeeded"].includes(event.type)) {
     return new Response(JSON.stringify({ received: true, ignored: event.type }), {
       headers: { "content-type": "application/json; charset=utf-8" }
