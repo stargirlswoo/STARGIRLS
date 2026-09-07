@@ -4,13 +4,13 @@
       "id": "stargirls-heavyweight-tee-black",
       "name": "STARGIRLS HEAVYWEIGHT TEE — BLACK",
       "category": "merch",
-      "status": "COMING SOON",
-      "price": null,
+      "status": "AVAILABLE",
+      "price": 49.99,
       "image": "images/home/img_1571.jpeg",
-      "available": false,
+      "available": true,
       "color": "Black",
       "fulfillment": "apliiq",
-      "description": "Our signature oversized heavyweight tee. Black with the chrome-pink STARGIRLS logo on the left chest and a statement STARGIRLS graphic across the back.",
+      "description": "Our signature oversized heavyweight tee. Black with the chrome-pink STARGIRLS logo on the left chest and a statement STARGIRLS graphic across the back. Heavyweight feel, oversized fit, made for everyday wear.",
       "variants": [
         {"size":"S","sku":"APQ-6070911S6A1"},
         {"size":"M","sku":"APQ-6070911S7A1"},
@@ -20,6 +20,49 @@
         {"size":"XXXL","sku":"APQ-6070911S21A1"},
         {"size":"4XL","sku":"APQ-6070911S61A1"},
         {"size":"5XL","sku":"APQ-6070911S62A1"}
+      ]
+    },
+    {
+      "id": "stargirls-star-heavyweight-tee-black",
+      "name": "STARGIRLS STAR HEAVYWEIGHT TEE — BLACK",
+      "category": "merch",
+      "status": "AVAILABLE",
+      "price": 49.99,
+      "image": "images/home/img_1571.jpeg",
+      "available": true,
+      "color": "Black",
+      "fulfillment": "apliiq",
+      "description": "An oversized heavyweight tee made for the STARS. Featuring a chrome-pink STAR graphic across the front and our cosmic STARGIRLS galaxy graphic across the back. Heavyweight feel, relaxed oversized fit, and built for everyday wear. Unisex.",
+      "variants": [
+        {"size":"S","sku":"APQ-6071049S6A1"},
+        {"size":"M","sku":"APQ-6071049S7A1"},
+        {"size":"L","sku":"APQ-6071049S8A1"},
+        {"size":"XL","sku":"APQ-6071049S1A1"},
+        {"size":"XXL","sku":"APQ-6071049S2A1"},
+        {"size":"XXXL","sku":"APQ-6071049S21A1"},
+        {"size":"4XL","sku":"APQ-6071049S61A1"},
+        {"size":"5XL","sku":"APQ-6071049S62A1"}
+      ]
+    },
+    {
+      "id": "stargirls-orbit-heavyweight-hoodie-black",
+      "name": "STARGIRLS ORBIT HEAVYWEIGHT HOODIE — BLACK",
+      "category": "merch",
+      "status": "AVAILABLE",
+      "price": 59.99,
+      "image": "images/home/img_1571.jpeg",
+      "available": true,
+      "color": "Black",
+      "fulfillment": "apliiq",
+      "description": "Our signature heavyweight STARGIRLS hoodie. Black with a shining silver-chrome STARGIRLS graphic across the front and an oversized cosmic orbit graphic across the back. Heavyweight, structured feel with a relaxed unisex fit. Made for STARS.",
+      "variants": [
+        {"size":"XS","sku":"APQ-6071127S5A1"},
+        {"size":"S","sku":"APQ-6071127S6A1"},
+        {"size":"M","sku":"APQ-6071127S7A1"},
+        {"size":"L","sku":"APQ-6071127S8A1"},
+        {"size":"XL","sku":"APQ-6071127S1A1"},
+        {"size":"XXL","sku":"APQ-6071127S2A1"},
+        {"size":"XXXL","sku":"APQ-6071127S21A1"}
       ]
     },
     {
