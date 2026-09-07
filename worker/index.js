@@ -11,9 +11,16 @@ function cors(origin, allowedOrigin) {
   const allow = allowedOrigin || origin || "*";
   return {
     "access-control-allow-origin": allow,
-    "access-control-allow-methods": "POST, OPTIONS",
+    "access-control-allow-methods": "GET, POST, OPTIONS",
     "access-control-allow-headers": "content-type"
   };
+}
+
+function requireProductsKv(env) {
+  if (!env.APLIIQ_PRODUCTS) {
+    throw new Error("APLIIQ_PRODUCTS KV binding is not configured");
+  }
+  return env.APLIIQ_PRODUCTS;
 }
 
 async function loadCatalog(env) {
@@ -90,38 +97,198 @@ async function createStripeCheckout(items, env) {
   return data;
 }
 
+function compactProduct(payload, id) {
+  const imageUrls = Array.isArray(payload.imageUrls) ? payload.imageUrls.filter(Boolean) : [];
+  return {
+    store_ProductId: id,
+    name: String(payload.name || "Apliiq product"),
+    imageUrls
+  };
+}
+
+async function saveApliiqProduct(request, env) {
+  const kv = requireProductsKv(env);
+  const payload = await request.json();
+  if (!payload || typeof payload !== "object" || !payload.name) {
+    return json({
+      storeProductId: null,
+      stepsCompleted: [],
+      hasError: true,
+      errorMessages: ["Product name is required"]
+    }, 400);
+  }
+
+  const requestedId = payload.store_ProductId ? String(payload.store_ProductId) : "";
+  const id = requestedId || `apliiq-${crypto.randomUUID()}`;
+  const record = {
+    ...payload,
+    store_ProductId: id,
+    stargirlsReceivedAt: new Date().toISOString()
+  };
+
+  await kv.put(`product:${id}`, JSON.stringify(record));
+  return json({
+    storeProductId: id,
+    stepsCompleted: ["DraftCreated", "InventoryCreated", "ImagesUploaded", "Completed"],
+    hasError: false,
+    errorMessages: []
+  });
+}
+
+async function searchApliiqProducts(url, env) {
+  const kv = requireProductsKv(env);
+  const search = (url.searchParams.get("search") || "").trim().toLowerCase();
+  const results = [];
+  let cursor;
+
+  do {
+    const page = await kv.list({ prefix: "product:", cursor, limit: 100 });
+    for (const key of page.keys) {
+      const record = await kv.get(key.name, "json");
+      if (!record) continue;
+      const haystack = [record.name, record.type, record.store_ProductId]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      if (!search || haystack.includes(search)) {
+        results.push(compactProduct(record, String(record.store_ProductId || key.name.slice(8))));
+      }
+      if (results.length >= 50) return json(results);
+    }
+    cursor = page.list_complete ? undefined : page.cursor;
+  } while (cursor);
+
+  return json(results);
+}
+
+function timingSafeEqual(a, b) {
+  if (a.length !== b.length) return false;
+  let mismatch = 0;
+  for (let i = 0; i < a.length; i += 1) mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return mismatch === 0;
+}
+
+async function hmacBase64(message, secret) {
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const signature = await crypto.subtle.sign("HMAC", key, encoder.encode(message));
+  let binary = "";
+  for (const byte of new Uint8Array(signature)) binary += String.fromCharCode(byte);
+  return btoa(binary);
+}
+
+function bytesToBase64(bytes) {
+  let binary = "";
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary);
+}
+
+async function verifyApliiqHmac(request, env, rawBody) {
+  if (!env.APLIIQ_SHARED_SECRET) return false;
+  const received = request.headers.get("x-apliiq-hmac") || "";
+  if (!received) return false;
+  const payloadBase64 = bytesToBase64(new TextEncoder().encode(rawBody));
+  const expected = await hmacBase64(payloadBase64, env.APLIIQ_SHARED_SECRET);
+  return timingSafeEqual(received, expected);
+}
+
+async function receiveFulfillment(request, env) {
+  const rawBody = await request.text();
+  if (!(await verifyApliiqHmac(request, env, rawBody))) {
+    return json({ error: "Invalid Apliiq signature" }, 401);
+  }
+
+  let payload;
+  try {
+    payload = JSON.parse(rawBody);
+  } catch {
+    return json({ error: "Invalid JSON" }, 400);
+  }
+
+  const orderId = payload?.fulfillment?.order_id;
+  if (!orderId) return json({ error: "Missing fulfillment.order_id" }, 400);
+
+  const kv = requireProductsKv(env);
+  await kv.put(`fulfillment:${orderId}:${Date.now()}`, JSON.stringify({
+    ...payload,
+    stargirlsReceivedAt: new Date().toISOString()
+  }));
+
+  return json({ ok: true });
+}
+
+async function receiveWarehouseShipment(request, env) {
+  if (!env.APLIIQ_APP_ID) return json({ error: "APLIIQ_APP_ID is not configured" }, 503);
+  const receivedAppId = request.headers.get("x-apliiq-appId") || "";
+  if (!timingSafeEqual(receivedAppId, env.APLIIQ_APP_ID)) {
+    return json({ error: "Invalid Apliiq app id" }, 401);
+  }
+
+  const payload = await request.json();
+  if (!Array.isArray(payload)) return json({ error: "Expected shipment array" }, 400);
+
+  const kv = requireProductsKv(env);
+  await kv.put(`warehouse-shipment:${Date.now()}:${crypto.randomUUID()}`, JSON.stringify({
+    shipments: payload,
+    stargirlsReceivedAt: new Date().toISOString()
+  }));
+
+  return json({ ok: true, received: payload.length });
+}
+
 export default {
   async fetch(request, env) {
     const origin = request.headers.get("origin") || "";
     const corsHeaders = cors(origin, env.ALLOWED_ORIGIN);
+    const url = new URL(request.url);
 
     if (request.method === "OPTIONS") {
       return new Response(null, { status: 204, headers: corsHeaders });
     }
 
-    const url = new URL(request.url);
-
     if (url.pathname === "/health") {
       return json({ ok: true }, 200, corsHeaders);
     }
 
-    if (url.pathname !== "/checkout" || request.method !== "POST") {
-      return json({ error: "Not found" }, 404, corsHeaders);
-    }
-
-    if (env.ALLOWED_ORIGIN && origin && origin !== env.ALLOWED_ORIGIN) {
-      return json({ error: "Origin not allowed" }, 403, corsHeaders);
-    }
-
     try {
+      if (url.pathname === "/apliiq/product" && request.method === "POST") {
+        return await saveApliiqProduct(request, env);
+      }
+
+      if (url.pathname === "/apliiq/product-search" && request.method === "GET") {
+        return await searchApliiqProducts(url, env);
+      }
+
+      if (url.pathname === "/apliiq/fulfillment" && request.method === "POST") {
+        return await receiveFulfillment(request, env);
+      }
+
+      if (url.pathname === "/apliiq/warehouse-shipment-complete" && request.method === "POST") {
+        return await receiveWarehouseShipment(request, env);
+      }
+
+      if (url.pathname !== "/checkout" || request.method !== "POST") {
+        return json({ error: "Not found" }, 404, corsHeaders);
+      }
+
+      if (env.ALLOWED_ORIGIN && origin && origin !== env.ALLOWED_ORIGIN) {
+        return json({ error: "Origin not allowed" }, 403, corsHeaders);
+      }
+
       const payload = await request.json();
       const catalog = await loadCatalog(env);
       const validatedItems = validateCart(payload.items, catalog);
       const session = await createStripeCheckout(validatedItems, env);
       return json({ url: session.url }, 200, corsHeaders);
     } catch (error) {
-      console.error("STARGIRLS checkout worker", error);
-      return json({ error: error.message || "Checkout failed" }, 400, corsHeaders);
+      console.error("STARGIRLS store worker", error);
+      return json({ error: error.message || "Request failed" }, 400, corsHeaders);
     }
   }
 };
