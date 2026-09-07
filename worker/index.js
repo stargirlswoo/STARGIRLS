@@ -1,3 +1,5 @@
+import { receiveStripeWebhook } from "./stripe-fulfillment.js";
+
 const JSON_HEADERS = { "content-type": "application/json; charset=utf-8" };
 
 function json(data, status = 200, extraHeaders = {}) {
@@ -51,7 +53,15 @@ function validateCart(requestedItems, catalog) {
       throw new Error(`Invalid quantity for: ${item.id}`);
     }
 
-    return { product, quantity };
+    let variant = null;
+    if (Array.isArray(product.variants) && product.variants.length) {
+      variant = product.variants.find(entry => entry.size === item.size);
+      if (!variant || !variant.sku || (item.sku && item.sku !== variant.sku)) {
+        throw new Error(`Invalid variant for: ${item.id}`);
+      }
+    }
+
+    return { product, variant, quantity };
   });
 }
 
@@ -66,13 +76,20 @@ async function createStripeCheckout(items, env) {
   body.set("billing_address_collection", "auto");
   body.set("shipping_address_collection[allowed_countries][0]", "US");
 
-  items.forEach(({ product, quantity }, index) => {
+  items.forEach(({ product, variant, quantity }, index) => {
     const cents = Math.round(product.price * 100);
+    const sku = variant?.sku || product.sku || "";
+    const size = variant?.size || "";
+
     body.set(`line_items[${index}][quantity]`, String(quantity));
     body.set(`line_items[${index}][price_data][currency]`, "usd");
     body.set(`line_items[${index}][price_data][unit_amount]`, String(cents));
-    body.set(`line_items[${index}][price_data][product_data][name]`, product.name);
+    body.set(`line_items[${index}][price_data][product_data][name]`, size ? `${product.name} — ${size}` : product.name);
     body.set(`line_items[${index}][price_data][product_data][metadata][stargirls_product_id]`, product.id);
+    body.set(`line_items[${index}][price_data][product_data][metadata][fulfillment]`, product.fulfillment || "stargirls");
+    if (sku) body.set(`line_items[${index}][price_data][product_data][metadata][sku]`, sku);
+    if (size) body.set(`line_items[${index}][price_data][product_data][metadata][size]`, size);
+
     if (product.image && env.PUBLIC_SITE_URL) {
       const imageUrl = new URL(product.image, env.PUBLIC_SITE_URL).toString();
       body.set(`line_items[${index}][price_data][product_data][images][0]`, imageUrl);
@@ -257,6 +274,10 @@ export default {
     }
 
     try {
+      if (url.pathname === "/stripe/webhook" && request.method === "POST") {
+        return await receiveStripeWebhook(request, env);
+      }
+
       if (url.pathname === "/apliiq/product" && request.method === "POST") {
         return await saveApliiqProduct(request, env);
       }

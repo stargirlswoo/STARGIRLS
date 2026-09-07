@@ -1,31 +1,42 @@
 # STARGIRLS store worker
 
-This folder contains the checkout backend scaffold for the custom storefront plus the Apliiq custom-store callback endpoints.
+This folder contains the checkout backend for the custom storefront, Apliiq custom-store callbacks, and automatic Stripe-to-Apliiq fulfillment.
 
-The frontend stays safe by default: checkout is disabled until `window.STARGIRLS_STORE_API` is set in `store-config.js`.
+## Required Cloudflare configuration
 
-## Deploy
+- KV binding: `APLIIQ_PRODUCTS`
+- Secret: `STRIPE_SECRET_KEY`
+- Secret: `STRIPE_WEBHOOK_SECRET`
+- Secret: `APLIIQ_SHARED_SECRET`
+- Variable: `APLIIQ_APP_ID`
+- `ALLOWED_ORIGIN=https://stargirls.maison`
+- `PUBLIC_SITE_URL=https://stargirls.maison/`
+- `CATALOG_URL=https://stargirls.maison/content/products.json`
+- `SUCCESS_URL=https://stargirls.maison/checkout-success.html`
+- `CANCEL_URL=https://stargirls.maison/checkout-cancelled.html`
 
-1. Copy `wrangler.toml.example` to `wrangler.toml`.
-2. Create a Cloudflare KV namespace and bind it as `APLIIQ_PRODUCTS`.
-3. Set the Worker secret `STRIPE_SECRET_KEY` in Cloudflare.
-4. Set the Worker secret `APLIIQ_SHARED_SECRET` in Cloudflare. Never commit it.
-5. Put your Apliiq app ID into the Worker environment as `APLIIQ_APP_ID`.
-6. Deploy the Worker.
-7. Put the deployed Worker URL into `store-config.js`.
-8. Switch products in `content/products.json` to `available: true` only after their real price and fulfillment details are final.
+Never commit Stripe or Apliiq secret values.
 
-The Worker reloads the public product catalog server-side and rejects unavailable products, so customers cannot alter prices in their browser and submit fake amounts.
+## Apliiq custom-store callbacks
 
-## Apliiq custom-store callback URLs
+- Add product to store: `https://stargirls.stargirlswoo.workers.dev/apliiq/product`
+- Product search: `https://stargirls.stargirlswoo.workers.dev/apliiq/product-search?search=`
+- Fulfillment: `https://stargirls.stargirlswoo.workers.dev/apliiq/fulfillment`
+- Warehouse shipment complete: `https://stargirls.stargirlswoo.workers.dev/apliiq/warehouse-shipment-complete`
 
-After deployment, replace `https://YOUR-WORKER-HOST` with the real Worker hostname and enter these in Apliiq Stores > Custom Store callbacks:
+## Stripe webhook
 
-- Add product to store URL: `https://YOUR-WORKER-HOST/apliiq/product`
-- Product search URL: `https://YOUR-WORKER-HOST/apliiq/product-search`
-- Fulfillment URL: `https://YOUR-WORKER-HOST/apliiq/fulfillment`
-- Warehouse shipment complete URL: `https://YOUR-WORKER-HOST/apliiq/warehouse-shipment-complete`
+Create a Stripe webhook endpoint pointing to:
 
-The product webhook stores Apliiq's payload in KV and returns Apliiq's expected custom-store response. Product search reads those stored records. Fulfillment callbacks are HMAC-verified with `APLIIQ_SHARED_SECRET`. Warehouse-complete callbacks require the matching `x-apliiq-appId` value.
+`https://stargirls.stargirlswoo.workers.dev/stripe/webhook`
 
-Stripe-to-Apliiq automatic order submission is still a separate step. Do not mark POD products as live until the Stripe webhook and Apliiq Create Order flow are connected and tested.
+Subscribe to:
+
+- `checkout.session.completed`
+- `checkout.session.async_payment_succeeded`
+
+Copy Stripe's webhook signing secret into Cloudflare as the secret `STRIPE_WEBHOOK_SECRET`.
+
+At checkout the Worker validates product prices and variants against the public catalog, then puts product ID, fulfillment owner, size, and Apliiq SKU into server-created Stripe product metadata. When Stripe confirms a paid Checkout Session, the Worker retrieves the paid line items, sends only `fulfillment: "apliiq"` items to Apliiq's Create Order API, and stores the fulfillment result in KV so retries do not intentionally resubmit a completed order.
+
+Keep products `available: false` until their real retail price is set and the Stripe webhook has been configured and tested. Apliiq does not provide a sandbox, so the first end-to-end order test must use a real payment and then be cancelled if desired.
