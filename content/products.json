@@ -2,7 +2,7 @@
   "products": [
     {
       "id": "stargirls-heavyweight-tee-black",
-      "name": "STARGIRLS HEAVYWEIGHT TEE — BLACK",
+      "name": "STARGIRLS TEE",
       "category": "merch",
       "status": "AVAILABLE",
       "price": 49.99,
@@ -24,7 +24,7 @@
     },
     {
       "id": "stargirls-star-heavyweight-tee-black",
-      "name": "STARGIRLS STAR HEAVYWEIGHT TEE — BLACK",
+      "name": "STAR TEE",
       "category": "merch",
       "status": "AVAILABLE",
       "price": 49.99,
@@ -46,7 +46,7 @@
     },
     {
       "id": "stargirls-orbit-heavyweight-hoodie-black",
-      "name": "STARGIRLS ORBIT HEAVYWEIGHT HOODIE — BLACK",
+      "name": "STAR HOODIE",
       "category": "merch",
       "status": "AVAILABLE",
       "price": 59.99,
@@ -64,24 +64,6 @@
         {"size":"XXL","sku":"APQ-6071127S2A1"},
         {"size":"XXXL","sku":"APQ-6071127S21A1"}
       ]
-    },
-    {
-      "id": "the-closet",
-      "name": "THE CLOSET",
-      "category": "clothing",
-      "status": "COMING SOON",
-      "price": null,
-      "image": "images/home/img_2410.jpeg",
-      "available": false
-    },
-    {
-      "id": "new-clothing",
-      "name": "NEW CLOTHING",
-      "category": "clothing",
-      "status": "COMING SOON",
-      "price": null,
-      "image": "images/shop/img_1725.jpeg",
-      "available": false
     },
     {
       "id": "juno-edp",
