@@ -123,19 +123,49 @@ function compactProduct(payload, id) {
   };
 }
 
+function normalizeApliiqProductPayload(rawPayload) {
+  const candidates = [
+    rawPayload,
+    rawPayload?.product,
+    rawPayload?.data,
+    rawPayload?.productData,
+    rawPayload?.product_data
+  ].filter(candidate => candidate && typeof candidate === "object" && !Array.isArray(candidate));
+
+  const productPayload = candidates.find(candidate =>
+    candidate.name || candidate.title || candidate.productName || candidate.product_name
+  ) || candidates[0] || {};
+
+  const name = productPayload.name
+    || productPayload.title
+    || productPayload.productName
+    || productPayload.product_name
+    || rawPayload?.name
+    || rawPayload?.title
+    || "Apliiq product";
+
+  return {
+    ...rawPayload,
+    ...productPayload,
+    name: String(name)
+  };
+}
+
 async function saveApliiqProduct(request, env) {
   const kv = requireProductsKv(env);
-  const payload = await request.json();
-  if (!payload || typeof payload !== "object" || !payload.name) {
+  const rawPayload = await request.json();
+  if (!rawPayload || typeof rawPayload !== "object" || Array.isArray(rawPayload)) {
     return json({
       storeProductId: null,
       stepsCompleted: [],
       hasError: true,
-      errorMessages: ["Product name is required"]
+      errorMessages: ["Invalid product payload"]
     }, 400);
   }
 
-  const requestedId = payload.store_ProductId ? String(payload.store_ProductId) : "";
+  const payload = normalizeApliiqProductPayload(rawPayload);
+  const requestedIdValue = payload.store_ProductId ?? payload.storeProductId;
+  const requestedId = requestedIdValue ? String(requestedIdValue) : "";
   const id = requestedId || `apliiq-${crypto.randomUUID()}`;
   const record = {
     ...payload,
