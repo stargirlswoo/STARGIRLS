@@ -1,17 +1,46 @@
-/* STARGIRLS storefront gallery: prefer real garment previews; remove HAYATI artwork anywhere in gallery. */
+/* STARGIRLS storefront gallery: use product mockups, never raw artwork files. */
 (function(){
   const unique=items=>[...new Set(items.filter(Boolean))];
   const meta=file=>`${String(file?.type||'')} ${String(file?.preview_url||'')}`.toLowerCase();
-  const isArtwork=file=>/printfile|print[_ -]?file|embroidery|inside|label|template|pattern|logo|design|digitization|artwork/.test(meta(file));
-  const score=file=>{const m=meta(file);if(isArtwork(file))return-9999;let s=10;if(/mockup/.test(m))s+=500;if(/front/.test(m))s+=220;if(/back/.test(m))s+=170;if(/side/.test(m))s+=140;if(/sleeve/.test(m))s+=100;if(/product|preview/.test(m))s+=50;return s;};
-  const imagesFromVariant=v=>unique((v?.files||[]).filter(f=>f?.preview_url&&!isArtwork(f)).slice().sort((a,b)=>score(b)-score(a)).map(f=>f.preview_url));
-  const isHayati=p=>p?.id==='hayati-tee'||p?.id==='hayati-pullover';
-  const hayatiSharedImages=product=>{const map=new Map;for(const v of product?.variants||[]){const color=v?.color||'';for(const img of v?.images||[]){if(!img)continue;const colors=map.get(img)||new Set;colors.add(color);map.set(img,colors);}}return new Set([...map].filter(([,colors])=>colors.size>=2).map(([img])=>img));};
-  const cleanHayati=(product,images)=>{if(!isHayati(product))return images;const shared=hayatiSharedImages(product);const cleaned=images.filter(img=>!shared.has(img));return cleaned.length?cleaned:images;};
-  window.parsePrintfulVariant=function(v){const parts=String(v.name||'').split(' / '),price=Number(v.retail_price),images=imagesFromVariant(v);return{...v,color:parts.length>=3?parts.at(-2).trim():'',size:(parts.at(-1)||'').trim(),price:Number.isFinite(price)?price:null,printful_sync_variant_id:Number(v.sync_variant_id||0),images,image:images[0]||''};};
+  const isArtwork=file=>/printfile|print[_ -]?file|artwork|design|template|pattern|logo|digitization|inside|label/.test(meta(file));
+  const isMockup=file=>!!file?.preview_url&&!isArtwork(file)&&/mockup|preview/.test(meta(file));
+  const imagesFromVariant=v=>unique((v?.files||[]).filter(isMockup).map(f=>f.preview_url));
+
+  window.parsePrintfulVariant=function(v){
+    const parts=String(v.name||'').split(' / ').map(x=>x.trim()).filter(Boolean);
+    const price=Number(v.retail_price);
+    const images=imagesFromVariant(v);
+    const color=parts.length>=3?(parts.at(-2)||'Default'):'Default';
+    const size=parts.length>=2?(parts.at(-1)||'One Size'):'One Size';
+    return {...v,color,size,price:Number.isFinite(price)?price:null,printful_sync_variant_id:Number(v.sync_variant_id||0),images,image:images[0]||''};
+  };
   try{parsePrintfulVariant=window.parsePrintfulVariant;}catch(e){}
-  window.galleryFor=function(product){const selected=typeof selectionFor==='function'?selectionFor(product.id):{color:''},variants=(product.variants||[]).filter(v=>!selected.color||v.color===selected.color),out=[];for(const v of variants)for(const img of(v.images||[])){const safe=typeof safeImage==='function'?safeImage(img||''):img;if(safe&&!out.includes(safe))out.push(safe);}if(!product.printful_product_id){for(const img of product.gallery||[]){const safe=typeof safeImage==='function'?safeImage(img||''):img;if(safe&&!out.includes(safe))out.push(safe);}const hero=typeof safeImage==='function'?safeImage(product.image||''):product.image;if(hero&&!out.includes(hero))out.unshift(hero);}return cleanHayati(product,out).slice(0,12);};
+
+  window.galleryFor=function(product){
+    const out=[];
+    const hero=typeof safeImage==='function'?safeImage(product.image||''):product.image;
+    if(hero)out.push(hero);
+    if(!product.printful_product_id){
+      for(const img of product.gallery||[]){
+        const safe=typeof safeImage==='function'?safeImage(img||''):img;
+        if(safe&&!out.includes(safe))out.push(safe);
+      }
+    }else{
+      const selected=typeof selectionFor==='function'?selectionFor(product.id):{color:''};
+      const variants=(product.variants||[]).filter(v=>!selected.color||v.color===selected.color);
+      for(const v of variants)for(const img of(v.images||[])){
+        const safe=typeof safeImage==='function'?safeImage(img||''):img;
+        if(safe&&!out.includes(safe))out.push(safe);
+      }
+    }
+    return out.slice(0,12);
+  };
   try{galleryFor=window.galleryFor;}catch(e){}
-  window.sourceImage=function(source){let imgs=[];for(const v of source?.variants||[])imgs.push(...imagesFromVariant(v));imgs=unique(imgs);if(isHayati(source)){const pseudo={...source,variants:(source.variants||[]).map(v=>({...v,color:String(v.name||'').split(' / ').at(-2)?.trim()||'',images:imagesFromVariant(v)}))};imgs=cleanHayati(pseudo,imgs);}return imgs[0]||'';};
+
+  window.sourceImage=function(source){
+    if(source?.thumbnail_url)return source.thumbnail_url;
+    for(const v of source?.variants||[]){const imgs=imagesFromVariant(v);if(imgs[0])return imgs[0];}
+    return'';
+  };
   try{sourceImage=window.sourceImage;}catch(e){}
 })();
