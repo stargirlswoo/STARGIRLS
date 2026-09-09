@@ -1,22 +1,82 @@
-/* STARGIRLS collection-page polish: cleaner, calmer, more editorial product merchandising. */
-:root{--sg-cream:#faf9f6;--sg-ink:#0b0b0b;--sg-line:#dedbd5;--sg-accent:#8f5cff}
+/* STARGIRLS storefront — clean editorial commerce layout. */
+:root{--sg-cream:#faf9f6;--sg-ink:#0b0b0b;--sg-line:#dedbd5;--sg-muted:#77726b}
 .storefront-home{background:var(--sg-cream);color:var(--sg-ink)}
-.storefront-home .drop-bar{background:var(--sg-accent);color:#0b0b0b;height:26px;font-size:8px;letter-spacing:.16em}
-.storefront-home .site-header{background:rgba(250,249,246,.97);border-bottom:1px solid var(--sg-line);min-height:66px}
-.storefront-home .logo,.storefront-home .desktop-nav a,.storefront-home .header-shop{color:var(--sg-ink)}
-.storefront-home .home-store-intro{background:var(--sg-cream);border-bottom:1px solid var(--sg-line);padding-top:38px;padding-bottom:28px}
-.storefront-home .home-store-intro h1{color:var(--sg-ink);font-size:clamp(52px,8vw,118px)}
-.storefront-home .home-store-intro p{color:#6f6b64}.storefront-home .home-store-meta span{border-color:#cfcac2;color:#4f4b45;background:rgba(255,255,255,.35)}
-.storefront-home .shop-tabs{background:var(--sg-cream);border-color:var(--sg-line)}
-.storefront-home .shop-tabs a{color:#6f6b64}.storefront-home .shop-tabs a.active{color:var(--sg-ink);border-color:var(--sg-ink)}
-.storefront-home .catalog-section{background:var(--sg-cream)}
-.storefront-home .catalog-heading-row{border-color:var(--sg-line)}
-.storefront-home .catalog-heading-row h2{color:var(--sg-ink)}
-.storefront-home .catalog-explainer,.storefront-home .shop-eyebrow{color:#77726b}
-.storefront-home .catalog-grid{gap:1px;background:var(--sg-line);border-top:1px solid var(--sg-line);border-left:1px solid var(--sg-line)}
-.storefront-home .catalog-card{background:var(--sg-cream);border:0;border-right:1px solid var(--sg-line);border-bottom:1px solid var(--sg-line);transition:opacity .18s ease}
-.storefront-home .catalog-card:hover{opacity:.94}.storefront-home .catalog-card-image-wrap{background:#f0ede7}.storefront-home .catalog-card-image{background-color:#f0ede7}
-.storefront-home .catalog-body{padding:17px 14px 20px}.storefront-home .catalog-meta{align-items:flex-start}.storefront-home .catalog-meta strong{color:var(--sg-ink);font-size:13px;letter-spacing:.01em}.storefront-home .catalog-meta span{color:#8a857e;font-size:9px}.storefront-home .catalog-price{color:var(--sg-ink);font-size:12px;font-weight:700}.storefront-home .product-card-title-link{text-decoration:none}
-.storefront-home .store-signup{background:#0b0b0b;color:#fff;border-color:#0b0b0b}.storefront-home .store-signup .shop-eyebrow,.storefront-home .store-signup-copy>p:last-child{color:#aaa}.storefront-home .store-email-form{border-color:#666}.storefront-home .store-email-form input,.storefront-home .store-email-form button{color:#fff}
-.storefront-home .store-footer{background:#0b0b0b;color:#fff}.storefront-home .store-footer-logo,.storefront-home .support-menu>a{color:#fff}
-@media(max-width:800px){.storefront-home .site-header{min-height:58px}.storefront-home .home-store-intro{padding:28px 20px 22px}.storefront-home .home-store-intro h1{font-size:58px}.storefront-home .home-store-meta{gap:7px}.storefront-home .home-store-meta span{font-size:8px;padding:7px 9px}.storefront-home .catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:1px}.storefront-home .catalog-body{padding:13px 10px 16px}.storefront-home .catalog-meta{display:block}.storefront-home .catalog-price{margin-top:6px}.storefront-home .catalog-meta strong{font-size:11px}.storefront-home .catalog-card-image{min-height:0;aspect-ratio:1/1.15}}
+
+/* top chrome */
+.storefront-home .drop-bar{background:#0b0b0b!important;color:#fff!important;height:24px!important;font-size:8px!important;letter-spacing:.16em!important;border:0!important}
+.storefront-home .drop-bar .sg-mark{filter:none!important}
+.storefront-home .site-header{background:rgba(250,249,246,.98)!important;border-bottom:1px solid var(--sg-line)!important;min-height:66px!important}
+.storefront-home .logo,.storefront-home .desktop-nav a,.storefront-home .header-shop{color:var(--sg-ink)!important}
+.storefront-home .site-header .sg-mark{filter:invert(1)}
+.storefront-home .desktop-nav{gap:22px}
+.storefront-home .header-shop{border-color:var(--sg-ink)!important}
+
+/* hero — intentionally compact so shopping begins above the fold */
+.storefront-home .home-store-intro{background:var(--sg-cream)!important;border-bottom:1px solid var(--sg-line)!important;padding:34px 4vw 26px!important;min-height:0!important}
+.storefront-home .home-store-intro h1{color:var(--sg-ink)!important;font-size:clamp(50px,7vw,102px)!important;line-height:.84!important;max-width:900px}
+.storefront-home .home-store-intro h1 .sg-mark{filter:invert(1)}
+.storefront-home .home-store-intro p{color:#6f6b64!important;margin-top:16px!important;max-width:560px!important}
+.storefront-home .home-store-meta{margin-top:16px!important;gap:7px!important}
+.storefront-home .home-store-meta span{border-color:#d6d1ca!important;color:#5e5952!important;background:transparent!important;padding:6px 9px!important;font-size:8px!important}
+.storefront-home .home-store-meta .sg-mark{filter:invert(1)}
+
+/* the three oversized department tiles duplicated the tabs and pushed products down */
+.storefront-home .shop-category-intro{display:none!important}
+
+/* category navigation */
+.storefront-home .shop-tabs{position:sticky!important;top:66px!important;z-index:30!important;background:rgba(250,249,246,.97)!important;backdrop-filter:blur(12px);border-top:0!important;border-bottom:1px solid var(--sg-line)!important;padding-left:4vw!important;padding-right:4vw!important;overflow-x:auto;white-space:nowrap;scrollbar-width:none}
+.storefront-home .shop-tabs::-webkit-scrollbar{display:none}
+.storefront-home .shop-tabs a{color:#7d7871!important;padding-top:15px!important;padding-bottom:13px!important;font-size:10px!important;letter-spacing:.09em!important}
+.storefront-home .shop-tabs a.active{color:var(--sg-ink)!important;border-color:var(--sg-ink)!important}
+
+/* catalog */
+.storefront-home .catalog-section{background:var(--sg-cream)!important;padding-top:0!important}
+.storefront-home .catalog-heading-row{border-color:var(--sg-line)!important;padding:30px 4vw 18px!important;align-items:end!important}
+.storefront-home .catalog-heading-row h2{color:var(--sg-ink)!important;font-size:clamp(34px,4.8vw,64px)!important;letter-spacing:-.045em!important;line-height:.9!important}
+.storefront-home .catalog-explainer,.storefront-home .shop-eyebrow{color:var(--sg-muted)!important}
+.storefront-home .catalog-explainer{max-width:330px!important;font-size:10px!important;line-height:1.5!important}
+.storefront-home .catalog-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:1px!important;background:var(--sg-line)!important;border-top:1px solid var(--sg-line)!important;border-left:1px solid var(--sg-line)!important}
+.storefront-home .catalog-card{background:var(--sg-cream)!important;border:0!important;border-right:1px solid var(--sg-line)!important;border-bottom:1px solid var(--sg-line)!important;transition:opacity .16s ease!important;min-width:0!important}
+.storefront-home .catalog-card:hover{opacity:.92!important}
+.storefront-home .catalog-card-image-wrap,.storefront-home .catalog-card-image{background:#f0ede7!important}
+.storefront-home .catalog-card-image{aspect-ratio:4/5!important;min-height:0!important;background-size:cover!important;background-position:center!important}
+.storefront-home .catalog-body{padding:14px 12px 18px!important}
+.storefront-home .catalog-meta{align-items:flex-start!important;gap:10px!important}
+.storefront-home .catalog-meta strong{color:var(--sg-ink)!important;font-size:12px!important;line-height:1.2!important;letter-spacing:.005em!important}
+.storefront-home .catalog-meta span{color:#8a857e!important;font-size:8px!important;letter-spacing:.08em!important}
+.storefront-home .catalog-price{color:var(--sg-ink)!important;font-size:11px!important;font-weight:700!important;white-space:nowrap!important}
+.storefront-home .product-card-title-link{text-decoration:none!important}
+.storefront-home .catalog-thumbs,.storefront-home .catalog-image-tools{display:none!important}
+
+/* remove unnecessary visual weight below products */
+.storefront-home .store-signup{background:#0b0b0b!important;color:#fff!important;border-color:#0b0b0b!important;padding-top:58px!important;padding-bottom:58px!important}
+.storefront-home .store-signup .shop-eyebrow,.storefront-home .store-signup-copy>p:last-child{color:#aaa!important}
+.storefront-home .store-email-form{border-color:#666!important}
+.storefront-home .store-email-form input,.storefront-home .store-email-form button{color:#fff!important}
+.storefront-home .store-signup .sg-mark{filter:none!important}
+.storefront-home .store-footer{background:#0b0b0b!important;color:#fff!important}
+.storefront-home .store-footer-logo,.storefront-home .support-menu>a{color:#fff!important}
+.storefront-home .store-footer .sg-mark{filter:none!important}
+
+@media(max-width:1050px){
+ .storefront-home .catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:800px){
+ .storefront-home .site-header{min-height:58px!important}
+ .storefront-home .shop-tabs{top:58px!important;padding-left:18px!important;padding-right:18px!important}
+ .storefront-home .home-store-intro{padding:22px 20px 18px!important}
+ .storefront-home .home-store-intro h1{font-size:50px!important}
+ .storefront-home .home-store-intro>p:not(.shop-eyebrow){font-size:12px!important;line-height:1.45!important}
+ .storefront-home .home-store-meta{display:none!important}
+ .storefront-home .catalog-heading-row{padding:24px 20px 14px!important;display:block!important}
+ .storefront-home .catalog-heading-row h2{font-size:38px!important}
+ .storefront-home .catalog-explainer{display:none!important}
+ .storefront-home .catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .storefront-home .catalog-body{padding:10px 8px 14px!important}
+ .storefront-home .catalog-meta{display:block!important}
+ .storefront-home .catalog-price{margin-top:5px!important;font-size:10px!important}
+ .storefront-home .catalog-meta strong{font-size:10px!important}
+ .storefront-home .catalog-meta span{font-size:7px!important}
+ .storefront-home .catalog-card-image{aspect-ratio:4/5!important}
+ .storefront-home .store-signup{padding:46px 20px!important}
+}
