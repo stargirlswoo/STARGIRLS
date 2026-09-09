@@ -1,23 +1,36 @@
 (()=>{
   const nativeFetch=window.fetch.bind(window);
   const api=window.STARGIRLS_STORE_API||'';
+
   const inferCategory=name=>{
     const n=String(name||'').toLowerCase();
     if(/juno|perfume|parfum|fragrance|eau de/.test(n)) return 'perfume';
     return 'fashion';
   };
+
   const needsMockupOnly=name=>/hunt.*swim|hunt.*flip|anew.*pullover|stargirl?s?.*pullover/i.test(String(name||''));
-  const cleanSource=source=>{
-    if(!needsMockupOnly(source?.name)) return source;
-    const variants=(source.variants||[]).map(v=>{
-      const files=Array.isArray(v.files)?v.files:[];
-      const previews=files.filter(f=>f&&f.preview_url&&String(f.type||'').toLowerCase()==='preview');
-      return {...v,files:previews.length?previews:files.slice(1)};
-    });
-    let hero='';
-    for(const v of variants){const f=(v.files||[]).find(x=>x?.preview_url);if(f){hero=f.preview_url;break;}}
-    return {...source,variants,thumbnail_url:hero||source.thumbnail_url};
+  const badArtwork=file=>{
+    const m=`${String(file?.type||'')} ${String(file?.preview_url||'')}`.toLowerCase();
+    return /printfile|print[_ -]?file|artwork|design|template|pattern|logo|digitization|inside|label/.test(m);
   };
+  const trustedMockup=file=>!!file?.preview_url&&!badArtwork(file)&&/mockup|preview/.test(`${String(file?.type||'')} ${String(file?.preview_url||'')}`.toLowerCase());
+
+  const normalizeVariant=(v,productName='')=>{
+    const parts=String(v?.name||'').split(' / ').map(x=>x.trim()).filter(Boolean);
+    let name=String(v?.name||'').trim();
+    if(parts.length===2) name=`${parts[0]} / Default / ${parts[1]}`;
+    else if(parts.length<2) name=`${productName||parts[0]||'STARGIRLS PIECE'} / Default / One Size`;
+    return {...v,name,sku:v?.sku||`PF-${Number(v?.sync_variant_id||0)}`,files:Array.isArray(v?.files)?v.files:[]};
+  };
+
+  const cleanSource=source=>{
+    const baseVariants=(source?.variants||[]).map(v=>normalizeVariant(v,source?.name||''));
+    if(!needsMockupOnly(source?.name)) return {...source,variants:baseVariants};
+    const variants=baseVariants.map(v=>({...v,files:(v.files||[]).filter(trustedMockup)}));
+    return {...source,variants,thumbnail_url:source?.thumbnail_url||null};
+  };
+
+  const cleanCatalog=data=>({...data,products:Array.isArray(data?.products)?data.products.map(cleanSource):[]});
   const isProductsRequest=input=>{
     const u=typeof input==='string'?input:(input&&input.url)||'';
     return /(?:^|\/)content\/products\.json(?:\?|$)/.test(u);
@@ -26,16 +39,17 @@
     const u=typeof input==='string'?input:(input&&input.url)||'';
     return !!api&&u.startsWith(`${api}/printful/catalog`);
   };
+
   window.fetch=async(input,init)=>{
     if(isPrintfulCatalogRequest(input)){
       const response=await nativeFetch(input,init);
       if(!response.ok) return response;
       try{
-        const data=await response.clone().json();
-        const products=Array.isArray(data.products)?data.products.map(cleanSource):[];
-        return new Response(JSON.stringify({...data,products}),{status:response.status,statusText:response.statusText,headers:{'content-type':'application/json; charset=utf-8'}});
+        const data=cleanCatalog(await response.clone().json());
+        return new Response(JSON.stringify(data),{status:response.status,statusText:response.statusText,headers:{'content-type':'application/json; charset=utf-8'}});
       }catch{return response;}
     }
+
     if(!isProductsRequest(input)||!api) return nativeFetch(input,init);
     const baseResponse=await nativeFetch(input,init);
     if(!baseResponse.ok) return baseResponse;
@@ -45,8 +59,7 @@
         nativeFetch(`${api}/printful/catalog?v=${Date.now()}`,{cache:'no-store',mode:'cors'})
       ]);
       if(!printfulResponse.ok) return baseResponse;
-      const printful=await printfulResponse.json();
-      const sources=(Array.isArray(printful.products)?printful.products:[]).map(cleanSource);
+      const sources=cleanCatalog(await printfulResponse.json()).products;
       const baseProducts=Array.isArray(base.products)?base.products:[];
       const mappedIds=new Set(baseProducts.map(p=>Number(p.printful_product_id||0)).filter(Boolean));
       const merged=baseProducts.map(product=>{
