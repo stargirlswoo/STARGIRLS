@@ -1,0 +1,52 @@
+.site-header.katseye-header{position:sticky;top:0;z-index:70;display:grid;grid-template-columns:auto 1fr auto;align-items:center;min-height:78px;padding:0 22px;border-bottom:1px solid rgba(255,255,255,.16);background:rgba(5,5,5,.94);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.katseye-header .logo{justify-self:center;font-size:clamp(23px,3vw,34px);line-height:1;font-weight:900;letter-spacing:-.04em;text-decoration:none;color:#fff;white-space:nowrap}
+.katseye-header .logo span{font-size:.55em;vertical-align:top;margin-left:4px}
+.katseye-header .header-actions{justify-self:end;display:flex;align-items:center;gap:7px}
+.katseye-header .header-icon-btn,.katseye-header .menu-toggle{width:42px;height:42px;display:grid;place-items:center;border:0;background:transparent;color:#fff;padding:0;cursor:pointer;border-radius:50%;transition:background .18s ease,transform .18s ease}
+.katseye-header .header-icon-btn:hover,.katseye-header .menu-toggle:hover{background:rgba(255,255,255,.1)}
+.katseye-header .header-icon-btn:active,.katseye-header .menu-toggle:active{transform:scale(.94)}
+.katseye-header .header-icon-btn svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.katseye-header .menu-toggle{display:none}
+.katseye-header .menu-toggle span{display:block;width:24px;height:2px;background:#fff;margin:2.5px 0}
+.katseye-header .cart-icon-btn{position:relative}
+.katseye-header .cart-badge{position:absolute;top:2px;right:1px;min-width:17px;height:17px;padding:0 4px;display:grid;place-items:center;border-radius:999px;background:#fff;color:#000;font-size:9px;font-weight:900;line-height:1}
+
+.sg-header-popover{position:fixed;z-index:120;top:92px;right:18px;width:min(360px,calc(100vw - 36px));padding:18px;border:1px solid rgba(255,255,255,.16);background:#090909;color:#fff;box-shadow:0 18px 70px rgba(0,0,0,.55);opacity:0;visibility:hidden;transform:translateY(-8px);transition:.18s ease}
+.sg-header-popover.is-open{opacity:1;visibility:visible;transform:translateY(0)}
+.sg-header-popover h3{margin:0 0 8px;font-size:14px;letter-spacing:.12em}
+.sg-header-popover p{margin:0;color:#aaa;font-size:12px;line-height:1.5}
+.sg-search-wrap{display:flex;gap:8px;margin-top:12px}
+.sg-search-wrap input{min-width:0;flex:1;height:44px;border:1px solid #333;background:#111;color:#fff;padding:0 13px;font:inherit;outline:none}
+.sg-search-wrap input:focus{border-color:#fff}
+.sg-search-wrap button,.sg-account-action,.sg-locale-action{height:44px;border:1px solid #fff;background:#fff;color:#000;padding:0 16px;font:inherit;font-size:11px;font-weight:900;letter-spacing:.07em;cursor:pointer}
+.sg-popover-close{position:absolute;top:8px;right:8px;width:34px;height:34px;border:0;background:transparent;color:#fff;font-size:25px;cursor:pointer}
+.sg-locale-row{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:14px;padding-top:14px;border-top:1px solid #222;font-size:12px}
+.sg-locale-row strong{font-size:11px;letter-spacing:.08em}
+.sg-search-empty{display:none;margin-top:12px!important;color:#ff6a6a!important}
+
+@media(max-width:850px){
+  .drop-bar{font-size:9px;min-height:28px}
+  .site-header.katseye-header{min-height:72px;padding:0 12px;grid-template-columns:44px 1fr auto}
+  .katseye-header .menu-toggle{display:grid!important}
+  .katseye-header .desktop-nav{display:none!important}
+  .katseye-header .logo{font-size:27px}
+  .katseye-header .header-actions{gap:0}
+  .katseye-header .header-icon-btn{width:39px;height:39px}
+  .katseye-header .header-icon-btn svg{width:23px;height:23px}
+  .katseye-header .cart-icon-btn{display:none}
+  .sg-header-popover{top:112px;right:10px;width:calc(100vw - 20px)}
+}
+
+@media(max-width:430px){
+  .site-header.katseye-header{padding:0 7px;grid-template-columns:40px 1fr auto}
+  .katseye-header .logo{font-size:23px}
+  .katseye-header .header-icon-btn{width:34px;height:38px}
+  .katseye-header .header-icon-btn svg{width:22px;height:22px}
+  .katseye-header .menu-toggle{width:38px;height:38px}
+  .katseye-header .menu-toggle span{width:23px}
+}
+
+@media(max-width:360px){
+  .katseye-header .logo{font-size:20px}
+  .katseye-header .header-icon-btn{width:31px}
+}
