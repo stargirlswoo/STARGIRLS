@@ -46,3 +46,58 @@
   document.addEventListener('keydown',e=>{const image=e.target.closest?.('[data-main-image]');if(image&&(e.key==='Enter'||e.key===' ')){e.preventDefault();image.click();}});
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',polish);else polish();
 })();
+
+/* KATSEYE-inspired mobile storefront header: STARGIRLS branding, original implementation. */
+(function(){
+  function setupKatseyeHeader(){
+    const header=document.querySelector('.site-header');
+    if(!header||header.classList.contains('katseye-header'))return;
+
+    const css=document.createElement('link');
+    css.rel='stylesheet';css.href='katseye-header.css?v=20260909';document.head.appendChild(css);
+    header.classList.add('katseye-header');
+
+    const oldCart=header.querySelector('.header-shop');
+    if(oldCart)oldCart.remove();
+
+    const actions=document.createElement('div');
+    actions.className='header-actions';
+    actions.innerHTML=`
+      <button class="header-icon-btn" type="button" aria-label="Search shop" aria-expanded="false" data-header-popover="shopSearchPopover">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4.2 4.2"></path></svg>
+      </button>
+      <button class="header-icon-btn" type="button" aria-label="Account" aria-expanded="false" data-header-popover="shopAccountPopover">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"></circle><path d="M5.5 20c.7-4 3-6 6.5-6s5.8 2 6.5 6"></path></svg>
+      </button>
+      <button class="header-icon-btn" type="button" aria-label="Language and region" aria-expanded="false" data-header-popover="shopLocalePopover">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3c2.4 2.5 3.6 5.5 3.6 9S14.4 18.5 12 21M12 3C9.6 5.5 8.4 8.5 8.4 12S9.6 18.5 12 21"></path></svg>
+      </button>
+      <button class="header-icon-btn cart-icon-btn" type="button" aria-label="Open cart" data-cart-open>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8Z"></path><path d="M9 8a3 3 0 0 1 6 0"></path></svg><span class="cart-badge" data-cart-count>0</span>
+      </button>`;
+    header.appendChild(actions);
+
+    const popovers=document.createElement('div');
+    popovers.innerHTML=`
+      <section class="sg-header-popover" id="shopSearchPopover" aria-label="Search shop">
+        <button class="sg-popover-close" type="button" aria-label="Close" data-popover-close>×</button>
+        <h3>SEARCH STARGIRLS</h3><p>Search the current drop.</p>
+        <div class="sg-search-wrap"><input type="search" placeholder="hoodie, tee, JUNO…" autocomplete="off" data-shop-search><button type="button" data-shop-search-submit>SEARCH</button></div>
+        <p class="sg-search-empty" data-search-empty>No products match that search.</p>
+      </section>
+      <section class="sg-header-popover" id="shopAccountPopover" aria-label="Account">
+        <button class="sg-popover-close" type="button" aria-label="Close" data-popover-close>×</button>
+        <h3>STARGIRLS ACCOUNT</h3><p>Account sign-in is coming next. You can still shop and check out securely as a guest right now.</p>
+      </section>
+      <section class="sg-header-popover" id="shopLocalePopover" aria-label="Language and region">
+        <button class="sg-popover-close" type="button" aria-label="Close" data-popover-close>×</button>
+        <h3>LANGUAGE + REGION</h3><p>Your storefront is currently set to English and USD.</p>
+        <div class="sg-locale-row"><span>Language</span><strong>ENGLISH</strong></div><div class="sg-locale-row"><span>Currency</span><strong>USD $</strong></div>
+      </section>`;
+    document.body.appendChild(popovers);
+
+    const js=document.createElement('script');
+    js.src='katseye-header.js?v=20260909';document.body.appendChild(js);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setupKatseyeHeader);else setupKatseyeHeader();
+})();
