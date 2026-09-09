@@ -1,26 +1,40 @@
-/* Dedicated STARGIRLS product-page navigation + curated storefront color choices. */
+/* STARGIRLS storefront: clean collection cards that open dedicated product pages. */
 (function(){
-  const priority=[/black/i,/white/i,/heather|grey|gray|ash/i,/pink|blue|green|navy|burgundy|red/i];
-  function curate(card){
-    const buttons=[...card.querySelectorAll('[data-color-option]')];
-    if(buttons.length<=4)return;
-    const chosen=[];
-    for(const rule of priority){const hit=buttons.find(b=>rule.test(b.dataset.color||b.textContent||'')&&!chosen.includes(b));if(hit)chosen.push(hit);}
-    for(const b of buttons)if(chosen.length<4&&!chosen.includes(b))chosen.push(b);
-    buttons.forEach(b=>b.hidden=!chosen.includes(b));
+  function destination(id){return id==='juno-edp'?'fragrance.html':`product.html?id=${encodeURIComponent(id)}`;}
+  function simplify(card){
+    const body=card.querySelector('.catalog-body');
+    if(body){
+      body.querySelectorAll('.variant-group,.catalog-selection,.catalog-buy,.catalog-status,.product-details').forEach(el=>el.remove());
+    }
+    card.querySelector('.catalog-thumbs')?.remove();
+    card.querySelector('.catalog-image-tools')?.remove();
   }
   function apply(){
     document.querySelectorAll('[data-product-card]').forEach(card=>{
-      curate(card);
+      simplify(card);
       const id=card.dataset.productCard;
       if(!id||card.dataset.productLinked==='1')return;
       card.dataset.productLinked='1';
-      const go=()=>location.href=`product.html?id=${encodeURIComponent(id)}`;
+      card.setAttribute('role','link');
+      card.setAttribute('tabindex','0');
+      card.style.cursor='pointer';
+      const go=()=>location.href=destination(id);
+      card.addEventListener('click',e=>{
+        if(e.target.closest('button,a,input,select,summary,details'))return;
+        go();
+      });
+      card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}});
       const image=card.querySelector('[data-main-image]');
-      if(image){image.style.cursor='pointer';image.setAttribute('aria-label',`Open ${id.replaceAll('-',' ')} product page`);image.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();go();},{capture:true});}
+      if(image){
+        image.style.cursor='pointer';
+        image.setAttribute('aria-label',`Open ${id.replaceAll('-',' ')} product page`);
+        image.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();go();},{capture:true});
+      }
       const title=card.querySelector('.catalog-meta strong');
-      if(title){title.style.cursor='pointer';title.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();go();});}
+      if(title)title.classList.add('product-card-title-link');
     });
   }
-  const obs=new MutationObserver(apply);const grid=document.querySelector('[data-product-grid]');if(grid)obs.observe(grid,{childList:true,subtree:true});apply();
+  const grid=document.querySelector('[data-product-grid]');
+  if(grid)new MutationObserver(apply).observe(grid,{childList:true,subtree:true});
+  apply();
 })();
