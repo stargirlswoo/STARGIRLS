@@ -1,0 +1,22 @@
+/* STARGIRLS collection-page polish: cleaner, calmer, more editorial product merchandising. */
+:root{--sg-cream:#faf9f6;--sg-ink:#0b0b0b;--sg-line:#dedbd5;--sg-accent:#8f5cff}
+.storefront-home{background:var(--sg-cream);color:var(--sg-ink)}
+.storefront-home .drop-bar{background:var(--sg-accent);color:#0b0b0b;height:26px;font-size:8px;letter-spacing:.16em}
+.storefront-home .site-header{background:rgba(250,249,246,.97);border-bottom:1px solid var(--sg-line);min-height:66px}
+.storefront-home .logo,.storefront-home .desktop-nav a,.storefront-home .header-shop{color:var(--sg-ink)}
+.storefront-home .home-store-intro{background:var(--sg-cream);border-bottom:1px solid var(--sg-line);padding-top:38px;padding-bottom:28px}
+.storefront-home .home-store-intro h1{color:var(--sg-ink);font-size:clamp(52px,8vw,118px)}
+.storefront-home .home-store-intro p{color:#6f6b64}.storefront-home .home-store-meta span{border-color:#cfcac2;color:#4f4b45;background:rgba(255,255,255,.35)}
+.storefront-home .shop-tabs{background:var(--sg-cream);border-color:var(--sg-line)}
+.storefront-home .shop-tabs a{color:#6f6b64}.storefront-home .shop-tabs a.active{color:var(--sg-ink);border-color:var(--sg-ink)}
+.storefront-home .catalog-section{background:var(--sg-cream)}
+.storefront-home .catalog-heading-row{border-color:var(--sg-line)}
+.storefront-home .catalog-heading-row h2{color:var(--sg-ink)}
+.storefront-home .catalog-explainer,.storefront-home .shop-eyebrow{color:#77726b}
+.storefront-home .catalog-grid{gap:1px;background:var(--sg-line);border-top:1px solid var(--sg-line);border-left:1px solid var(--sg-line)}
+.storefront-home .catalog-card{background:var(--sg-cream);border:0;border-right:1px solid var(--sg-line);border-bottom:1px solid var(--sg-line);transition:opacity .18s ease}
+.storefront-home .catalog-card:hover{opacity:.94}.storefront-home .catalog-card-image-wrap{background:#f0ede7}.storefront-home .catalog-card-image{background-color:#f0ede7}
+.storefront-home .catalog-body{padding:17px 14px 20px}.storefront-home .catalog-meta{align-items:flex-start}.storefront-home .catalog-meta strong{color:var(--sg-ink);font-size:13px;letter-spacing:.01em}.storefront-home .catalog-meta span{color:#8a857e;font-size:9px}.storefront-home .catalog-price{color:var(--sg-ink);font-size:12px;font-weight:700}.storefront-home .product-card-title-link{text-decoration:none}
+.storefront-home .store-signup{background:#0b0b0b;color:#fff;border-color:#0b0b0b}.storefront-home .store-signup .shop-eyebrow,.storefront-home .store-signup-copy>p:last-child{color:#aaa}.storefront-home .store-email-form{border-color:#666}.storefront-home .store-email-form input,.storefront-home .store-email-form button{color:#fff}
+.storefront-home .store-footer{background:#0b0b0b;color:#fff}.storefront-home .store-footer-logo,.storefront-home .support-menu>a{color:#fff}
+@media(max-width:800px){.storefront-home .site-header{min-height:58px}.storefront-home .home-store-intro{padding:28px 20px 22px}.storefront-home .home-store-intro h1{font-size:58px}.storefront-home .home-store-meta{gap:7px}.storefront-home .home-store-meta span{font-size:8px;padding:7px 9px}.storefront-home .catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:1px}.storefront-home .catalog-body{padding:13px 10px 16px}.storefront-home .catalog-meta{display:block}.storefront-home .catalog-price{margin-top:6px}.storefront-home .catalog-meta strong{font-size:11px}.storefront-home .catalog-card-image{min-height:0;aspect-ratio:1/1.15}}
