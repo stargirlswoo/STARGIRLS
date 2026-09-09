@@ -1,117 +1,49 @@
-const STORE_API_BASE = window.STARGIRLS_STORE_API || "";
-const productGrid = document.querySelector("[data-product-grid]");
-const filterLinks = document.querySelectorAll("[data-shop-filter]");
-const cartButtons = document.querySelectorAll("[data-cart-open]");
-const cartDrawer = document.querySelector("[data-cart-drawer]");
-const cartClose = document.querySelector("[data-cart-close]");
-const cartBackdrop = document.querySelector("[data-cart-backdrop]");
-const cartItems = document.querySelector("[data-cart-items]");
-const cartCount = document.querySelectorAll("[data-cart-count]");
-const cartSubtotal = document.querySelector("[data-cart-subtotal]");
-const checkoutButton = document.querySelector("[data-checkout]");
-const checkoutNote = document.querySelector("[data-checkout-note]");
-let products = [], cart = loadCart(), activeFilter = "all";
-
-const money = value => typeof value === "number" ? new Intl.NumberFormat("en-US", {style:"currency",currency:"USD"}).format(value) : "";
-function esc(value=""){return String(value).replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));}
-function safeImage(value=""){return /^(?:images\/|https:\/\/)/.test(String(value)) ? String(value).replace(/["'()\\]/g,"") : "";}
-function loadCart(){try{const value=JSON.parse(localStorage.getItem("stargirls-cart"));return Array.isArray(value)?value.filter(x=>x&&typeof x.id==="string"&&Number.isFinite(x.quantity)&&x.quantity>0).map(x=>({id:x.id,size:typeof x.size==="string"?x.size:"",color:typeof x.color==="string"?x.color:"",sku:typeof x.sku==="string"?x.sku:"",printful_sync_variant_id:Number(x.printful_sync_variant_id||0),quantity:Math.min(10,Math.floor(x.quantity))})):[];}catch{return [];}}
+const STORE_API_BASE=window.STARGIRLS_STORE_API||"";
+const productGrid=document.querySelector("[data-product-grid]"),filterLinks=document.querySelectorAll("[data-shop-filter]"),cartButtons=document.querySelectorAll("[data-cart-open]"),cartDrawer=document.querySelector("[data-cart-drawer]"),cartClose=document.querySelector("[data-cart-close]"),cartBackdrop=document.querySelector("[data-cart-backdrop]"),cartItems=document.querySelector("[data-cart-items]"),cartCount=document.querySelectorAll("[data-cart-count]"),cartSubtotal=document.querySelector("[data-cart-subtotal]"),checkoutButton=document.querySelector("[data-checkout]"),checkoutNote=document.querySelector("[data-checkout-note]");
+let products=[],cart=loadCart(),activeFilter="all",selections={};
+const money=v=>typeof v==="number"?new Intl.NumberFormat("en-US",{style:"currency",currency:"USD"}).format(v):"";
+function esc(v=""){return String(v).replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));}
+function safeImage(v=""){return /^(?:images\/|https:\/\/)/.test(String(v))?String(v).replace(/["'()\\]/g,""):"";}
+function loadCart(){try{const v=JSON.parse(localStorage.getItem("stargirls-cart"));return Array.isArray(v)?v.filter(x=>x&&typeof x.id==="string"&&Number.isFinite(x.quantity)&&x.quantity>0).map(x=>({id:x.id,size:typeof x.size==="string"?x.size:"",color:typeof x.color==="string"?x.color:"",sku:typeof x.sku==="string"?x.sku:"",printful_sync_variant_id:Number(x.printful_sync_variant_id||0),quantity:Math.min(10,Math.floor(x.quantity))})):[];}catch{return[];}}
 function saveCart(){localStorage.setItem("stargirls-cart",JSON.stringify(cart));renderCart();}
-const productById=id=>products.find(product=>product.id===id);
-const variantFor=(product,size,color)=>Array.isArray(product?.variants)?product.variants.find(v=>v.size===size&&v.color===color):null;
-function variantPrice(product,variant){const value=Number(variant?.price ?? product?.price);return Number.isFinite(value)?value:null;}
-
-function addToCart(id,size="",color=""){const product=productById(id);if(!product||!product.available)return;const variant=variantFor(product,size,color);if(Array.isArray(product.variants)&&!variant)return;const existing=cart.find(item=>item.id===id&&item.size===size&&item.color===color);if(existing)existing.quantity=Math.min(10,existing.quantity+1);else cart.push({id,size,color,sku:variant?.sku||"",printful_sync_variant_id:Number(variant?.printful_sync_variant_id||0),quantity:1});saveCart();openCart();}
-function changeQuantity(id,size,color,amount){const item=cart.find(entry=>entry.id===id&&entry.size===size&&entry.color===color);if(!item)return;item.quantity=Math.min(10,item.quantity+amount);if(item.quantity<=0)cart=cart.filter(entry=>!(entry.id===id&&entry.size===size&&entry.color===color));saveCart();}
-
+const productById=id=>products.find(p=>p.id===id),variantFor=(p,s,c)=>Array.isArray(p?.variants)?p.variants.find(v=>v.size===s&&v.color===c):null;
+function variantPrice(p,v){const x=Number(v?.price??p?.price);return Number.isFinite(x)?x:null;}
+function colorHex(name=""){const n=name.toLowerCase();const map={black:"#090909",white:"#f7f7f2",navy:"#1b2640",blue:"#3f6fa8",red:"#a3202a",burgundy:"#631f2a",maroon:"#641f2d",pink:"#e7a3ba","light pink":"#efc2cf",purple:"#6a4d86",green:"#4f6b58",olive:"#666849",brown:"#66483b",beige:"#d7c7aa",sand:"#cdbc9b",gray:"#888",grey:"#888","dark heather":"#464646","sport grey":"#a9a9a9","ash":"#c6c6c0","forest green":"#244332"};return map[n]||(/#[0-9a-f]{6}/i.test(name)?name:"#777");}
+function addToCart(id,size="",color=""){const p=productById(id);if(!p||!p.available)return;const v=variantFor(p,size,color);if(Array.isArray(p.variants)&&!v)return;const ex=cart.find(i=>i.id===id&&i.size===size&&i.color===color);if(ex)ex.quantity=Math.min(10,ex.quantity+1);else cart.push({id,size,color,sku:v?.sku||"",printful_sync_variant_id:Number(v?.printful_sync_variant_id||0),quantity:1});saveCart();showToast("ADDED TO CART ★");openCart();}
+function changeQuantity(id,size,color,amount){const i=cart.find(e=>e.id===id&&e.size===size&&e.color===color);if(!i)return;i.quantity=Math.min(10,i.quantity+amount);if(i.quantity<=0)cart=cart.filter(e=>!(e.id===id&&e.size===size&&e.color===color));saveCart();}
+function removeItem(id,size,color){cart=cart.filter(e=>!(e.id===id&&e.size===size&&e.color===color));saveCart();}
+function galleryFor(product){const out=[];for(const v of product.variants||[]){const img=safeImage(v.image||"");if(img&&!out.includes(img))out.push(img);}const hero=safeImage(product.image||"");if(hero&&!out.includes(hero))out.unshift(hero);return out.slice(0,8);}
+function selectionFor(id){return selections[id]||(selections[id]={color:"",size:"",image:""});}
 function renderProducts(){
-  if(!productGrid)return;
-  const visible=activeFilter==="all"?products:products.filter(product=>product.category===activeFilter);
-  if(!visible.length){productGrid.innerHTML='<div class="catalog-empty"><strong>NOTHING HERE YET.</strong><p>Try another category.</p></div>';return;}
-  productGrid.innerHTML=visible.map(product=>{
-    const id=esc(product.id),name=esc(product.name),category=esc(product.category||"drop"),status=esc(product.status||"COMING SOON"),image=safeImage(product.image);
-    const variants=Array.isArray(product.variants)?product.variants:[];
-    const colors=[...new Set(variants.map(v=>v.color).filter(Boolean))];
-    const prices=variants.map(v=>Number(v.price)).filter(Number.isFinite);
-    const low=prices.length?Math.min(...prices):Number(product.price);
-    const high=prices.length?Math.max(...prices):Number(product.price);
-    const priceText=Number.isFinite(low)?(Number.isFinite(high)&&high!==low?`FROM ${money(low)}`:money(low)):status;
-    const selectors=variants.length?`<label class="catalog-size-label" for="color-${id}">COLOR</label><select class="catalog-size" id="color-${id}" data-color-for="${id}" ${product.available?'':'disabled'}><option value="">SELECT COLOR</option>${colors.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("")}</select><label class="catalog-size-label" for="size-${id}">SIZE</label><select class="catalog-size" id="size-${id}" data-size-for="${id}" disabled><option value="">SELECT SIZE</option></select>`:"";
-    const action=product.available&&variants.length?`<button class="catalog-buy" type="button" data-add-to-cart="${id}">ADD TO CART</button>`:`<span class="catalog-status">${status}</span>`;
-    const imageStyle=image?`background-image:url(&quot;${image}&quot;)`:"";
-    return `<article class="catalog-card" data-category="${category}"><div class="catalog-card-image" style="${imageStyle}" role="img" aria-label="${name}"></div><div class="catalog-meta"><div><strong>${name}</strong><span>${category.toUpperCase()}</span></div><div class="catalog-price" data-price-for="${id}">${priceText}</div></div>${selectors}${action}</article>`;
-  }).join("");
-
-  document.querySelectorAll("[data-color-for]").forEach(select=>select.addEventListener("change",()=>{
-    const id=select.dataset.colorFor, product=productById(id), sizeSelect=document.querySelector(`[data-size-for="${CSS.escape(id)}"]`), priceEl=document.querySelector(`[data-price-for="${CSS.escape(id)}"]`);
-    const variants=(product?.variants||[]).filter(v=>v.color===select.value);
-    sizeSelect.innerHTML='<option value="">SELECT SIZE</option>'+variants.map(v=>`<option value="${esc(v.size)}">${esc(v.size)}</option>`).join("");
-    sizeSelect.disabled=!select.value;
-    sizeSelect.value="";
-    if(priceEl&&variants.length){const vals=variants.map(v=>Number(v.price)).filter(Number.isFinite);if(vals.length){const lo=Math.min(...vals),hi=Math.max(...vals);priceEl.textContent=lo===hi?money(lo):`FROM ${money(lo)}`;}}
-  }));
-
-  document.querySelectorAll("[data-size-for]").forEach(select=>select.addEventListener("change",()=>{
-    const id=select.dataset.sizeFor, product=productById(id), color=document.querySelector(`[data-color-for="${CSS.escape(id)}"]`)?.value||"", variant=variantFor(product,select.value,color), priceEl=document.querySelector(`[data-price-for="${CSS.escape(id)}"]`), price=variantPrice(product,variant);if(priceEl&&price!==null)priceEl.textContent=money(price);
-  }));
-
-  document.querySelectorAll("[data-add-to-cart]").forEach(button=>button.addEventListener("click",()=>{
-    const id=button.dataset.addToCart, color=document.querySelector(`[data-color-for="${CSS.escape(id)}"]`), size=document.querySelector(`[data-size-for="${CSS.escape(id)}"]`);
-    if(!color?.value){color?.focus();return;} if(!size?.value){size?.focus();return;} addToCart(id,size.value,color.value);
-  }));
+ if(!productGrid)return;const visible=activeFilter==="all"?products:products.filter(p=>p.category===activeFilter);if(!visible.length){productGrid.innerHTML='<div class="catalog-empty"><strong>NOTHING HERE YET.</strong><p>Try another category.</p></div>';return;}
+ productGrid.innerHTML=visible.map(product=>{const id=esc(product.id),name=esc(product.name),category=esc(product.category||"drop"),status=esc(product.status||"COMING SOON"),variants=Array.isArray(product.variants)?product.variants:[],colors=[...new Set(variants.map(v=>v.color).filter(Boolean))],sizes=[...new Set(variants.map(v=>v.size).filter(Boolean))],sel=selectionFor(product.id),selectedVariant=variantFor(product,sel.size,sel.color),prices=variants.map(v=>Number(v.price)).filter(Number.isFinite),low=prices.length?Math.min(...prices):Number(product.price),high=prices.length?Math.max(...prices):Number(product.price),priceText=selectedVariant?money(variantPrice(product,selectedVariant)):(Number.isFinite(low)?(Number.isFinite(high)&&high!==low?`FROM ${money(low)}`:money(low)):status),gallery=galleryFor(product),hero=safeImage(sel.image||selectedVariant?.image||product.image||gallery[0]||""),availableSizes=sel.color?new Set(variants.filter(v=>v.color===sel.color).map(v=>v.size)):new Set(sizes),canBuy=!!selectedVariant&&product.available;
+ const thumbs=gallery.length>1?`<div class="catalog-thumbs">${gallery.map((img,i)=>`<button class="catalog-thumb ${img===hero||(!sel.image&&i===0)?'active':''}" type="button" aria-label="View image ${i+1}" data-thumb-for="${id}" data-image="${esc(img)}" style="background-image:url(&quot;${img}&quot;)"></button>`).join("")}</div>`:"";
+ const selectors=variants.length?`<div class="variant-group"><div class="variant-head"><span>COLOR</span><span>${sel.color?esc(sel.color):'SELECT ONE'}</span></div><div class="color-options">${colors.map(c=>`<button type="button" class="color-option ${sel.color===c?'active':''}" data-color-option="${id}" data-color="${esc(c)}" aria-pressed="${sel.color===c}"><span class="color-swatch" style="background:${colorHex(c)}"></span><span>${esc(c)}</span></button>`).join("")}</div></div><div class="variant-group"><div class="variant-head"><span>SIZE</span><button class="size-guide-link" type="button" data-size-guide>SIZE GUIDE</button></div><div class="size-options">${sizes.map(s=>`<button type="button" class="size-option ${sel.size===s?'active':''}" data-size-option="${id}" data-size="${esc(s)}" ${sel.color&&!availableSizes.has(s)?'disabled':''}>${esc(s)}</button>`).join("")}</div></div><div class="catalog-selection">${sel.color||sel.size?`SELECTED: ${esc(sel.color||'—')} / ${esc(sel.size||'—')}`:'CHOOSE A COLOR + SIZE'}</div>`:"";
+ const action=product.available&&variants.length?`<button class="catalog-buy" type="button" data-add-to-cart="${id}" ${canBuy?'':'disabled'}>${canBuy?'ADD TO CART':'SELECT OPTIONS'}</button>`:`<span class="catalog-status">${status}</span>`;
+ return `<article class="catalog-card" data-product-card="${id}"><div class="catalog-card-image-wrap"><div class="catalog-card-image" data-main-image="${id}" style="${hero?`background-image:url(&quot;${hero}&quot;)`:''}" role="img" aria-label="${name}"></div>${hero?`<div class="catalog-image-tools"><button class="catalog-image-tool" type="button" data-zoom-image="${esc(hero)}">ZOOM</button></div>`:''}</div>${thumbs}<div class="catalog-body"><div class="catalog-meta"><div><strong>${name}</strong><span>${category.toUpperCase()}</span></div><div class="catalog-price">${priceText}</div></div>${selectors}${action}<div class="product-details"><details><summary>PRODUCT DETAILS</summary><p>${category==='MERCH'||category==='merch'?'Made to order through STARGIRLS fulfillment. Select your exact color and size before adding to cart.':'STARGIRLS release item.'}</p></details><details><summary>SHIPPING + RETURNS</summary><p>Shipping cost and delivery estimate are shown at checkout. See the Shipping and Returns pages for full policies.</p></details></div></div></article>`;
+ }).join("");
+ bindProductEvents();updateMobileBuyBar();
 }
-
-function renderCart(){
-  const hydrated=cart.map(item=>{const product=productById(item.id);const variant=variantFor(product,item.size,item.color);return {...item,product,variant};}).filter(item=>item.product&&item.product.available&&item.variant);
-  const validKeys=new Set(hydrated.map(item=>`${item.id}::${item.color}::${item.size}`));
-  if(cart.some(item=>!validKeys.has(`${item.id}::${item.color}::${item.size}`))){cart=cart.filter(item=>validKeys.has(`${item.id}::${item.color}::${item.size}`));localStorage.setItem("stargirls-cart",JSON.stringify(cart));}
-  const count=hydrated.reduce((sum,item)=>sum+item.quantity,0);cartCount.forEach(element=>element.textContent=String(count));
-  if(!cartItems||!cartSubtotal||!checkoutButton)return;
-  if(!hydrated.length){cartItems.innerHTML='<div class="cart-empty"><strong>YOUR CART IS EMPTY.</strong><p>The real stuff will show up here as soon as the first products go live.</p></div>';cartSubtotal.textContent=money(0);checkoutButton.disabled=true;if(checkoutNote)checkoutNote.textContent="Checkout activates when purchasable products and the payment backend are connected.";return;}
-  cartItems.innerHTML=hydrated.map(item=>{const price=variantPrice(item.product,item.variant)||0;return `<div class="cart-line"><div class="cart-thumb" style="background-image:url(&quot;${safeImage(item.product.image)}&quot;)"></div><div class="cart-line-copy"><strong>${esc(item.product.name)}</strong><span>${esc(item.color)} · SIZE ${esc(item.size)}</span><span>${money(price)}</span><div class="qty-controls"><button type="button" data-qty="-1" data-id="${esc(item.id)}" data-color="${esc(item.color)}" data-size="${esc(item.size)}">−</button><span>${item.quantity}</span><button type="button" data-qty="1" data-id="${esc(item.id)}" data-color="${esc(item.color)}" data-size="${esc(item.size)}">+</button></div></div></div>`;}).join("");
-  document.querySelectorAll("[data-qty]").forEach(button=>button.addEventListener("click",()=>changeQuantity(button.dataset.id,button.dataset.size||"",button.dataset.color||"",Number(button.dataset.qty))));
-  cartSubtotal.textContent=money(hydrated.reduce((sum,item)=>sum+(variantPrice(item.product,item.variant)||0)*item.quantity,0));
-  checkoutButton.disabled=!STORE_API_BASE;if(checkoutNote)checkoutNote.textContent=STORE_API_BASE?"Taxes and shipping are calculated at checkout.":"Cart is ready. Payment checkout will activate when the store backend is connected.";
+function bindProductEvents(){
+ document.querySelectorAll("[data-color-option]").forEach(b=>b.addEventListener("click",()=>{const s=selectionFor(b.dataset.colorOption);s.color=b.dataset.color;s.size="";const p=productById(b.dataset.colorOption),v=(p?.variants||[]).find(x=>x.color===s.color&&x.image);if(v?.image)s.image=v.image;renderProducts();}));
+ document.querySelectorAll("[data-size-option]").forEach(b=>b.addEventListener("click",()=>{const s=selectionFor(b.dataset.sizeOption);s.size=b.dataset.size;renderProducts();}));
+ document.querySelectorAll("[data-thumb-for]").forEach(b=>b.addEventListener("click",()=>{selectionFor(b.dataset.thumbFor).image=b.dataset.image;renderProducts();}));
+ document.querySelectorAll("[data-main-image]").forEach(el=>el.addEventListener("click",()=>{const p=productById(el.dataset.mainImage),s=selectionFor(el.dataset.mainImage),v=variantFor(p,s.size,s.color);openImageModal(s.image||v?.image||p?.image||"");}));
+ document.querySelectorAll("[data-zoom-image]").forEach(b=>b.addEventListener("click",()=>openImageModal(b.dataset.zoomImage)));
+ document.querySelectorAll("[data-size-guide]").forEach(b=>b.addEventListener("click",openSizeGuide));
+ document.querySelectorAll("[data-add-to-cart]").forEach(b=>b.addEventListener("click",()=>{const s=selectionFor(b.dataset.addToCart);if(!s.color||!s.size)return;addToCart(b.dataset.addToCart,s.size,s.color);}));
+ document.querySelectorAll("[data-product-card]").forEach(card=>{const obs=new IntersectionObserver(entries=>{if(entries[0].isIntersecting){window.__activeShopProduct=card.dataset.productCard;updateMobileBuyBar();}},{threshold:.55});obs.observe(card);});
 }
-
+function renderCart(){const hydrated=cart.map(item=>{const product=productById(item.id),variant=variantFor(product,item.size,item.color);return{...item,product,variant};}).filter(i=>i.product&&i.product.available&&i.variant),validKeys=new Set(hydrated.map(i=>`${i.id}::${i.color}::${i.size}`));if(cart.some(i=>!validKeys.has(`${i.id}::${i.color}::${i.size}`))){cart=cart.filter(i=>validKeys.has(`${i.id}::${i.color}::${i.size}`));localStorage.setItem("stargirls-cart",JSON.stringify(cart));}const count=hydrated.reduce((s,i)=>s+i.quantity,0);cartCount.forEach(e=>e.textContent=String(count));if(!cartItems||!cartSubtotal||!checkoutButton)return;if(!hydrated.length){cartItems.innerHTML='<div class="cart-empty"><strong>NOTHING IN YOUR BAG YET.</strong><p>Pick something from the drop and it will show up here.</p></div>';cartSubtotal.textContent=money(0);checkoutButton.disabled=true;if(checkoutNote)checkoutNote.textContent="Add an item to continue to secure checkout.";return;}cartItems.innerHTML=hydrated.map(i=>{const price=variantPrice(i.product,i.variant)||0,img=safeImage(i.variant?.image||i.product.image);return `<div class="cart-line"><div class="cart-thumb" style="background-image:url(&quot;${img}&quot;)"></div><div class="cart-line-copy"><strong>${esc(i.product.name)}</strong><span>${esc(i.color)} · SIZE ${esc(i.size)}</span><span>${money(price)}</span><div class="qty-controls"><button type="button" data-qty="-1" data-id="${esc(i.id)}" data-color="${esc(i.color)}" data-size="${esc(i.size)}">−</button><span>${i.quantity}</span><button type="button" data-qty="1" data-id="${esc(i.id)}" data-color="${esc(i.color)}" data-size="${esc(i.size)}">+</button></div><button class="cart-remove" type="button" data-remove data-id="${esc(i.id)}" data-color="${esc(i.color)}" data-size="${esc(i.size)}">REMOVE</button></div></div>`;}).join("");document.querySelectorAll("[data-qty]").forEach(b=>b.addEventListener("click",()=>changeQuantity(b.dataset.id,b.dataset.size||"",b.dataset.color||"",Number(b.dataset.qty))));document.querySelectorAll("[data-remove]").forEach(b=>b.addEventListener("click",()=>removeItem(b.dataset.id,b.dataset.size||"",b.dataset.color||"")));cartSubtotal.textContent=money(hydrated.reduce((s,i)=>s+(variantPrice(i.product,i.variant)||0)*i.quantity,0));checkoutButton.disabled=!STORE_API_BASE;if(checkoutNote){checkoutNote.classList.remove("is-error");checkoutNote.textContent=STORE_API_BASE?"Taxes and shipping are calculated at checkout.":"Cart is ready. Payment checkout will activate when the store backend is connected.";}}
 function openCart(){if(!cartDrawer||!cartBackdrop)return;cartDrawer.classList.add("active");cartBackdrop.classList.add("active");cartDrawer.setAttribute("aria-hidden","false");document.body.classList.add("menu-open");cartClose?.focus();}
 function closeCart(){if(!cartDrawer||!cartBackdrop)return;cartDrawer.classList.remove("active");cartBackdrop.classList.remove("active");cartDrawer.setAttribute("aria-hidden","true");document.body.classList.remove("menu-open");}
-async function checkout(){if(!STORE_API_BASE||!cart.length)return;checkoutButton.disabled=true;checkoutButton.textContent="OPENING CHECKOUT…";try{const response=await fetch(`${STORE_API_BASE}/checkout`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({items:cart})});const data=await response.json();if(!response.ok)throw new Error(data.error||"Checkout request failed");if(!data.url||!/^https:\/\//.test(data.url))throw new Error("Checkout URL missing");window.location.assign(data.url);}catch(error){console.error("STARGIRLS checkout:",error);checkoutButton.disabled=false;checkoutButton.textContent="CHECKOUT";if(checkoutNote)checkoutNote.textContent=error.message||"Checkout could not open. Please try again.";}}
-
-function parsePrintfulVariant(v){const parts=String(v.name||"").split(" / ");const price=Number(v.retail_price);return {...v,color:parts.length>=3?parts.at(-2):"",size:parts.at(-1)||"",price:Number.isFinite(price)?price:null,printful_sync_variant_id:Number(v.sync_variant_id||0)};}
-function sourceImage(source){if(source?.thumbnail_url)return source.thumbnail_url;for(const variant of source?.variants||[]){const preview=(variant.files||[]).find(file=>file?.preview_url)?.preview_url;if(preview)return preview;}return "";}
-
-async function initStore(){
-  try{
-    const catalogResponse=await fetch(`content/products.json?v=${Date.now()}`,{cache:"no-store"});
-    if(!catalogResponse.ok)throw new Error("Could not load products");
-    const data=await catalogResponse.json();
-    products=Array.isArray(data.products)?data.products:[];
-
-    if(STORE_API_BASE){
-      try{
-        const printfulResponse=await fetch(`${STORE_API_BASE}/printful/catalog?v=${Date.now()}`,{cache:"no-store",mode:"cors"});
-        if(!printfulResponse.ok)throw new Error(`Printful catalog returned ${printfulResponse.status}`);
-        const pf=await printfulResponse.json();
-        products=products.map(product=>{
-          if(!product.printful_product_id)return product;
-          const source=(pf.products||[]).find(p=>Number(p.id)===Number(product.printful_product_id));
-          if(!source)return {...product,available:false,status:"UNAVAILABLE"};
-          const variants=(source.variants||[])
-            .filter(v=>v.synced!==false&&v.availability_status!=="inactive")
-            .map(parsePrintfulVariant)
-            .filter(v=>v.color&&v.size&&v.sku&&v.printful_sync_variant_id>0);
-          const image=sourceImage(source)||product.image||"";
-          return {...product,image,variants,available:product.available&&variants.length>0,status:variants.length?product.status:"UNAVAILABLE"};
-        });
-      }catch(error){
-        console.error("STARGIRLS Printful catalog:",error);
-        products=products.map(product=>product.printful_product_id?{...product,available:false,status:"SYNCING"}:product);
-      }
-    }
-  }catch(error){console.error("STARGIRLS products:",error);products=[];}
-  renderProducts();renderCart();
-}
-
-filterLinks.forEach(link=>link.addEventListener("click",event=>{event.preventDefault();activeFilter=link.dataset.shopFilter||"all";filterLinks.forEach(item=>item.classList.toggle("active",item.dataset.shopFilter===activeFilter));renderProducts();document.querySelector("#catalog")?.scrollIntoView({behavior:"smooth",block:"start"});}));
-cartButtons.forEach(button=>button.addEventListener("click",openCart));cartClose?.addEventListener("click",closeCart);cartBackdrop?.addEventListener("click",closeCart);checkoutButton?.addEventListener("click",checkout);document.addEventListener("keydown",event=>{if(event.key==="Escape")closeCart();});initStore();
+async function checkout(){if(!STORE_API_BASE||!cart.length)return;checkoutButton.disabled=true;checkoutButton.classList.add("is-loading");checkoutButton.textContent="OPENING SECURE CHECKOUT…";if(checkoutNote){checkoutNote.classList.remove("is-error");checkoutNote.textContent="Connecting to secure checkout…";}try{const r=await fetch(`${STORE_API_BASE}/checkout`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({items:cart})}),d=await r.json();if(!r.ok)throw new Error(d.error||"Checkout request failed");if(!d.url||!/^https:\/\//.test(d.url))throw new Error("Checkout URL missing");window.location.assign(d.url);}catch(e){console.error("STARGIRLS checkout:",e);checkoutButton.disabled=false;checkoutButton.classList.remove("is-loading");checkoutButton.textContent="TRY CHECKOUT AGAIN →";if(checkoutNote){checkoutNote.classList.add("is-error");checkoutNote.textContent=e.message||"Checkout could not open. Please try again.";}}}
+function parsePrintfulVariant(v){const parts=String(v.name||"").split(" / "),price=Number(v.retail_price),preview=(v.files||[]).find(f=>f?.preview_url)?.preview_url||"";return{...v,color:parts.length>=3?parts.at(-2):"",size:parts.at(-1)||"",price:Number.isFinite(price)?price:null,printful_sync_variant_id:Number(v.sync_variant_id||0),image:preview};}
+function sourceImage(source){if(source?.thumbnail_url)return source.thumbnail_url;for(const v of source?.variants||[]){const p=(v.files||[]).find(f=>f?.preview_url)?.preview_url;if(p)return p;}return"";}
+function ensureUI(){if(!document.querySelector(".mobile-buy-bar")){document.body.insertAdjacentHTML("beforeend",'<div class="mobile-buy-bar"><div class="mobile-buy-copy"><strong data-mobile-product>STARGIRLS SHOP</strong><span data-mobile-selection>Choose an item</span></div><button class="mobile-buy-action" type="button" data-mobile-buy disabled>SELECT OPTIONS</button></div><div class="shop-toast" role="status"></div>');document.querySelector("[data-mobile-buy]")?.addEventListener("click",()=>{const id=window.__activeShopProduct,s=selectionFor(id||"");if(id&&s.color&&s.size)addToCart(id,s.size,s.color);else document.querySelector(`[data-product-card="${CSS.escape(id||'')}"]`)?.scrollIntoView({behavior:"smooth",block:"center"});});}}
+function updateMobileBuyBar(){ensureUI();const bar=document.querySelector(".mobile-buy-bar"),id=window.__activeShopProduct,p=productById(id||""),s=id?selectionFor(id):null,btn=document.querySelector("[data-mobile-buy]");if(!bar||!p||!p.available){bar?.classList.remove("active");return;}bar.classList.add("active");document.querySelector("[data-mobile-product]").textContent=p.name;document.querySelector("[data-mobile-selection]").textContent=s?.color&&s?.size?`${s.color} / ${s.size}`:"Choose color + size";btn.disabled=!(s?.color&&s?.size&&variantFor(p,s.size,s.color));btn.textContent=btn.disabled?"SELECT OPTIONS":"ADD TO CART";}
+function showToast(text){ensureUI();const t=document.querySelector(".shop-toast");if(!t)return;t.textContent=text;t.classList.add("active");clearTimeout(window.__shopToastTimer);window.__shopToastTimer=setTimeout(()=>t.classList.remove("active"),1800);}
+function openImageModal(img){if(!img)return;let m=document.querySelector("[data-image-modal]");if(!m){document.body.insertAdjacentHTML("beforeend",'<div class="shop-modal" data-image-modal><div class="shop-modal-panel"><button class="shop-modal-close" type="button" data-modal-close>×</button><img class="shop-modal-image" alt="Product preview"></div></div>');m=document.querySelector("[data-image-modal]");m.addEventListener("click",e=>{if(e.target===m||e.target.closest("[data-modal-close]"))m.classList.remove("active");});}m.querySelector("img").src=img;m.classList.add("active");}
+function openSizeGuide(){let m=document.querySelector("[data-size-modal]");if(!m){document.body.insertAdjacentHTML("beforeend",'<div class="shop-modal" data-size-modal><div class="shop-modal-panel"><button class="shop-modal-close" type="button" data-modal-close>×</button><h2>SIZE GUIDE</h2><p class="size-guide-note">Fit can vary by garment and color. Use the size printed on the product option as your selection; for the most precise fit, compare a similar shirt or hoodie you already own with the measurements provided by the garment manufacturer.</p><table class="size-guide-table"><thead><tr><th>SIZE</th><th>FIT</th></tr></thead><tbody><tr><td>S</td><td>Small</td></tr><tr><td>M</td><td>Medium</td></tr><tr><td>L</td><td>Large</td></tr><tr><td>XL</td><td>Extra Large</td></tr><tr><td>2XL+</td><td>Extended sizing where available</td></tr></tbody></table></div></div>');m=document.querySelector("[data-size-modal]");m.addEventListener("click",e=>{if(e.target===m||e.target.closest("[data-modal-close]"))m.classList.remove("active");});}m.classList.add("active");}
+async function initStore(){try{const r=await fetch(`content/products.json?v=${Date.now()}`,{cache:"no-store"});if(!r.ok)throw new Error("Could not load products");const d=await r.json();products=Array.isArray(d.products)?d.products:[];if(STORE_API_BASE){try{const pr=await fetch(`${STORE_API_BASE}/printful/catalog?v=${Date.now()}`,{cache:"no-store",mode:"cors"});if(!pr.ok)throw new Error(`Printful catalog returned ${pr.status}`);const pf=await pr.json();products=products.map(product=>{if(!product.printful_product_id)return product;const source=(pf.products||[]).find(p=>Number(p.id)===Number(product.printful_product_id));if(!source)return{...product,available:false,status:"UNAVAILABLE"};const variants=(source.variants||[]).filter(v=>v.synced!==false&&v.availability_status!=="inactive").map(parsePrintfulVariant).filter(v=>v.color&&v.size&&v.sku&&v.printful_sync_variant_id>0),image=sourceImage(source)||product.image||"";return{...product,image,variants,available:product.available&&variants.length>0,status:variants.length?product.status:"UNAVAILABLE"};});}catch(e){console.error("STARGIRLS Printful catalog:",e);products=products.map(p=>p.printful_product_id?{...p,available:false,status:"SYNCING"}:p);}}}catch(e){console.error("STARGIRLS products:",e);products=[];}ensureUI();renderProducts();renderCart();}
+filterLinks.forEach(link=>link.addEventListener("click",e=>{e.preventDefault();activeFilter=link.dataset.shopFilter||"all";filterLinks.forEach(i=>i.classList.toggle("active",i.dataset.shopFilter===activeFilter));renderProducts();document.querySelector("#catalog")?.scrollIntoView({behavior:"smooth",block:"start"});}));cartButtons.forEach(b=>b.addEventListener("click",openCart));cartClose?.addEventListener("click",closeCart);cartBackdrop?.addEventListener("click",closeCart);checkoutButton?.addEventListener("click",checkout);document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeCart();document.querySelectorAll(".shop-modal.active").forEach(m=>m.classList.remove("active"));}});initStore();
