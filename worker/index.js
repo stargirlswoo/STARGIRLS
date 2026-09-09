@@ -1,4 +1,4 @@
-import { receiveStripeWebhook } from "./stripe-fulfillment.js";
+import { receiveStripeWebhook, getPrintfulCatalog } from "./stripe-fulfillment.js";
 
 const JSON_HEADERS = { "content-type": "application/json; charset=utf-8" };
 
@@ -19,17 +19,15 @@ function cors(origin, allowedOrigin) {
 }
 
 function requireProductsKv(env) {
-  if (!env.APLIIQ_PRODUCTS) {
-    throw new Error("APLIIQ_PRODUCTS KV binding is not configured");
+  const kv = env.STARGIRLS_PRODUCTS || env.APLIIQ_PRODUCTS;
+  if (!kv) {
+    throw new Error("STARGIRLS_PRODUCTS (or existing APLIIQ_PRODUCTS) KV binding is not configured");
   }
-  return env.APLIIQ_PRODUCTS;
+  return kv;
 }
 
 async function loadCatalog(env) {
-  if (!env.CATALOG_URL) {
-    throw new Error("CATALOG_URL is not configured");
-  }
-
+  if (!env.CATALOG_URL) throw new Error("CATALOG_URL is not configured");
   const response = await fetch(env.CATALOG_URL, { cf: { cacheTtl: 60 } });
   if (!response.ok) throw new Error("Could not load product catalog");
   const data = await response.json();
@@ -56,7 +54,7 @@ function validateCart(requestedItems, catalog) {
     let variant = null;
     if (Array.isArray(product.variants) && product.variants.length) {
       variant = product.variants.find(entry => entry.size === item.size);
-      if (!variant || !variant.sku || (item.sku && item.sku !== variant.sku)) {
+      if (!variant || (item.sku && variant.sku && item.sku !== variant.sku)) {
         throw new Error(`Invalid variant for: ${item.id}`);
       }
     }
@@ -80,15 +78,31 @@ async function createStripeCheckout(items, env) {
     const cents = Math.round(product.price * 100);
     const sku = variant?.sku || product.sku || "";
     const size = variant?.size || "";
+    const color = variant?.color || product.color || "";
 
     body.set(`line_items[${index}][quantity]`, String(quantity));
     body.set(`line_items[${index}][price_data][currency]`, "usd");
     body.set(`line_items[${index}][price_data][unit_amount]`, String(cents));
     body.set(`line_items[${index}][price_data][product_data][name]`, size ? `${product.name} — ${size}` : product.name);
     body.set(`line_items[${index}][price_data][product_data][metadata][stargirls_product_id]`, product.id);
-    body.set(`line_items[${index}][price_data][product_data][metadata][fulfillment]`, product.fulfillment || "stargirls");
+
+    const configuredFulfillment = product.fulfillment || "stargirls";
+    const fulfillment = configuredFulfillment === "apliiq" ? "printful" : configuredFulfillment;
+    body.set(`line_items[${index}][price_data][product_data][metadata][fulfillment]`, fulfillment);
+
+    const syncVariantId =
+      variant?.printful_sync_variant_id ||
+      variant?.printfulSyncVariantId ||
+      product.printful_sync_variant_id ||
+      product.printfulSyncVariantId ||
+      "";
+
+    if (syncVariantId) {
+      body.set(`line_items[${index}][price_data][product_data][metadata][printful_sync_variant_id]`, String(syncVariantId));
+    }
     if (sku) body.set(`line_items[${index}][price_data][product_data][metadata][sku]`, sku);
     if (size) body.set(`line_items[${index}][price_data][product_data][metadata][size]`, size);
+    if (color) body.set(`line_items[${index}][price_data][product_data][metadata][color]`, color);
 
     if (product.image && env.PUBLIC_SITE_URL) {
       const imageUrl = new URL(product.image, env.PUBLIC_SITE_URL).toString();
@@ -108,185 +122,9 @@ async function createStripeCheckout(items, env) {
   const data = await response.json();
   if (!response.ok) {
     console.error("Stripe checkout error", data);
-    throw new Error("Could not create checkout session");
+    throw new Error(data?.error?.message || "Could not create checkout session");
   }
-
   return data;
-}
-
-function compactProduct(payload, id) {
-  const imageUrls = Array.isArray(payload.imageUrls) ? payload.imageUrls.filter(Boolean) : [];
-  return {
-    store_ProductId: id,
-    name: String(payload.name || "Apliiq product"),
-    imageUrls
-  };
-}
-
-function normalizeApliiqProductPayload(rawPayload) {
-  const candidates = [
-    rawPayload,
-    rawPayload?.product,
-    rawPayload?.data,
-    rawPayload?.productData,
-    rawPayload?.product_data
-  ].filter(candidate => candidate && typeof candidate === "object" && !Array.isArray(candidate));
-
-  const productPayload = candidates.find(candidate =>
-    candidate.name || candidate.title || candidate.productName || candidate.product_name
-  ) || candidates[0] || {};
-
-  const name = productPayload.name
-    || productPayload.title
-    || productPayload.productName
-    || productPayload.product_name
-    || rawPayload?.name
-    || rawPayload?.title
-    || "Apliiq product";
-
-  return {
-    ...rawPayload,
-    ...productPayload,
-    name: String(name)
-  };
-}
-
-async function saveApliiqProduct(request, env) {
-  const kv = requireProductsKv(env);
-  const rawPayload = await request.json();
-  if (!rawPayload || typeof rawPayload !== "object" || Array.isArray(rawPayload)) {
-    return json({
-      storeProductId: null,
-      stepsCompleted: [],
-      hasError: true,
-      errorMessages: ["Invalid product payload"]
-    }, 400);
-  }
-
-  const payload = normalizeApliiqProductPayload(rawPayload);
-  const requestedIdValue = payload.store_ProductId ?? payload.storeProductId;
-  const requestedId = requestedIdValue ? String(requestedIdValue) : "";
-  const id = requestedId || `apliiq-${crypto.randomUUID()}`;
-  const record = {
-    ...payload,
-    store_ProductId: id,
-    stargirlsReceivedAt: new Date().toISOString()
-  };
-
-  await kv.put(`product:${id}`, JSON.stringify(record));
-  return json({
-    storeProductId: id,
-    stepsCompleted: ["DraftCreated", "InventoryCreated", "ImagesUploaded", "Completed"],
-    hasError: false,
-    errorMessages: []
-  });
-}
-
-async function searchApliiqProducts(url, env) {
-  const kv = requireProductsKv(env);
-  const search = (url.searchParams.get("search") || "").trim().toLowerCase();
-  const results = [];
-  let cursor;
-
-  do {
-    const page = await kv.list({ prefix: "product:", cursor, limit: 100 });
-    for (const key of page.keys) {
-      const record = await kv.get(key.name, "json");
-      if (!record) continue;
-      const haystack = [record.name, record.type, record.store_ProductId]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
-      if (!search || haystack.includes(search)) {
-        results.push(compactProduct(record, String(record.store_ProductId || key.name.slice(8))));
-      }
-      if (results.length >= 50) return json(results);
-    }
-    cursor = page.list_complete ? undefined : page.cursor;
-  } while (cursor);
-
-  return json(results);
-}
-
-function timingSafeEqual(a, b) {
-  if (a.length !== b.length) return false;
-  let mismatch = 0;
-  for (let i = 0; i < a.length; i += 1) mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  return mismatch === 0;
-}
-
-async function hmacBase64(message, secret) {
-  const encoder = new TextEncoder();
-  const key = await crypto.subtle.importKey(
-    "raw",
-    encoder.encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"]
-  );
-  const signature = await crypto.subtle.sign("HMAC", key, encoder.encode(message));
-  let binary = "";
-  for (const byte of new Uint8Array(signature)) binary += String.fromCharCode(byte);
-  return btoa(binary);
-}
-
-function bytesToBase64(bytes) {
-  let binary = "";
-  for (const byte of bytes) binary += String.fromCharCode(byte);
-  return btoa(binary);
-}
-
-async function verifyApliiqHmac(request, env, rawBody) {
-  if (!env.APLIIQ_SHARED_SECRET) return false;
-  const received = request.headers.get("x-apliiq-hmac") || "";
-  if (!received) return false;
-  const payloadBase64 = bytesToBase64(new TextEncoder().encode(rawBody));
-  const expected = await hmacBase64(payloadBase64, env.APLIIQ_SHARED_SECRET);
-  return timingSafeEqual(received, expected);
-}
-
-async function receiveFulfillment(request, env) {
-  const rawBody = await request.text();
-  if (!(await verifyApliiqHmac(request, env, rawBody))) {
-    return json({ error: "Invalid Apliiq signature" }, 401);
-  }
-
-  let payload;
-  try {
-    payload = JSON.parse(rawBody);
-  } catch {
-    return json({ error: "Invalid JSON" }, 400);
-  }
-
-  const orderId = payload?.fulfillment?.order_id;
-  if (!orderId) return json({ error: "Missing fulfillment.order_id" }, 400);
-
-  const kv = requireProductsKv(env);
-  await kv.put(`fulfillment:${orderId}:${Date.now()}`, JSON.stringify({
-    ...payload,
-    stargirlsReceivedAt: new Date().toISOString()
-  }));
-
-  return json({ ok: true });
-}
-
-async function receiveWarehouseShipment(request, env) {
-  if (!env.APLIIQ_APP_ID) return json({ error: "APLIIQ_APP_ID is not configured" }, 503);
-  const receivedAppId = request.headers.get("x-apliiq-appId") || "";
-  if (!timingSafeEqual(receivedAppId, env.APLIIQ_APP_ID)) {
-    return json({ error: "Invalid Apliiq app id" }, 401);
-  }
-
-  const payload = await request.json();
-  if (!Array.isArray(payload)) return json({ error: "Expected shipment array" }, 400);
-
-  const kv = requireProductsKv(env);
-  await kv.put(`warehouse-shipment:${Date.now()}:${crypto.randomUUID()}`, JSON.stringify({
-    shipments: payload,
-    stargirlsReceivedAt: new Date().toISOString()
-  }));
-
-  return json({ ok: true, received: payload.length });
 }
 
 export default {
@@ -300,7 +138,7 @@ export default {
     }
 
     if (url.pathname === "/health") {
-      return json({ ok: true }, 200, corsHeaders);
+      return json({ ok: true, fulfillment: "printful" }, 200, corsHeaders);
     }
 
     try {
@@ -308,20 +146,11 @@ export default {
         return await receiveStripeWebhook(request, env);
       }
 
-      if (url.pathname === "/apliiq/product" && request.method === "POST") {
-        return await saveApliiqProduct(request, env);
-      }
-
-      if (url.pathname === "/apliiq/product-search" && request.method === "GET") {
-        return await searchApliiqProducts(url, env);
-      }
-
-      if (url.pathname === "/apliiq/fulfillment" && request.method === "POST") {
-        return await receiveFulfillment(request, env);
-      }
-
-      if (url.pathname === "/apliiq/warehouse-shipment-complete" && request.method === "POST") {
-        return await receiveWarehouseShipment(request, env);
+      // Temporary, non-secret catalog discovery endpoint used to map the Printful
+      // Sync Variant IDs. It never returns the API token or file URLs.
+      if (url.pathname === "/printful/catalog" && request.method === "GET") {
+        const catalog = await getPrintfulCatalog(env);
+        return json(catalog, 200, corsHeaders);
       }
 
       if (url.pathname !== "/checkout" || request.method !== "POST") {
@@ -331,6 +160,10 @@ export default {
       if (env.ALLOWED_ORIGIN && origin && origin !== env.ALLOWED_ORIGIN) {
         return json({ error: "Origin not allowed" }, 403, corsHeaders);
       }
+
+      // Ensure the KV binding is available before checkout so fulfillment
+      // idempotency is guaranteed before taking an order.
+      requireProductsKv(env);
 
       const payload = await request.json();
       const catalog = await loadCatalog(env);
