@@ -3,10 +3,7 @@ import { receiveStripeWebhook, getPrintfulCatalog } from "./stripe-fulfillment.j
 const JSON_HEADERS = { "content-type": "application/json; charset=utf-8" };
 
 function json(data, status = 200, extraHeaders = {}) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: { ...JSON_HEADERS, ...extraHeaders }
-  });
+  return new Response(JSON.stringify(data), { status, headers: { ...JSON_HEADERS, ...extraHeaders } });
 }
 
 function cors(origin, allowedOrigin) {
@@ -20,9 +17,7 @@ function cors(origin, allowedOrigin) {
 
 function requireProductsKv(env) {
   const kv = env.STARGIRLS_PRODUCTS || env.APLIIQ_PRODUCTS;
-  if (!kv) {
-    throw new Error("STARGIRLS_PRODUCTS (or existing APLIIQ_PRODUCTS) KV binding is not configured");
-  }
+  if (!kv) throw new Error("STARGIRLS_PRODUCTS (or existing APLIIQ_PRODUCTS) KV binding is not configured");
   return kv;
 }
 
@@ -34,32 +29,55 @@ async function loadCatalog(env) {
   return Array.isArray(data.products) ? data.products : [];
 }
 
-function validateCart(requestedItems, catalog) {
-  if (!Array.isArray(requestedItems) || requestedItems.length === 0) {
-    throw new Error("Cart is empty");
-  }
+function parsedVariant(variant) {
+  const parts = String(variant.name || "").split(" / ");
+  const size = parts.at(-1) || "";
+  const color = parts.length >= 3 ? parts.at(-2) : "";
+  const price = Number(variant.retail_price);
+  return {
+    ...variant,
+    size,
+    color,
+    price: Number.isFinite(price) ? price : null,
+    printful_sync_variant_id: Number(variant.sync_variant_id || 0)
+  };
+}
+
+function mergePrintfulProduct(product, printfulCatalog) {
+  if (!product.printful_product_id) return product;
+  const source = (printfulCatalog.products || []).find(entry => Number(entry.id) === Number(product.printful_product_id));
+  if (!source) throw new Error(`Printful product not found: ${product.name}`);
+  const variants = (source.variants || [])
+    .filter(v => v.synced !== false && v.availability_status !== "inactive")
+    .map(parsedVariant)
+    .filter(v => v.size && v.color && v.sku && v.printful_sync_variant_id > 0);
+  if (!variants.length) throw new Error(`No active Printful variants: ${product.name}`);
+  return { ...product, variants };
+}
+
+function validateCart(requestedItems, catalog, printfulCatalog) {
+  if (!Array.isArray(requestedItems) || requestedItems.length === 0) throw new Error("Cart is empty");
 
   return requestedItems.map(item => {
-    const product = catalog.find(entry => entry.id === item.id);
+    const baseProduct = catalog.find(entry => entry.id === item.id);
+    if (!baseProduct || !baseProduct.available) throw new Error(`Product is not available: ${item.id}`);
+    const product = mergePrintfulProduct(baseProduct, printfulCatalog);
     const quantity = Number(item.quantity);
-
-    if (!product || !product.available || typeof product.price !== "number") {
-      throw new Error(`Product is not available: ${item.id}`);
-    }
-
-    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 20) {
-      throw new Error(`Invalid quantity for: ${item.id}`);
-    }
+    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 20) throw new Error(`Invalid quantity for: ${item.id}`);
 
     let variant = null;
     if (Array.isArray(product.variants) && product.variants.length) {
-      variant = product.variants.find(entry => entry.size === item.size);
-      if (!variant || (item.sku && variant.sku && item.sku !== variant.sku)) {
-        throw new Error(`Invalid variant for: ${item.id}`);
-      }
+      const requestedSyncId = Number(item.printful_sync_variant_id || item.syncVariantId || 0);
+      variant = product.variants.find(entry =>
+        (requestedSyncId > 0 && entry.printful_sync_variant_id === requestedSyncId) ||
+        (entry.size === item.size && entry.color === item.color && (!item.sku || entry.sku === item.sku))
+      );
+      if (!variant) throw new Error(`Invalid variant for: ${item.id}`);
     }
 
-    return { product, variant, quantity };
+    const price = Number(variant?.price ?? product.price);
+    if (!Number.isFinite(price) || price < 0) throw new Error(`Invalid price for: ${item.id}`);
+    return { product, variant, quantity, unitPrice: price };
   });
 }
 
@@ -74,36 +92,24 @@ async function createStripeCheckout(items, env) {
   body.set("billing_address_collection", "auto");
   body.set("shipping_address_collection[allowed_countries][0]", "US");
 
-  items.forEach(({ product, variant, quantity }, index) => {
-    const cents = Math.round(product.price * 100);
+  items.forEach(({ product, variant, quantity, unitPrice }, index) => {
+    const cents = Math.round(unitPrice * 100);
     const sku = variant?.sku || product.sku || "";
     const size = variant?.size || "";
     const color = variant?.color || product.color || "";
+    const syncVariantId = variant?.printful_sync_variant_id || "";
+    const optionLabel = [color, size].filter(Boolean).join(" / ");
 
     body.set(`line_items[${index}][quantity]`, String(quantity));
     body.set(`line_items[${index}][price_data][currency]`, "usd");
     body.set(`line_items[${index}][price_data][unit_amount]`, String(cents));
-    body.set(`line_items[${index}][price_data][product_data][name]`, size ? `${product.name} — ${size}` : product.name);
+    body.set(`line_items[${index}][price_data][product_data][name]`, optionLabel ? `${product.name} — ${optionLabel}` : product.name);
     body.set(`line_items[${index}][price_data][product_data][metadata][stargirls_product_id]`, product.id);
-
-    const configuredFulfillment = product.fulfillment || "stargirls";
-    const fulfillment = configuredFulfillment === "apliiq" ? "printful" : configuredFulfillment;
-    body.set(`line_items[${index}][price_data][product_data][metadata][fulfillment]`, fulfillment);
-
-    const syncVariantId =
-      variant?.printful_sync_variant_id ||
-      variant?.printfulSyncVariantId ||
-      product.printful_sync_variant_id ||
-      product.printfulSyncVariantId ||
-      "";
-
-    if (syncVariantId) {
-      body.set(`line_items[${index}][price_data][product_data][metadata][printful_sync_variant_id]`, String(syncVariantId));
-    }
+    body.set(`line_items[${index}][price_data][product_data][metadata][fulfillment]`, "printful");
+    if (syncVariantId) body.set(`line_items[${index}][price_data][product_data][metadata][printful_sync_variant_id]`, String(syncVariantId));
     if (sku) body.set(`line_items[${index}][price_data][product_data][metadata][sku]`, sku);
     if (size) body.set(`line_items[${index}][price_data][product_data][metadata][size]`, size);
     if (color) body.set(`line_items[${index}][price_data][product_data][metadata][color]`, color);
-
     if (product.image && env.PUBLIC_SITE_URL) {
       const imageUrl = new URL(product.image, env.PUBLIC_SITE_URL).toString();
       body.set(`line_items[${index}][price_data][product_data][images][0]`, imageUrl);
@@ -112,13 +118,9 @@ async function createStripeCheckout(items, env) {
 
   const response = await fetch("https://api.stripe.com/v1/checkout/sessions", {
     method: "POST",
-    headers: {
-      authorization: `Bearer ${env.STRIPE_SECRET_KEY}`,
-      "content-type": "application/x-www-form-urlencoded"
-    },
+    headers: { authorization: `Bearer ${env.STRIPE_SECRET_KEY}`, "content-type": "application/x-www-form-urlencoded" },
     body
   });
-
   const data = await response.json();
   if (!response.ok) {
     console.error("Stripe checkout error", data);
@@ -133,41 +135,19 @@ export default {
     const corsHeaders = cors(origin, env.ALLOWED_ORIGIN);
     const url = new URL(request.url);
 
-    if (request.method === "OPTIONS") {
-      return new Response(null, { status: 204, headers: corsHeaders });
-    }
-
-    if (url.pathname === "/health") {
-      return json({ ok: true, fulfillment: "printful" }, 200, corsHeaders);
-    }
+    if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders });
+    if (url.pathname === "/health") return json({ ok: true, fulfillment: "printful" }, 200, corsHeaders);
 
     try {
-      if (url.pathname === "/stripe/webhook" && request.method === "POST") {
-        return await receiveStripeWebhook(request, env);
-      }
+      if (url.pathname === "/stripe/webhook" && request.method === "POST") return await receiveStripeWebhook(request, env);
+      if (url.pathname === "/printful/catalog" && request.method === "GET") return json(await getPrintfulCatalog(env), 200, corsHeaders);
+      if (url.pathname !== "/checkout" || request.method !== "POST") return json({ error: "Not found" }, 404, corsHeaders);
+      if (env.ALLOWED_ORIGIN && origin && origin !== env.ALLOWED_ORIGIN) return json({ error: "Origin not allowed" }, 403, corsHeaders);
 
-      // Temporary, non-secret catalog discovery endpoint used to map the Printful
-      // Sync Variant IDs. It never returns the API token or file URLs.
-      if (url.pathname === "/printful/catalog" && request.method === "GET") {
-        const catalog = await getPrintfulCatalog(env);
-        return json(catalog, 200, corsHeaders);
-      }
-
-      if (url.pathname !== "/checkout" || request.method !== "POST") {
-        return json({ error: "Not found" }, 404, corsHeaders);
-      }
-
-      if (env.ALLOWED_ORIGIN && origin && origin !== env.ALLOWED_ORIGIN) {
-        return json({ error: "Origin not allowed" }, 403, corsHeaders);
-      }
-
-      // Ensure the KV binding is available before checkout so fulfillment
-      // idempotency is guaranteed before taking an order.
       requireProductsKv(env);
-
       const payload = await request.json();
-      const catalog = await loadCatalog(env);
-      const validatedItems = validateCart(payload.items, catalog);
+      const [catalog, printfulCatalog] = await Promise.all([loadCatalog(env), getPrintfulCatalog(env)]);
+      const validatedItems = validateCart(payload.items, catalog, printfulCatalog);
       const session = await createStripeCheckout(validatedItems, env);
       return json({ url: session.url }, 200, corsHeaders);
     } catch (error) {
