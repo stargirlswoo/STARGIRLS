@@ -38,7 +38,8 @@ function renderProducts(){
     const priceText=Number.isFinite(low)?(Number.isFinite(high)&&high!==low?`FROM ${money(low)}`:money(low)):status;
     const selectors=variants.length?`<label class="catalog-size-label" for="color-${id}">COLOR</label><select class="catalog-size" id="color-${id}" data-color-for="${id}" ${product.available?'':'disabled'}><option value="">SELECT COLOR</option>${colors.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("")}</select><label class="catalog-size-label" for="size-${id}">SIZE</label><select class="catalog-size" id="size-${id}" data-size-for="${id}" disabled><option value="">SELECT SIZE</option></select>`:"";
     const action=product.available&&variants.length?`<button class="catalog-buy" type="button" data-add-to-cart="${id}">ADD TO CART</button>`:`<span class="catalog-status">${status}</span>`;
-    return `<article class="catalog-card" data-category="${category}"><div class="catalog-card-image" style="background-image:url(&quot;${image}&quot;)" role="img" aria-label="${name}"></div><div class="catalog-meta"><div><strong>${name}</strong><span>${category.toUpperCase()}</span></div><div class="catalog-price" data-price-for="${id}">${priceText}</div></div>${selectors}${action}</article>`;
+    const imageStyle=image?`background-image:url(&quot;${image}&quot;)`:"";
+    return `<article class="catalog-card" data-category="${category}"><div class="catalog-card-image" style="${imageStyle}" role="img" aria-label="${name}"></div><div class="catalog-meta"><div><strong>${name}</strong><span>${category.toUpperCase()}</span></div><div class="catalog-price" data-price-for="${id}">${priceText}</div></div>${selectors}${action}</article>`;
   }).join("");
 
   document.querySelectorAll("[data-color-for]").forEach(select=>select.addEventListener("change",()=>{
@@ -78,12 +79,36 @@ function closeCart(){if(!cartDrawer||!cartBackdrop)return;cartDrawer.classList.r
 async function checkout(){if(!STORE_API_BASE||!cart.length)return;checkoutButton.disabled=true;checkoutButton.textContent="OPENING CHECKOUT…";try{const response=await fetch(`${STORE_API_BASE}/checkout`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({items:cart})});const data=await response.json();if(!response.ok)throw new Error(data.error||"Checkout request failed");if(!data.url||!/^https:\/\//.test(data.url))throw new Error("Checkout URL missing");window.location.assign(data.url);}catch(error){console.error("STARGIRLS checkout:",error);checkoutButton.disabled=false;checkoutButton.textContent="CHECKOUT";if(checkoutNote)checkoutNote.textContent=error.message||"Checkout could not open. Please try again.";}}
 
 function parsePrintfulVariant(v){const parts=String(v.name||"").split(" / ");const price=Number(v.retail_price);return {...v,color:parts.length>=3?parts.at(-2):"",size:parts.at(-1)||"",price:Number.isFinite(price)?price:null,printful_sync_variant_id:Number(v.sync_variant_id||0)};}
+function sourceImage(source){if(source?.thumbnail_url)return source.thumbnail_url;for(const variant of source?.variants||[]){const preview=(variant.files||[]).find(file=>file?.preview_url)?.preview_url;if(preview)return preview;}return "";}
+
 async function initStore(){
   try{
-    const [catalogResponse,printfulResponse]=await Promise.all([fetch("content/products.json",{cache:"no-store"}),STORE_API_BASE?fetch(`${STORE_API_BASE}/printful/catalog`,{cache:"no-store"}):Promise.resolve(null)]);
+    const catalogResponse=await fetch(`content/products.json?v=${Date.now()}`,{cache:"no-store"});
     if(!catalogResponse.ok)throw new Error("Could not load products");
-    const data=await catalogResponse.json();products=Array.isArray(data.products)?data.products:[];
-    if(printfulResponse?.ok){const pf=await printfulResponse.json();products=products.map(product=>{if(!product.printful_product_id)return product;const source=(pf.products||[]).find(p=>Number(p.id)===Number(product.printful_product_id));if(!source)return {...product,available:false,status:"UNAVAILABLE"};const variants=(source.variants||[]).filter(v=>v.synced!==false&&v.availability_status!=="inactive").map(parsePrintfulVariant).filter(v=>v.color&&v.size&&v.sku&&v.printful_sync_variant_id>0);return {...product,variants};});}
+    const data=await catalogResponse.json();
+    products=Array.isArray(data.products)?data.products:[];
+
+    if(STORE_API_BASE){
+      try{
+        const printfulResponse=await fetch(`${STORE_API_BASE}/printful/catalog?v=${Date.now()}`,{cache:"no-store",mode:"cors"});
+        if(!printfulResponse.ok)throw new Error(`Printful catalog returned ${printfulResponse.status}`);
+        const pf=await printfulResponse.json();
+        products=products.map(product=>{
+          if(!product.printful_product_id)return product;
+          const source=(pf.products||[]).find(p=>Number(p.id)===Number(product.printful_product_id));
+          if(!source)return {...product,available:false,status:"UNAVAILABLE"};
+          const variants=(source.variants||[])
+            .filter(v=>v.synced!==false&&v.availability_status!=="inactive")
+            .map(parsePrintfulVariant)
+            .filter(v=>v.color&&v.size&&v.sku&&v.printful_sync_variant_id>0);
+          const image=sourceImage(source)||product.image||"";
+          return {...product,image,variants,available:product.available&&variants.length>0,status:variants.length?product.status:"UNAVAILABLE"};
+        });
+      }catch(error){
+        console.error("STARGIRLS Printful catalog:",error);
+        products=products.map(product=>product.printful_product_id?{...product,available:false,status:"SYNCING"}:product);
+      }
+    }
   }catch(error){console.error("STARGIRLS products:",error);products=[];}
   renderProducts();renderCart();
 }
