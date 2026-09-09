@@ -6,11 +6,36 @@
     if(/juno|perfume|parfum|fragrance|eau de/.test(n)) return 'perfume';
     return 'fashion';
   };
+  const needsMockupOnly=name=>/hunt.*swim|hunt.*flip|anew.*pullover|stargirl?s?.*pullover/i.test(String(name||''));
+  const cleanSource=source=>{
+    if(!needsMockupOnly(source?.name)) return source;
+    const variants=(source.variants||[]).map(v=>{
+      const files=Array.isArray(v.files)?v.files:[];
+      const previews=files.filter(f=>f&&f.preview_url&&String(f.type||'').toLowerCase()==='preview');
+      return {...v,files:previews.length?previews:files.slice(1)};
+    });
+    let hero='';
+    for(const v of variants){const f=(v.files||[]).find(x=>x?.preview_url);if(f){hero=f.preview_url;break;}}
+    return {...source,variants,thumbnail_url:hero||source.thumbnail_url};
+  };
   const isProductsRequest=input=>{
     const u=typeof input==='string'?input:(input&&input.url)||'';
     return /(?:^|\/)content\/products\.json(?:\?|$)/.test(u);
   };
+  const isPrintfulCatalogRequest=input=>{
+    const u=typeof input==='string'?input:(input&&input.url)||'';
+    return !!api&&u.startsWith(`${api}/printful/catalog`);
+  };
   window.fetch=async(input,init)=>{
+    if(isPrintfulCatalogRequest(input)){
+      const response=await nativeFetch(input,init);
+      if(!response.ok) return response;
+      try{
+        const data=await response.clone().json();
+        const products=Array.isArray(data.products)?data.products.map(cleanSource):[];
+        return new Response(JSON.stringify({...data,products}),{status:response.status,statusText:response.statusText,headers:{'content-type':'application/json; charset=utf-8'}});
+      }catch{return response;}
+    }
     if(!isProductsRequest(input)||!api) return nativeFetch(input,init);
     const baseResponse=await nativeFetch(input,init);
     if(!baseResponse.ok) return baseResponse;
@@ -21,7 +46,7 @@
       ]);
       if(!printfulResponse.ok) return baseResponse;
       const printful=await printfulResponse.json();
-      const sources=Array.isArray(printful.products)?printful.products:[];
+      const sources=(Array.isArray(printful.products)?printful.products:[]).map(cleanSource);
       const baseProducts=Array.isArray(base.products)?base.products:[];
       const mappedIds=new Set(baseProducts.map(p=>Number(p.printful_product_id||0)).filter(Boolean));
       const merged=baseProducts.map(product=>{
