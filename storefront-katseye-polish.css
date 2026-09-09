@@ -11,7 +11,7 @@
 .storefront-home .desktop-nav{gap:22px}
 .storefront-home .header-shop{border-color:var(--sg-ink)!important}
 
-/* hero — intentionally compact so shopping begins above the fold */
+/* hero */
 .storefront-home .home-store-intro{background:var(--sg-cream)!important;border-bottom:1px solid var(--sg-line)!important;padding:34px 4vw 26px!important;min-height:0!important}
 .storefront-home .home-store-intro h1{color:var(--sg-ink)!important;font-size:clamp(50px,7vw,102px)!important;line-height:.84!important;max-width:900px}
 .storefront-home .home-store-intro h1 .sg-mark{filter:invert(1)}
@@ -20,14 +20,15 @@
 .storefront-home .home-store-meta span{border-color:#d6d1ca!important;color:#5e5952!important;background:transparent!important;padding:6px 9px!important;font-size:8px!important}
 .storefront-home .home-store-meta .sg-mark{filter:invert(1)}
 
-/* the three oversized department tiles duplicated the tabs and pushed products down */
+/* only one category navigation belongs on the storefront */
 .storefront-home .shop-category-intro{display:none!important}
 
 /* category navigation */
-.storefront-home .shop-tabs{position:sticky!important;top:66px!important;z-index:30!important;background:rgba(250,249,246,.97)!important;backdrop-filter:blur(12px);border-top:0!important;border-bottom:1px solid var(--sg-line)!important;padding-left:4vw!important;padding-right:4vw!important;overflow-x:auto;white-space:nowrap;scrollbar-width:none}
+.storefront-home .shop-tabs{position:sticky!important;top:66px!important;z-index:30!important;background:rgba(250,249,246,.98)!important;backdrop-filter:blur(12px);border-top:0!important;border-bottom:1px solid var(--sg-line)!important;padding-left:4vw!important;padding-right:4vw!important;overflow-x:auto;white-space:nowrap;scrollbar-width:none}
 .storefront-home .shop-tabs::-webkit-scrollbar{display:none}
-.storefront-home .shop-tabs a{color:#7d7871!important;padding-top:15px!important;padding-bottom:13px!important;font-size:10px!important;letter-spacing:.09em!important}
-.storefront-home .shop-tabs a.active{color:var(--sg-ink)!important;border-color:var(--sg-ink)!important}
+.storefront-home .shop-tabs a,.storefront-home .shop-tabs a:visited{color:#6f6b64!important;background:transparent!important;padding-top:15px!important;padding-bottom:13px!important;font-size:10px!important;letter-spacing:.09em!important;text-decoration:none!important}
+.storefront-home .shop-tabs a:hover{color:var(--sg-ink)!important;background:#f0ede7!important}
+.storefront-home .shop-tabs a.active,.storefront-home .shop-tabs a.active:visited{color:#0b0b0b!important;background:#ece8e1!important;border-color:#0b0b0b!important;border-bottom:2px solid #0b0b0b!important}
 
 /* catalog */
 .storefront-home .catalog-section{background:var(--sg-cream)!important;padding-top:0!important}
@@ -48,7 +49,7 @@
 .storefront-home .product-card-title-link{text-decoration:none!important}
 .storefront-home .catalog-thumbs,.storefront-home .catalog-image-tools{display:none!important}
 
-/* remove unnecessary visual weight below products */
+/* footer/sign-up */
 .storefront-home .store-signup{background:#0b0b0b!important;color:#fff!important;border-color:#0b0b0b!important;padding-top:58px!important;padding-bottom:58px!important}
 .storefront-home .store-signup .shop-eyebrow,.storefront-home .store-signup-copy>p:last-child{color:#aaa!important}
 .storefront-home .store-email-form{border-color:#666!important}
@@ -58,9 +59,7 @@
 .storefront-home .store-footer-logo,.storefront-home .support-menu>a{color:#fff!important}
 .storefront-home .store-footer .sg-mark{filter:none!important}
 
-@media(max-width:1050px){
- .storefront-home .catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
-}
+@media(max-width:1050px){.storefront-home .catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 @media(max-width:800px){
  .storefront-home .site-header{min-height:58px!important}
  .storefront-home .shop-tabs{top:58px!important;padding-left:18px!important;padding-right:18px!important}
