@@ -16,9 +16,8 @@ function cors(origin, allowedOrigin) {
 }
 
 function requireProductsKv(env) {
-  const kv = env.STARGIRLS_PRODUCTS || env.APLIIQ_PRODUCTS;
-  if (!kv) throw new Error("STARGIRLS_PRODUCTS (or existing APLIIQ_PRODUCTS) KV binding is not configured");
-  return kv;
+  if (!env.STARGIRLS_PRODUCTS) throw new Error("STARGIRLS_PRODUCTS KV binding is not configured");
+  return env.STARGIRLS_PRODUCTS;
 }
 
 async function loadCatalog(env) {
