@@ -110,6 +110,7 @@ export async function getPrintfulCatalog(env) {
 
     for (const product of batch) {
       const details = await printfulRequest(`/store/products/${encodeURIComponent(product.id)}`, env, { method: "GET" });
+      const syncProduct = details?.result?.sync_product || product || {};
       const variants = Array.isArray(details?.result?.sync_variants)
         ? details.result.sync_variants
         : [];
@@ -118,6 +119,7 @@ export async function getPrintfulCatalog(env) {
         id: product.id,
         external_id: product.external_id || null,
         name: product.name || "",
+        thumbnail_url: syncProduct.thumbnail_url || product.thumbnail_url || null,
         variants: variants.map(variant => ({
           sync_variant_id: variant.id,
           external_id: variant.external_id || null,
@@ -126,7 +128,11 @@ export async function getPrintfulCatalog(env) {
           catalog_variant_id: variant.variant_id || null,
           retail_price: variant.retail_price || null,
           synced: variant.synced !== false,
-          availability_status: variant.availability_status || null
+          availability_status: variant.availability_status || null,
+          product: variant.product || null,
+          files: Array.isArray(variant.files)
+            ? variant.files.filter(file => file && file.preview_url).map(file => ({ preview_url: file.preview_url, type: file.type || null }))
+            : []
         }))
       });
     }
@@ -228,8 +234,6 @@ async function resolvePrintfulSyncVariant(item, env) {
 }
 
 async function createPrintfulOrder(payload, env) {
-  // Keep orders as drafts until the full mapping has been verified. Turning on
-  // PRINTFUL_CONFIRM_ORDERS=true later will submit them for fulfillment.
   const confirm = String(env.PRINTFUL_CONFIRM_ORDERS || "").toLowerCase() === "true";
 
   const data = await printfulRequest(
