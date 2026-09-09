@@ -37,4 +37,10 @@
   const grid=document.querySelector('[data-product-grid]');
   if(grid)new MutationObserver(apply).observe(grid,{childList:true,subtree:true});
   apply();
+  if(!document.querySelector('script[data-hayati-image-guard]')){
+    const s=document.createElement('script');
+    s.src='hayati-image-guard.js?v=20260909a';
+    s.dataset.hayatiImageGuard='1';
+    document.body.appendChild(s);
+  }
 })();
