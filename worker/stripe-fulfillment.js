@@ -9,12 +9,6 @@ function bytesToHex(bytes) {
   return Array.from(bytes, byte => byte.toString(16).padStart(2, "0")).join("");
 }
 
-function bytesToBase64(bytes) {
-  let binary = "";
-  for (const byte of bytes) binary += String.fromCharCode(byte);
-  return btoa(binary);
-}
-
 async function hmacBytes(message, secret) {
   const encoder = new TextEncoder();
   const key = await crypto.subtle.importKey(
@@ -25,10 +19,6 @@ async function hmacBytes(message, secret) {
     ["sign"]
   );
   return new Uint8Array(await crypto.subtle.sign("HMAC", key, encoder.encode(message)));
-}
-
-async function hmacBase64(message, secret) {
-  return bytesToBase64(await hmacBytes(message, secret));
 }
 
 function parseStripeSignature(header) {
@@ -52,6 +42,7 @@ async function verifyStripeWebhook(rawBody, signatureHeader, secret) {
 
 async function stripeGet(path, env, params = {}) {
   if (!env.STRIPE_SECRET_KEY) throw new Error("STRIPE_SECRET_KEY is not configured");
+
   const url = new URL(`https://api.stripe.com${path}`);
   Object.entries(params).forEach(([key, value]) => {
     if (Array.isArray(value)) value.forEach(item => url.searchParams.append(key, item));
@@ -62,6 +53,7 @@ async function stripeGet(path, env, params = {}) {
     headers: { authorization: `Bearer ${env.STRIPE_SECRET_KEY}` }
   });
   const data = await response.json();
+
   if (!response.ok) {
     console.error("Stripe API error", data);
     throw new Error("Could not load Stripe checkout details");
@@ -69,84 +61,193 @@ async function stripeGet(path, env, params = {}) {
   return data;
 }
 
-async function stableNumericId(value) {
-  const digest = new Uint8Array(
-    await crypto.subtle.digest("SHA-256", new TextEncoder().encode(String(value)))
-  );
-  return Number.parseInt(bytesToHex(digest.slice(0, 6)), 16);
-}
-
-function splitName(name = "") {
-  const parts = String(name).trim().split(/\s+/).filter(Boolean);
-  if (!parts.length) return { first_name: "Customer", last_name: "Customer" };
-  if (parts.length === 1) return { first_name: parts[0], last_name: parts[0] };
-  return { first_name: parts.slice(0, -1).join(" "), last_name: parts.at(-1) };
-}
-
-function apliIqAddress(shippingDetails, customerDetails) {
-  const details = shippingDetails || {};
-  const address = details.address || customerDetails?.address || {};
-  const name = details.name || customerDetails?.name || "";
-  const phone = details.phone || customerDetails?.phone || "";
-  const names = splitName(name);
-  const countryCode = String(address.country || "US").toUpperCase();
-
-  if (!address.line1 || !address.city || !address.postal_code || !address.state) {
-    throw new Error("Stripe checkout is missing a complete shipping address");
+function requireProductsKv(env) {
+  const kv = env.STARGIRLS_PRODUCTS || env.APLIIQ_PRODUCTS;
+  if (!kv) {
+    throw new Error("STARGIRLS_PRODUCTS (or existing APLIIQ_PRODUCTS) KV binding is not configured");
   }
+  return kv;
+}
 
-  return {
-    ...names,
-    address1: address.line1,
-    address2: address.line2 || "",
-    phone,
-    city: address.city,
-    zip: address.postal_code,
-    province: address.state,
-    province_code: countryCode === "US" ? address.state : (address.state || ""),
-    country: countryCode === "US" ? "United States" : countryCode,
-    country_code: countryCode,
-    name
+function printfulHeaders(env, includeJson = true) {
+  if (!env.PRINTFUL_API_TOKEN) throw new Error("PRINTFUL_API_TOKEN is not configured");
+
+  const headers = {
+    Authorization: `Bearer ${env.PRINTFUL_API_TOKEN}`,
+    Accept: "application/json"
   };
+  if (includeJson) headers["Content-Type"] = "application/json";
+  if (env.PRINTFUL_STORE_ID) headers["X-PF-Store-Id"] = String(env.PRINTFUL_STORE_ID);
+  return headers;
 }
 
-async function createApliiqOrder(payload, env) {
-  if (!env.APLIIQ_APP_ID || !env.APLIIQ_SHARED_SECRET) {
-    throw new Error("Apliiq API credentials are not configured");
-  }
-
-  const body = JSON.stringify(payload);
-  const rts = String(Math.floor(Date.now() / 1000));
-  const state = crypto.randomUUID().replaceAll("-", "").toLowerCase();
-  const contentBase64 = bytesToBase64(new TextEncoder().encode(body));
-  const signature = await hmacBase64(
-    `${env.APLIIQ_APP_ID}${rts}${state}${contentBase64}`,
-    env.APLIIQ_SHARED_SECRET
-  );
-
-  const response = await fetch("https://api.apliiq.com/v1/Order", {
-    method: "POST",
+async function printfulRequest(path, env, options = {}) {
+  const response = await fetch(`https://api.printful.com${path}`, {
+    ...options,
     headers: {
-      Authorization: `x-apliiq-auth ${rts}:${signature}:${env.APLIIQ_APP_ID}:${state}`,
-      Accept: "application/json",
-      "Content-Type": "application/json"
-    },
-    body
+      ...printfulHeaders(env, options.body !== undefined),
+      ...(options.headers || {})
+    }
   });
 
   const data = await response.json().catch(() => ({}));
-  if (response.status !== 200) {
-    console.error("Apliiq create order error", response.status, data);
-    throw new Error(data?.message || `Apliiq order was not processed (${response.status})`);
+  if (!response.ok || Number(data?.code || response.status) >= 400) {
+    console.error("Printful API error", path, response.status, data);
+    const message = data?.result || data?.error?.message || data?.message;
+    throw new Error(typeof message === "string" ? message : `Printful request failed (${response.status})`);
   }
   return data;
 }
 
+export async function getPrintfulCatalog(env) {
+  const products = [];
+  let offset = 0;
+  const limit = 100;
+
+  while (true) {
+    const page = await printfulRequest(`/store/products?offset=${offset}&limit=${limit}`, env, { method: "GET" });
+    const batch = Array.isArray(page?.result) ? page.result : [];
+
+    for (const product of batch) {
+      const details = await printfulRequest(`/store/products/${encodeURIComponent(product.id)}`, env, { method: "GET" });
+      const variants = Array.isArray(details?.result?.sync_variants)
+        ? details.result.sync_variants
+        : [];
+
+      products.push({
+        id: product.id,
+        external_id: product.external_id || null,
+        name: product.name || "",
+        variants: variants.map(variant => ({
+          sync_variant_id: variant.id,
+          external_id: variant.external_id || null,
+          name: variant.name || "",
+          sku: variant.sku || "",
+          catalog_variant_id: variant.variant_id || null,
+          retail_price: variant.retail_price || null,
+          synced: variant.synced !== false,
+          availability_status: variant.availability_status || null
+        }))
+      });
+    }
+
+    const total = Number(page?.paging?.total || batch.length);
+    offset += batch.length;
+    if (!batch.length || offset >= total) break;
+  }
+
+  return { products };
+}
+
+function printfulAddress(shippingDetails, customerDetails) {
+  const details = shippingDetails || {};
+  const address = details.address || customerDetails?.address || {};
+  const name = details.name || customerDetails?.name || "";
+  const phone = details.phone || customerDetails?.phone || "";
+  const email = customerDetails?.email || "";
+  const countryCode = String(address.country || "US").toUpperCase();
+
+  if (!name || !address.line1 || !address.city || !address.postal_code || !address.state) {
+    throw new Error("Stripe checkout is missing a complete shipping address");
+  }
+
+  return {
+    name,
+    address1: address.line1,
+    address2: address.line2 || "",
+    city: address.city,
+    state_code: address.state,
+    country_code: countryCode,
+    zip: address.postal_code,
+    phone,
+    email
+  };
+}
+
+function parsePrintfulVariantMap(env) {
+  if (!env.PRINTFUL_VARIANT_MAP) return {};
+  try {
+    const parsed = typeof env.PRINTFUL_VARIANT_MAP === "string"
+      ? JSON.parse(env.PRINTFUL_VARIANT_MAP)
+      : env.PRINTFUL_VARIANT_MAP;
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+  } catch {
+    throw new Error("PRINTFUL_VARIANT_MAP must be valid JSON");
+  }
+}
+
+async function findPrintfulSyncVariantBySku(sku, env) {
+  if (!sku) return null;
+  const catalog = await getPrintfulCatalog(env);
+  const matches = [];
+
+  for (const product of catalog.products) {
+    for (const variant of product.variants) {
+      if (String(variant.sku || "") === String(sku)) matches.push(variant);
+    }
+  }
+
+  if (matches.length > 1) {
+    throw new Error(`More than one Printful Sync Variant uses SKU ${sku}; add an exact mapping`);
+  }
+  return matches[0]?.sync_variant_id ? Number(matches[0].sync_variant_id) : null;
+}
+
+async function resolvePrintfulSyncVariant(item, env) {
+  const product = item.price?.product;
+  const metadata = product?.metadata || {};
+
+  const directId = Number(metadata.printful_sync_variant_id || 0);
+  if (Number.isInteger(directId) && directId > 0) return directId;
+
+  const map = parsePrintfulVariantMap(env);
+  const productId = String(metadata.stargirls_product_id || "").trim();
+  const size = String(metadata.size || "").trim();
+  const color = String(metadata.color || "").trim();
+  const sku = String(metadata.sku || "").trim();
+
+  const keys = [
+    sku,
+    productId && color && size ? `${productId}:${color}:${size}` : "",
+    productId && size ? `${productId}:${size}` : "",
+    color && size ? `${color}:${size}` : ""
+  ].filter(Boolean);
+
+  for (const key of keys) {
+    const mapped = Number(map[key] || 0);
+    if (Number.isInteger(mapped) && mapped > 0) return mapped;
+  }
+
+  const bySku = await findPrintfulSyncVariantBySku(sku, env);
+  if (bySku) return bySku;
+
+  throw new Error(
+    `No Printful Sync Variant mapping for ${productId || product?.name || "item"}`
+    + `${color ? ` / ${color}` : ""}${size ? ` / ${size}` : ""}${sku ? ` / SKU ${sku}` : ""}`
+  );
+}
+
+async function createPrintfulOrder(payload, env) {
+  // Keep orders as drafts until the full mapping has been verified. Turning on
+  // PRINTFUL_CONFIRM_ORDERS=true later will submit them for fulfillment.
+  const confirm = String(env.PRINTFUL_CONFIRM_ORDERS || "").toLowerCase() === "true";
+
+  const data = await printfulRequest(
+    `/orders?confirm=${confirm ? "true" : "false"}&update_existing=true`,
+    env,
+    {
+      method: "POST",
+      body: JSON.stringify(payload)
+    }
+  );
+  return data?.result || data;
+}
+
 async function fulfillStripeSession(session, env) {
-  if (!env.APLIIQ_PRODUCTS) throw new Error("APLIIQ_PRODUCTS KV binding is not configured");
-  const kv = env.APLIIQ_PRODUCTS;
+  const kv = requireProductsKv(env);
   const key = `stripe-fulfillment:${session.id}`;
   const existing = await kv.get(key, "json");
+
   if (existing?.status === "completed") return existing;
 
   await kv.put(key, JSON.stringify({
@@ -162,13 +263,13 @@ async function fulfillStripeSession(session, env) {
     })
   ]);
 
-  const apliIqItems = (lineItems.data || []).filter(item => {
+  const printfulItems = (lineItems.data || []).filter(item => {
     const product = item.price?.product;
-    return product && typeof product === "object" && product.metadata?.fulfillment === "apliiq";
+    return product && typeof product === "object" && product.metadata?.fulfillment === "printful";
   });
 
-  if (!apliIqItems.length) {
-    const result = { status: "completed", skipped: true, reason: "No Apliiq items" };
+  if (!printfulItems.length) {
+    const result = { status: "completed", skipped: true, reason: "No Printful items" };
     await kv.put(key, JSON.stringify(result), { expirationTtl: 60 * 60 * 24 * 365 });
     return result;
   }
@@ -178,41 +279,36 @@ async function fulfillStripeSession(session, env) {
     fullSession.shipping_details ||
     null;
   const customerDetails = fullSession.customer_details || null;
-  const shippingAddress = apliIqAddress(shippingDetails, customerDetails);
-  const orderId = await stableNumericId(session.id);
-  const friendlyName = `#SG-${session.id.slice(-8).toUpperCase()}`;
+  const recipient = printfulAddress(shippingDetails, customerDetails);
+
+  const items = await Promise.all(printfulItems.map(async item => ({
+    sync_variant_id: await resolvePrintfulSyncVariant(item, env),
+    quantity: item.quantity || 1,
+    retail_price: (
+      (item.amount_total || item.amount_subtotal || 0) /
+      100 /
+      Math.max(item.quantity || 1, 1)
+    ).toFixed(2)
+  })));
 
   const payload = {
-    id: orderId,
-    number: orderId,
-    name: friendlyName,
-    order_number: orderId,
-    line_items: await Promise.all(apliIqItems.map(async item => {
-      const product = item.price.product;
-      const sku = product.metadata?.sku || "";
-      if (!sku) throw new Error(`Missing Apliiq SKU for Stripe line item ${item.id}`);
-      return {
-        id: String(await stableNumericId(item.id)),
-        title: product.name || item.description || "STARGIRLS item",
-        name: product.name || item.description || "STARGIRLS item",
-        quantity: item.quantity || 1,
-        price: ((item.amount_total || item.amount_subtotal || 0) / 100 / Math.max(item.quantity || 1, 1)).toFixed(2),
-        grams: 0,
-        sku
-      };
-    })),
-    billing_address: shippingAddress,
-    shipping_address: shippingAddress,
-    shipping_lines: [{ code: "standard" }]
+    external_id: `stripe-${session.id}`,
+    shipping: "STANDARD",
+    recipient,
+    items
   };
 
-  const apliIqResponse = await createApliiqOrder(payload, env);
+  const printfulResponse = await createPrintfulOrder(payload, env);
   const result = {
     status: "completed",
     stripeSessionId: session.id,
-    apliIqOrderId: apliIqResponse?.id || null,
+    printfulOrderId: printfulResponse?.id || null,
+    printfulOrderStatus: printfulResponse?.status || null,
+    confirmedForFulfillment:
+      String(env.PRINTFUL_CONFIRM_ORDERS || "").toLowerCase() === "true",
     completedAt: new Date().toISOString()
   };
+
   await kv.put(key, JSON.stringify(result), { expirationTtl: 60 * 60 * 24 * 365 });
   return result;
 }
@@ -227,6 +323,7 @@ export async function receiveStripeWebhook(request, env) {
 
   const rawBody = await request.text();
   const signatureHeader = request.headers.get("stripe-signature") || "";
+
   if (!(await verifyStripeWebhook(rawBody, signatureHeader, env.STRIPE_WEBHOOK_SECRET))) {
     return new Response(JSON.stringify({ error: "Invalid Stripe signature" }), {
       status: 400,
@@ -244,8 +341,6 @@ export async function receiveStripeWebhook(request, env) {
     });
   }
 
-  // Apliiq does not provide a sandbox. Never let a Stripe test-mode event
-  // create a real production order at Apliiq.
   if (event.livemode === false) {
     return new Response(JSON.stringify({
       received: true,
@@ -276,8 +371,19 @@ export async function receiveStripeWebhook(request, env) {
     });
   }
 
-  const result = await fulfillStripeSession(session, env);
-  return new Response(JSON.stringify({ received: true, fulfillment: result }), {
-    headers: { "content-type": "application/json; charset=utf-8" }
-  });
+  try {
+    const result = await fulfillStripeSession(session, env);
+    return new Response(JSON.stringify({ received: true, fulfillment: result }), {
+      headers: { "content-type": "application/json; charset=utf-8" }
+    });
+  } catch (error) {
+    console.error("Printful fulfillment error", error);
+    return new Response(JSON.stringify({
+      received: true,
+      fulfillmentError: error.message || "Printful fulfillment failed"
+    }), {
+      status: 500,
+      headers: { "content-type": "application/json; charset=utf-8" }
+    });
+  }
 }
