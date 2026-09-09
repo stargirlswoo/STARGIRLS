@@ -52,14 +52,33 @@ function mergePrintfulProduct(product, printfulCatalog) {
     .map(parsedVariant)
     .filter(v => v.size && v.color && v.sku && v.printful_sync_variant_id > 0);
   if (!variants.length) throw new Error(`No active Printful variants: ${product.name}`);
-  return { ...product, variants };
+  return { ...product, name: source.name || product.name, image: source.thumbnail_url || product.image || "", variants };
+}
+
+function dynamicPrintfulProduct(itemId, printfulCatalog) {
+  const match = /^printful-(\d+)$/.exec(String(itemId || ""));
+  if (!match) return null;
+  const printfulId = Number(match[1]);
+  const source = (printfulCatalog.products || []).find(entry => Number(entry.id) === printfulId);
+  if (!source) return null;
+  return {
+    id: `printful-${printfulId}`,
+    name: source.name || "STARGIRLS PIECE",
+    category: "fashion",
+    status: "AVAILABLE",
+    available: true,
+    fulfillment: "printful",
+    printful_product_id: printfulId,
+    price_mode: "printful",
+    image: source.thumbnail_url || ""
+  };
 }
 
 function validateCart(requestedItems, catalog, printfulCatalog) {
   if (!Array.isArray(requestedItems) || requestedItems.length === 0) throw new Error("Cart is empty");
 
   return requestedItems.map(item => {
-    const baseProduct = catalog.find(entry => entry.id === item.id);
+    const baseProduct = catalog.find(entry => entry.id === item.id) || dynamicPrintfulProduct(item.id, printfulCatalog);
     if (!baseProduct || !baseProduct.available) throw new Error(`Product is not available: ${item.id}`);
     const product = mergePrintfulProduct(baseProduct, printfulCatalog);
     const quantity = Number(item.quantity);
