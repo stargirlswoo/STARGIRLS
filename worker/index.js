@@ -1,4 +1,5 @@
 import { receiveStripeWebhook, getPrintfulCatalog } from "./stripe-fulfillment.js";
+import { getPublicPrintfulCatalog } from "./catalog-public.js";
 
 const JSON_HEADERS = { "content-type": "application/json; charset=utf-8" };
 
@@ -139,7 +140,12 @@ export default {
 
     try {
       if (url.pathname === "/stripe/webhook" && request.method === "POST") return await receiveStripeWebhook(request, env);
-      if (url.pathname === "/printful/catalog" && request.method === "GET") return json(await getPrintfulCatalog(env), 200, corsHeaders);
+      if (url.pathname === "/printful/catalog" && request.method === "GET") {
+        return json(await getPublicPrintfulCatalog(env), 200, {
+          ...corsHeaders,
+          "cache-control": "public, max-age=300, stale-while-revalidate=3600"
+        });
+      }
       if (url.pathname !== "/checkout" || request.method !== "POST") return json({ error: "Not found" }, 404, corsHeaders);
       if (env.ALLOWED_ORIGIN && origin && origin !== env.ALLOWED_ORIGIN) return json({ error: "Origin not allowed" }, 403, corsHeaders);
 
