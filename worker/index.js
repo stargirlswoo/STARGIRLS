@@ -30,9 +30,11 @@ async function loadCatalog(env) {
 }
 
 function parsedVariant(variant) {
-  const parts = String(variant.name || "").split(" / ");
-  const size = parts.at(-1) || "";
-  const color = parts.length >= 3 ? parts.at(-2) : "";
+  const parts = String(variant.name || "").split(" / ").map(part => part.trim()).filter(Boolean);
+  const explicitSize = String(variant.size || "").trim();
+  const explicitColor = String(variant.color || "").trim();
+  const size = explicitSize || (parts.length >= 3 ? parts.at(-1) : "One Size");
+  const color = explicitColor || (parts.length >= 3 ? parts.at(-2) : parts.length === 2 ? parts.at(-1) : "Default");
   const price = Number(variant.retail_price);
   return {
     ...variant,
@@ -162,7 +164,7 @@ export default {
       if (url.pathname === "/printful/catalog" && request.method === "GET") {
         return json(await getPublicPrintfulCatalog(env), 200, {
           ...corsHeaders,
-          "cache-control": "public, max-age=300, stale-while-revalidate=3600"
+          "cache-control": "no-store"
         });
       }
       if (url.pathname !== "/checkout" || request.method !== "POST") return json({ error: "Not found" }, 404, corsHeaders);
