@@ -2,7 +2,8 @@ const API=window.STARGIRLS_STORE_API||'';
 const qs=s=>document.querySelector(s);
 const money=v=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(Number(v||0));
 const esc=v=>String(v??'').replace(/[&<>'\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','\"':'&quot;'}[c]));
-const CATALOG_CACHE_KEY='stargirls-printful-catalog-v2';
+const CATALOG_CACHE_KEY='stargirls-printful-catalog-v4';
+const CATALOG_TTL=120000;
 let product=null,selection={color:'',size:'',qty:1},cart=loadCart();
 
 function loadCart(){try{const v=JSON.parse(localStorage.getItem('stargirls-cart'));return Array.isArray(v)?v:[]}catch{return[]}}
@@ -18,10 +19,7 @@ function inferCategory(name=''){
 }
 function activeVariant(v){const s=String(v?.availability_status||'').toLowerCase();return !!v&&v.synced!==false&&v.is_ignored!==true&&s!=='inactive'&&s!=='discontinued'&&Number(v.sync_variant_id||0)>0}
 function partsFor(v){return String(v?.name||'').split(' / ').map(x=>x.trim()).filter(Boolean)}
-function rawColor(v){
-  const explicit=String(v?.color||'').trim();if(explicit)return explicit;
-  const p=partsFor(v);if(p.length>=3)return p.at(-2)||'Default';if(p.length===2)return p[0]||'Default';return'Default';
-}
+function rawColor(v){const explicit=String(v?.color||'').trim();if(explicit)return explicit;const p=partsFor(v);if(p.length>=3)return p.at(-2)||'Default';if(p.length===2)return p[0]||'Default';return'Default'}
 function rawSize(v){const explicit=String(v?.size||'').trim();if(explicit)return explicit;const p=partsFor(v);return p.length>=2?(p.at(-1)||'One Size'):'One Size'}
 function fileMeta(f){return`${String(f?.type||'')} ${String(f?.preview_url||'')} ${String(f?.thumbnail_url||'')}`.toLowerCase()}
 function isArtwork(f){return/printfile|print[_ -]?file|embroidery|inside|label|template|pattern|logo|design|digitization|artwork/.test(fileMeta(f))}
@@ -38,19 +36,13 @@ function parseProduct(base,raw){
   const variants=(raw?.variants||[]).filter(activeVariant).map(v=>{
     const price=Number(v?.retail_price);
     const images=variantImages(raw,v);
-    return {...v,color:rawColor(v),size:rawSize(v),price:Number.isFinite(price)?price:null,images,image:images[0]||safeUrl(raw?.thumbnail_url)||'',printful_sync_variant_id:Number(v?.sync_variant_id||0)};
+    return{...v,color:rawColor(v),size:rawSize(v),price:Number.isFinite(price)?price:null,images,image:images[0]||safeUrl(raw?.thumbnail_url)||'',printful_sync_variant_id:Number(v?.sync_variant_id||0)};
   }).filter(v=>v.color&&v.size&&Number.isFinite(v.price)&&v.printful_sync_variant_id>0);
   const image=safeUrl(raw?.thumbnail_url||raw?.image_url)||variants.map(v=>v.image).find(Boolean)||'';
-  return {...base,name:raw?.name||base.name,category:base.category||inferCategory(raw?.name),image,variants};
+  return{...base,name:raw?.name||base.name,category:base.category||inferCategory(raw?.name),image,variants};
 }
 function selectedVariant(){return product?.variants?.find(v=>v.color===selection.color&&v.size===selection.size)}
-function gallery(){
-  if(!product)return[];
-  const out=[];addUnique(out,product.image);
-  const vs=selection.color?product.variants.filter(v=>v.color===selection.color):product.variants;
-  for(const v of vs)for(const u of v.images||[])addUnique(out,u);
-  return out.slice(0,10);
-}
+function gallery(){if(!product)return[];const out=[];addUnique(out,product.image);const vs=selection.color?product.variants.filter(v=>v.color===selection.color):product.variants;for(const v of vs)for(const u of v.images||[])addUnique(out,u);return out.slice(0,10)}
 function swatch(name=''){
   const n=name.toLowerCase();
   if(n.includes('black'))return'#111';if(n.includes('white'))return'#f7f7f2';if(/grey|gray|ash|heather/.test(n))return'#9c9b98';
@@ -65,7 +57,7 @@ function render(){
   const v=selectedVariant(),imgs=gallery(),prices=product.variants.map(v=>v.price).filter(Number.isFinite),price=v?.price??(prices.length?Math.min(...prices):null);
   const availableSizes=new Set(product.variants.filter(x=>!selection.color||x.color===selection.color).map(x=>x.size));
   const galleryEl=qs('[data-product-gallery]');
-  galleryEl.innerHTML=imgs.length?imgs.map((u,i)=>`<img src="${esc(u)}" alt="${esc(product.name)}${i?` view ${i+1}`:''}" loading="${i?'lazy':'eager'}" referrerpolicy="no-referrer">`).join(''):'<div class="product-loading">PRODUCT IMAGE COMING SOON</div>';
+  galleryEl.innerHTML=imgs.length?imgs.map((u,i)=>`<img src="${esc(u)}" alt="${esc(product.name)}${i?` view ${i+1}`:''}" loading="${i?'lazy':'eager'}" decoding="async" referrerpolicy="no-referrer">`).join(''):'<div class="product-loading">PRODUCT IMAGE COMING SOON</div>';
   const badge=product.category==='merch'?'OFFICIAL STARGIRLS MERCH':product.category==='fashion'?'STARGIRLS FASHION':'STARGIRLS';
   qs('[data-product-info]').innerHTML=`<div class="product-info-inner"><span class="product-badge">${badge}</span><h1 class="product-title">${esc(product.name)}</h1><div class="product-price">${Number.isFinite(price)?money(price):esc(product.status||'')}</div>${product.variants.length?`<div class="option-block"><div class="option-head"><span>COLOR</span><span>${selection.color?esc(selection.color):'SELECT ONE'}</span></div><div class="color-list">${colors.map(c=>`<button class="color-btn ${selection.color===c?'active':''}" data-color="${esc(c)}"><span class="swatch" style="background:${swatch(c)}"></span>${esc(c)}</button>`).join('')}</div></div><div class="option-block"><div class="option-head"><span>SIZE</span><a href="help.html">SIZE GUIDE</a></div><div class="size-list">${allSizes.map(s=>`<button class="size-btn ${selection.size===s?'active':''}" data-size="${esc(s)}" ${selection.color&&!availableSizes.has(s)?'disabled':''}>${esc(s)}</button>`).join('')}</div></div><div class="quantity-row"><span>QUANTITY</span><div class="quantity-control"><button data-minus>−</button><span>${selection.qty}</span><button data-plus>+</button></div></div><button class="add-button" data-add ${v?'':'disabled'}>${v?'ADD TO CART':'SELECT COLOR + SIZE'}</button><p class="product-note">Made to order. Please double-check your size, color and shipping information before checkout.</p>`:`<button class="add-button" disabled>${esc(product.status||'COMING SOON')}</button>`}<div class="product-accordion"><details open><summary>PRODUCT DETAILS</summary><p>Official STARGIRLS item, produced to order through our fulfillment partner.</p></details><details><summary>SHIPPING + RETURNS</summary><p>Shipping cost and delivery estimates are shown at checkout. Made-to-order apparel is generally final sale except for qualifying defects or fulfillment errors. Read the full policies before ordering.</p></details></div></div>`;
   bind();
@@ -102,17 +94,33 @@ async function checkout(){
   try{const r=await fetch(`${API}/checkout`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items:cart})}),d=await r.json();if(!r.ok||!d.url)throw new Error(d.error||'Checkout failed');location.assign(d.url)}
   catch(e){btn.disabled=false;btn.textContent='TRY CHECKOUT AGAIN →';if(note)note.textContent=e.message||'Checkout could not open.'}
 }
-function cachedCatalog(){try{const d=JSON.parse(sessionStorage.getItem(CATALOG_CACHE_KEY)||'null');return d&&Array.isArray(d.products)?d:null}catch{return null}}
+function readCatalogCache(){
+  try{
+    const raw=JSON.parse(sessionStorage.getItem(CATALOG_CACHE_KEY)||'null');
+    if(raw?.data&&Array.isArray(raw.data.products))return{ts:Number(raw.ts||0),data:raw.data};
+    if(raw&&Array.isArray(raw.products))return{ts:0,data:raw};
+  }catch{}
+  return null;
+}
 async function liveCatalog(){
-  try{const r=await fetch(`${API}/printful/catalog?v=${Date.now()}`,{cache:'no-store',mode:'cors'});if(r.ok){const d=await r.json();if(d&&Array.isArray(d.products)){try{sessionStorage.setItem(CATALOG_CACHE_KEY,JSON.stringify(d))}catch{}return d}}}catch{}
-  return cachedCatalog();
+  const cached=readCatalogCache();
+  if(cached&&Date.now()-cached.ts<CATALOG_TTL)return cached.data;
+  try{
+    const bucket=Math.floor(Date.now()/60000);
+    const r=await fetch(`${API}/printful/catalog?v=${bucket}`,{cache:'no-store',mode:'cors'});
+    if(r.ok){
+      const d=await r.json();
+      if(d&&Array.isArray(d.products)){try{sessionStorage.setItem(CATALOG_CACHE_KEY,JSON.stringify({ts:Date.now(),data:d}))}catch{}return d;}
+    }
+  }catch{}
+  return cached?.data||null;
 }
 function normalizedName(v=''){return String(v).toLowerCase().replace(/[^a-z0-9]+/g,' ').trim()}
 async function boot(){
   const q=new URLSearchParams(location.search),id=q.get('id')||'',pfParam=Number(q.get('pf')||0);
   if(!id&&!pfParam){location.replace('index.html#catalog');return}
   let cfg={products:[]};
-  try{const r=await fetch(`content/products.json?v=${Date.now()}`,{cache:'no-store'});if(r.ok)cfg=await r.json()}catch{}
+  try{const r=await fetch('content/products.json',{cache:'force-cache'});if(r.ok)cfg=await r.json()}catch{}
   let base=(cfg.products||[]).find(p=>p.id===id)||null;
   if(base&&!base.printful_product_id){if(base.href)location.replace(base.href);else location.replace('index.html#catalog');return}
   const dynamic=/^printful-(\d+)$/.exec(id);
@@ -124,7 +132,7 @@ async function boot(){
   if(!raw)throw new Error('Product unavailable');
   targetId=Number(raw.id);
   const baseIsCurrent=base&&Number(base.printful_product_id||0)===targetId;
-  if(!base||!baseIsCurrent){base={id:`printful-${targetId}`,name:raw.name||'STARGIRLS PIECE',category:inferCategory(raw.name),status:'AVAILABLE',available:true,fulfillment:'printful',printful_product_id:targetId,price_mode:'printful'}}
+  if(!base||!baseIsCurrent)base={id:`printful-${targetId}`,name:raw.name||'STARGIRLS PIECE',category:inferCategory(raw.name),status:'AVAILABLE',available:true,fulfillment:'printful',printful_product_id:targetId,price_mode:'printful'};
   product=parseProduct(base,raw);
   if(!product.variants.length)throw new Error('No active variants');
   render();renderCart();
