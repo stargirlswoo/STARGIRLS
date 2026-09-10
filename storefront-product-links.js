@@ -6,7 +6,7 @@
     const p=productFor(id);
     const dynamic=/^printful-(\d+)$/.exec(String(id||''));
     const pfid=Number(p?.printful_product_id||dynamic?.[1]||0);
-    const q=new URLSearchParams({id:String(id)});
+    const q=new URLSearchParams({v:'20260910f',id:String(id)});
     if(pfid>0)q.set('pf',String(pfid));
     return`product.html?${q.toString()}`;
   }
