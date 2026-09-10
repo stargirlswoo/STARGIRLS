@@ -27,11 +27,11 @@
   }
 
   async function home(){
-    const data=await read('home');
+    const [data,cast]=await Promise.all([read('home'),read('about')]);
     bg('[data-cms-home-hero]',data.hero);
     bg('[data-cms-home-hayati]',data.hayati);
-    bg('[data-cms-home-moon]',data.moon);
-    bg('[data-cms-home-sun]',data.sun);
+    bg('[data-cms-home-moon]',cast.moon);
+    bg('[data-cms-home-sun]',cast.sun);
     bg('[data-cms-home-juno]',data.juno);
   }
 
