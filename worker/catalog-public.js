@@ -39,12 +39,17 @@ function compact(product,details){
       availability_status:v.availability_status||null,
       catalog_image:v?.product?.image||null,
       product:v.product||null,
-      files:Array.isArray(v.files)?v.files.filter(f=>f&&f.preview_url).slice(0,6).map(f=>({preview_url:f.preview_url,thumbnail_url:f.thumbnail_url||null,type:f.type||null})):[]
+      files:Array.isArray(v.files)?v.files.filter(f=>f&&f.preview_url).slice(0,8).map(f=>({
+        preview_url:f.preview_url,
+        thumbnail_url:f.thumbnail_url||null,
+        type:f.type||null,
+        filename:f.filename||f.name||null
+      })):[]
     }))
   };
 }
 
-const CACHE_VERSION='v6';
+const CACHE_VERSION='v7';
 const EDGE_TTL_SECONDS=300;
 const FRESH_MS=5*60*1000;
 const KV_KEY=`printful:public-catalog:${CACHE_VERSION}`;
