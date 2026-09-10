@@ -1,66 +1,6 @@
 {
   "products": [
     {
-      "id": "stargirls-pullover",
-      "name": "STARGIRLS PULLOVER",
-      "category": "merch",
-      "status": "AVAILABLE",
-      "available": true,
-      "fulfillment": "printful",
-      "printful_product_id": 468830632,
-      "price_mode": "printful"
-    },
-    {
-      "id": "hayati-tee",
-      "name": "HAYATI TEE",
-      "category": "merch",
-      "status": "AVAILABLE",
-      "available": true,
-      "fulfillment": "printful",
-      "printful_product_id": 468830207,
-      "price_mode": "printful"
-    },
-    {
-      "id": "stargirls-tee",
-      "name": "STARGIRLS TEE",
-      "category": "merch",
-      "status": "AVAILABLE",
-      "available": true,
-      "fulfillment": "printful",
-      "printful_product_id": 468829660,
-      "price_mode": "printful"
-    },
-    {
-      "id": "anew-tee",
-      "name": "ANEW TEE",
-      "category": "merch",
-      "status": "AVAILABLE",
-      "available": true,
-      "fulfillment": "printful",
-      "printful_product_id": 468829228,
-      "price_mode": "printful"
-    },
-    {
-      "id": "hayati-pullover",
-      "name": "HAYATI PULLOVER",
-      "category": "merch",
-      "status": "AVAILABLE",
-      "available": true,
-      "fulfillment": "printful",
-      "printful_product_id": 468828029,
-      "price_mode": "printful"
-    },
-    {
-      "id": "anew-pullover",
-      "name": "ANEW PULLOVER",
-      "category": "merch",
-      "status": "AVAILABLE",
-      "available": true,
-      "fulfillment": "printful",
-      "printful_product_id": 468839052,
-      "price_mode": "printful"
-    },
-    {
       "id": "juno-edp",
       "name": "JUNO EAU DE PARFUM",
       "category": "perfume",
