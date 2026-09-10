@@ -3,8 +3,9 @@
   const api=window.STARGIRLS_STORE_API||'';
   if(!api)return;
 
-  const CACHE_KEY='stargirls-printful-catalog-v4';
-  const CLIENT_TTL=60000;
+  const CACHE_KEY='stargirls-printful-catalog-v5';
+  const CLIENT_TTL=15*60*1000;
+  const MAX_STALE=7*24*60*60*1000;
   const state=window.__SG_PRINTFUL_STATE||(window.__SG_PRINTFUL_STATE={data:null,ts:0,promise:null});
 
   const inferCategory=name=>{
@@ -76,38 +77,63 @@
 
   function readCache(){
     try{
-      const cached=JSON.parse(sessionStorage.getItem(CACHE_KEY)||'null');
+      const cached=JSON.parse(localStorage.getItem(CACHE_KEY)||'null');
       if(cached?.data&&Array.isArray(cached.data.products))return cached;
     }catch{}
     return null;
   }
-  function save(data){
-    state.data=data;state.ts=Date.now();window.__SG_PRINTFUL_CATALOG=data;
-    try{sessionStorage.setItem(CACHE_KEY,JSON.stringify({ts:state.ts,data}));}catch{}
-  }
-  const responseFor=data=>new Response(JSON.stringify(data),{status:200,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store'}});
 
-  async function getCatalog(){
-    const now=Date.now();
-    if(state.data&&now-state.ts<CLIENT_TTL)return state.data;
-    const cached=readCache();
-    if(cached&&now-Number(cached.ts||0)<CLIENT_TTL){save(cached.data);return cached.data;}
+  function setState(data,ts){
+    state.data=data;
+    state.ts=Number(ts)||Date.now();
+    window.__SG_PRINTFUL_CATALOG=data;
+  }
+
+  function save(data){
+    const ts=Date.now();
+    setState(data,ts);
+    try{localStorage.setItem(CACHE_KEY,JSON.stringify({ts,data}));}catch{}
+  }
+
+  const responseFor=data=>new Response(JSON.stringify(data),{status:200,headers:{'content-type':'application/json; charset=utf-8','cache-control':'private, max-age=300'}});
+
+  async function refreshCatalog(){
     if(state.promise)return state.promise;
     state.promise=(async()=>{
       try{
-        const bucket=Math.floor(Date.now()/60000);
-        const r=await nativeFetch(`${api}/printful/catalog?v=${bucket}`,{cache:'no-store',mode:'cors'});
+        const r=await nativeFetch(`${api}/printful/catalog`,{cache:'default',mode:'cors'});
         if(!r.ok)throw new Error(`Catalog ${r.status}`);
         const data=normalize(await r.json());
         save(data);
         return data;
-      }catch(error){
-        const stale=state.data||cached?.data;
-        if(stale)return stale;
-        throw error;
-      }finally{state.promise=null;}
+      }finally{
+        state.promise=null;
+      }
     })();
     return state.promise;
+  }
+
+  async function getCatalog(){
+    const now=Date.now();
+    if(state.data&&now-state.ts<CLIENT_TTL)return state.data;
+
+    const cached=readCache();
+    if(cached?.data){
+      const age=now-Number(cached.ts||0);
+      if(age<MAX_STALE){
+        setState(cached.data,cached.ts);
+        if(age>=CLIENT_TTL)refreshCatalog().catch(error=>console.warn('STARGIRLS catalog refresh:',error));
+        return cached.data;
+      }
+    }
+
+    try{
+      return await refreshCatalog();
+    }catch(error){
+      const stale=state.data||cached?.data;
+      if(stale)return stale;
+      throw error;
+    }
   }
 
   function isProductsRequest(input){
@@ -139,7 +165,7 @@
       }));
       return new Response(JSON.stringify({products:[...liveProducts,...staticProducts]}),{
         status:baseResponse.status,statusText:baseResponse.statusText,
-        headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store'}
+        headers:{'content-type':'application/json; charset=utf-8','cache-control':'private, max-age=300'}
       });
     }catch(error){
       console.warn('STARGIRLS live product sync:',error);
