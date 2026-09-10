@@ -2,7 +2,7 @@
 'use strict';
 const API='https://stargirls.stargirlswoo.workers.dev';
 const SNAPSHOT_KEY='stargirls-clicked-product-v1';
-const CACHE_KEYS=['stargirls-printful-catalog-v6','stargirls-printful-catalog-v5'];
+const CACHE_KEYS=['stargirls-printful-catalog-v7'];
 const q=new URLSearchParams(location.search);
 const requestedId=q.get('id')||'';
 const requestedPf=Number(q.get('pf')||(/^printful-(\d+)$/.exec(requestedId)?.[1]||0));
@@ -13,6 +13,11 @@ const safe=u=>/^https:\/\//i.test(String(u||''))?String(u):'';
 const uniq=a=>[...new Set(a.filter(Boolean))];
 let source=null,variants=[],selection={color:'',size:'',qty:1},activeImage=0;
 
+const fileMeta=f=>`${String(f?.type||'')} ${String(f?.filename||'')} ${String(f?.name||'')} ${String(f?.preview_url||'')} ${String(f?.thumbnail_url||'')}`.toLowerCase();
+const isArtwork=f=>/printfile|print[_ -]?file|artwork|design|template|pattern|logo|digitization|inside|label|embroidery/.test(fileMeta(f));
+const looksLikeModel=f=>/\b(model|lifestyle|person|people|woman|women|man|men|male|female|wearing|on[-_ ]?model|street[-_ ]?style)\b/.test(fileMeta(f));
+const cleanFile=f=>f&&!isArtwork(f)&&!looksLikeModel(f);
+
 function variantParts(v){
   const parts=String(v?.name||'').split(' / ').map(x=>x.trim()).filter(Boolean);
   const color=String(v?.color||'').trim()||(parts.length>=3?parts.at(-2):(parts.length===2?parts[0]:'Default'))||'Default';
@@ -20,17 +25,20 @@ function variantParts(v){
   const price=Number(v?.price??v?.retail_price);
   const sync=Number(v?.printful_sync_variant_id||v?.sync_variant_id||0);
   const images=[];
+  /* v.images is already curated by the storefront catalog normalizer when a shopper clicks from the store. */
   for(const u of v?.images||[])if(safe(u))images.push(u);
-  for(const u of [v?.image,v?.catalog_image,v?.product?.image])if(safe(u))images.push(u);
-  for(const f of v?.files||[])for(const u of [f?.preview_url,f?.thumbnail_url])if(safe(u))images.push(u);
-  return {...v,color,size,price:Number.isFinite(price)?price:null,printful_sync_variant_id:sync,images:uniq(images)};
+  for(const f of v?.files||[]){if(!cleanFile(f))continue;for(const u of [f?.preview_url,f?.thumbnail_url])if(safe(u))images.push(u);}
+  for(const u of [v?.catalog_image,v?.product?.image])if(safe(u))images.push(u);
+  for(const u of [v?.image])if(safe(u))images.push(u);
+  return {...v,color,size,price:Number.isFinite(price)?price:null,printful_sync_variant_id:sync,images:uniq(images).slice(0,5)};
 }
 function productImages(){
   const out=[];
-  for(const u of [source?.thumbnail_url,source?.image_url])if(safe(u))out.push(u);
   const relevant=selection.color?variants.filter(v=>v.color===selection.color):variants;
   for(const v of relevant)for(const u of v.images||[])out.push(u);
-  return uniq(out).slice(0,8);
+  /* Never lead with the Printful sync-product thumbnail: it can be an unrelated on-model lifestyle photo. */
+  if(!out.length){for(const u of [source?.image_url,source?.thumbnail_url])if(safe(u))out.push(u);}
+  return uniq(out).slice(0,5);
 }
 function currentVariant(){return variants.find(v=>v.color===selection.color&&v.size===selection.size)||null;}
 function categoryName(){
@@ -42,6 +50,7 @@ function categoryName(){
 function desireLine(){
   const n=String(source?.name||'').toLowerCase();
   if(/party\s*(?:till|til)\s*hell/.test(n))return'For the nights that turn into stories.';
+  if(/\banew\b/.test(n))return'From the chapter that started everything over.';
   if(/hoodie|pullover|sweatshirt|sweater/.test(n))return'The layer you reach for first.';
   if(/hat|cap/.test(n))return'The last piece that makes the fit.';
   if(/tee|shirt/.test(n))return'The one you keep reaching for.';
@@ -49,9 +58,9 @@ function desireLine(){
 }
 function detailsCopy(){
   const n=String(source?.name||'').toLowerCase();
-  if(/hoodie|pullover|sweatshirt|sweater/.test(n))return'A STARGIRLS layer built around the artwork and made to live in your rotation. Choose your color and size above.';
+  if(/hoodie|pullover|sweatshirt|sweater/.test(n))return'A STARGIRLS layer built around the artwork and made to live in your rotation. Choose your available options above.';
   if(/hat|cap/.test(n))return'A STARGIRLS finishing piece made to pull the whole look together. Choose your available option above.';
-  if(/tee|shirt/.test(n))return'A STARGIRLS tee built around the artwork and made to wear on repeat. Choose your color and size above.';
+  if(/tee|shirt/.test(n))return'A STARGIRLS tee built around the artwork and made to wear on repeat. Choose your available options above.';
   return'A piece from the STARGIRLS world, made to wear your way. Choose your available options above.';
 }
 function loadSnapshot(){
@@ -102,7 +111,7 @@ function render(){
       <div class="product-layout">
         <div class="product-media">
           <div class="hero-stage">${imgs.length?`<img id="hero" src="${esc(imgs[activeImage])}" alt="${esc(source?.name||'STARGIRLS product')}" decoding="async">`:'<div class="error-state"><p>PRODUCT IMAGE COMING SOON</p></div>'}</div>
-          ${imgs.length?`<div class="thumbs">${imgs.map((u,i)=>`<button type="button" data-img="${i}" class="${i===activeImage?'active':''}" aria-label="View product image ${i+1}"><img src="${esc(u)}" alt="" loading="lazy" decoding="async"></button>`).join('')}</div>`:''}
+          ${imgs.length>1?`<div class="thumbs">${imgs.map((u,i)=>`<button type="button" data-img="${i}" class="${i===activeImage?'active':''}" aria-label="View product image ${i+1}"><img src="${esc(u)}" alt="" loading="lazy" decoding="async"></button>`).join('')}</div>`:''}
         </div>
         <div class="product-info">
           <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="index.html#catalog">Home</a><span class="dot"></span><a href="index.html#catalog">${esc(cat.charAt(0)+cat.slice(1).toLowerCase())}</a><span class="dot"></span><span>${esc(source?.name||'Product')}</span></nav>
@@ -112,8 +121,8 @@ function render(){
           ${showColorOptions(colors)?`<div class="option"><div class="option-label"><span>Color</span><span>${selection.color?esc(selection.color):'Select one'}</span></div><div class="choices">${colors.map(c=>`<button class="choice ${selection.color===c?'active':''}" type="button" data-color="${esc(c)}">${esc(c)}</button>`).join('')}</div></div>`:''}
           ${showSizeOptions(sizes)?`<div class="option"><div class="option-label"><span>Size</span><span>${selection.size?esc(selection.size):'Select one'}</span></div><div class="choices">${sizes.map(s=>`<button class="choice ${selection.size===s?'active':''}" type="button" data-size="${esc(s)}" ${selection.color&&!availableSizes.has(s)?'disabled':''}>${esc(s)}</button>`).join('')}</div></div>`:''}
           <div class="buy-row"><select class="qty-select" id="qty" aria-label="Quantity">${Array.from({length:10},(_,i)=>`<option value="${i+1}" ${selection.qty===i+1?'selected':''}>${i+1}</option>`).join('')}</select><button class="add" type="button" id="add" ${selected?'':'disabled'}>${selected?'ADD TO CART':'SELECT OPTIONS'}</button></div>
-          <div class="purchase-security-line">Secure checkout · Shipping shown before payment · No account required</div>
-          <div class="product-details"><details><summary>PRODUCT DETAILS</summary><p>${esc(detailsCopy())}</p></details><details><summary>SHIPPING + RETURNS</summary><p>Shipping cost and delivery estimate are shown before payment. See the STARGIRLS shipping and returns policies for full details.</p></details></div>
+          <div class="purchase-security-line">Secure checkout · Shipping shown before payment</div>
+          <div class="product-details"><details><summary>FIT + DETAILS</summary><p>${esc(detailsCopy())}</p></details><details><summary>SHIPPING + RETURNS</summary><p>Shipping cost and delivery estimate are shown before payment. See the STARGIRLS shipping and returns policies for full details.</p></details></div>
         </div>
       </div>
     </section>`;
@@ -127,7 +136,7 @@ function fail(){app.innerHTML=`<div class="error-state"><div><h1>COULDN'T OPEN T
 async function fetchDirect(){
   if(!requestedPf)return null;
   const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),3000);
-  try{const r=await fetch(`${API}/printful/catalog`,{cache:'default',mode:'cors',signal:controller.signal});if(!r.ok)return null;const data=await r.json();return(data?.products||[]).find(p=>Number(p.id)===requestedPf)||null;}catch{return null;}finally{clearTimeout(timer);}
+  try{const r=await fetch(`${API}/printful/catalog?v=20260910-photo-cut`,{cache:'no-store',mode:'cors',signal:controller.signal});if(!r.ok)return null;const data=await r.json();return(data?.products||[]).find(p=>Number(p.id)===requestedPf)||null;}catch{return null;}finally{clearTimeout(timer);}
 }
 function cart(){try{const c=JSON.parse(localStorage.getItem('stargirls-cart')||'[]');return Array.isArray(c)?c:[]}catch{return[];}}
 function saveCart(c){localStorage.setItem('stargirls-cart',JSON.stringify(c));renderCart();}
@@ -143,7 +152,7 @@ function renderCart(){
   const c=cart();document.getElementById('cartCount').textContent=String(c.reduce((n,x)=>n+Number(x.quantity||0),0));
   let total=0;const box=document.getElementById('cartItems');
   if(!c.length){box.innerHTML='<div class="empty">YOUR CART IS EMPTY.</div>';document.getElementById('cartSubtotal').textContent=money(0);document.getElementById('checkout').disabled=true;return;}
-  box.innerHTML=c.map((x,i)=>{const local=(x.id===(requestedId||`printful-${requestedPf}`))?variants.find(v=>v.color===x.color&&v.size===x.size):null;const price=Number(local?.price||0);if(price)total+=price*Number(x.quantity||0);const img=local?.images?.[0]||source?.thumbnail_url||'';return`<div class="cart-line">${safe(img)?`<img class="cart-thumb" src="${esc(img)}" alt="">`:'<div class="cart-thumb"></div>'}<div class="cart-copy"><strong>${esc(x.id===(requestedId||`printful-${requestedPf}`)?source?.name||'STARGIRLS ITEM':'STARGIRLS ITEM')}</strong><div>${esc(x.color)}${x.size?` · ${esc(x.size)}`:''} · QTY ${Number(x.quantity||0)}</div><button type="button" data-remove="${i}">REMOVE</button></div></div>`;}).join('');
+  box.innerHTML=c.map((x,i)=>{const local=(x.id===(requestedId||`printful-${requestedPf}`))?variants.find(v=>v.color===x.color&&v.size===x.size):null;const price=Number(local?.price||0);if(price)total+=price*Number(x.quantity||0);const img=local?.images?.[0]||'';return`<div class="cart-line">${safe(img)?`<img class="cart-thumb" src="${esc(img)}" alt="">`:'<div class="cart-thumb"></div>'}<div class="cart-copy"><strong>${esc(x.id===(requestedId||`printful-${requestedPf}`)?source?.name||'STARGIRLS ITEM':'STARGIRLS ITEM')}</strong><div>${esc(x.color)}${x.size?` · ${esc(x.size)}`:''} · QTY ${Number(x.quantity||0)}</div><button type="button" data-remove="${i}">REMOVE</button></div></div>`;}).join('');
   box.querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>{const next=cart();next.splice(Number(b.dataset.remove),1);saveCart(next);});
   document.getElementById('cartSubtotal').textContent=total?money(total):'Calculated at checkout';document.getElementById('checkout').disabled=false;
 }
