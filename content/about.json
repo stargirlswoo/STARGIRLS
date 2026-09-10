@@ -1,13 +1,4 @@
 {
-  "hero": "/images/about/img_3168.jpeg",
-  "photo_break": "",
-  "sun": "",
-  "moon": "",
-  "photos": [
-    {
-      "image": "/images/about/img_3145.jpeg",
-      "caption": "",
-      "alt": ""
-    }
-  ]
+  "moon": "/images/home/img_3144.jpeg",
+  "sun": "/images/home/img_3147.jpeg"
 }
