@@ -4,16 +4,19 @@ function headers(env){
   if(env.PRINTFUL_STORE_ID) h['X-PF-Store-Id']=String(env.PRINTFUL_STORE_ID);
   return h;
 }
+
 async function pf(path,env){
   const r=await fetch(`https://api.printful.com${path}`,{headers:headers(env)});
   const d=await r.json().catch(()=>({}));
   if(!r.ok||Number(d?.code||r.status)>=400) throw new Error(`Printful catalog request failed (${r.status})`);
   return d;
 }
+
 function activeVariant(v){
   const status=String(v?.availability_status||'').toLowerCase();
   return !!v&&v.synced!==false&&v.is_ignored!==true&&status!=='inactive'&&status!=='discontinued'&&Number(v.id||0)>0;
 }
+
 function compact(product,details){
   const sync=details?.result?.sync_product||product||{};
   const variants=Array.isArray(details?.result?.sync_variants)?details.result.sync_variants:[];
@@ -40,15 +43,41 @@ function compact(product,details){
     }))
   };
 }
-export async function getPublicPrintfulCatalog(env){
-  const cache=caches.default;
-  const store=String(env.PRINTFUL_STORE_ID||'default');
-  // Versioned stable key: most visitors get the cached catalog instead of triggering
-  // a full Printful product-detail fanout. Bump the version when an immediate refresh is needed.
-  const cacheKey=new Request(`https://stargirls.maison/__cache/printful-catalog-v4-${encodeURIComponent(store)}`);
-  const cached=await cache.match(cacheKey);
-  if(cached) return cached.json();
 
+const CACHE_VERSION='v5';
+const EDGE_TTL_SECONDS=900;
+const FRESH_MS=15*60*1000;
+const KV_KEY=`printful:public-catalog:${CACHE_VERSION}`;
+
+function validSnapshot(value){
+  return !!value&&Array.isArray(value.products)&&value.products.length>0&&value.refreshed_at;
+}
+
+function ageMs(value){
+  const ts=Date.parse(value?.refreshed_at||'');
+  return Number.isFinite(ts)?Math.max(0,Date.now()-ts):Infinity;
+}
+
+async function readKv(env){
+  if(!env.STARGIRLS_PRODUCTS)return null;
+  try{
+    const value=await env.STARGIRLS_PRODUCTS.get(KV_KEY,'json');
+    return validSnapshot(value)?value:null;
+  }catch(error){
+    console.warn('STARGIRLS Printful KV read',error);
+    return null;
+  }
+}
+
+async function seedEdge(cache,cacheKey,payload){
+  const response=new Response(JSON.stringify(payload),{headers:{
+    'content-type':'application/json; charset=utf-8',
+    'cache-control':`public, max-age=${EDGE_TTL_SECONDS}, stale-while-revalidate=86400`
+  }});
+  await cache.put(cacheKey,response);
+}
+
+async function fetchPrintfulCatalog(env){
   const products=[];
   let offset=0;
   const limit=100;
@@ -59,14 +88,44 @@ export async function getPublicPrintfulCatalog(env){
     batch.forEach((p,i)=>{const item=compact(p,details[i]);if(item.variants.length)products.push(item);});
     const total=Number(page?.paging?.total||batch.length);
     offset+=batch.length;
-    if(!batch.length||offset>=total) break;
+    if(!batch.length||offset>=total)break;
+  }
+  return {products,refreshed_at:new Date().toISOString()};
+}
+
+async function refresh(env,cache,cacheKey){
+  const payload=await fetchPrintfulCatalog(env);
+  if(env.STARGIRLS_PRODUCTS){
+    await env.STARGIRLS_PRODUCTS.put(KV_KEY,JSON.stringify(payload),{expirationTtl:7*24*60*60});
+  }
+  await seedEdge(cache,cacheKey,payload);
+  return payload;
+}
+
+export async function getPublicPrintfulCatalog(env,ctx){
+  const cache=caches.default;
+  const store=String(env.PRINTFUL_STORE_ID||'default');
+  const cacheKey=new Request(`https://stargirls.maison/__cache/printful-catalog-${CACHE_VERSION}-${encodeURIComponent(store)}`);
+
+  const edge=await cache.match(cacheKey);
+  if(edge){
+    const payload=await edge.json().catch(()=>null);
+    if(validSnapshot(payload))return payload;
   }
 
-  const payload={products,refreshed_at:new Date().toISOString()};
-  const response=new Response(JSON.stringify(payload),{headers:{
-    'content-type':'application/json; charset=utf-8',
-    'cache-control':'public, max-age=120, stale-while-revalidate=60'
-  }});
-  await cache.put(cacheKey,response.clone());
-  return payload;
+  const shared=await readKv(env);
+  if(shared){
+    if(ageMs(shared)<FRESH_MS){
+      const work=seedEdge(cache,cacheKey,shared).catch(error=>console.warn('STARGIRLS edge cache seed',error));
+      if(ctx?.waitUntil)ctx.waitUntil(work);else await work;
+      return shared;
+    }
+
+    const work=refresh(env,cache,cacheKey).catch(error=>console.warn('STARGIRLS Printful background refresh',error));
+    if(ctx?.waitUntil)ctx.waitUntil(work);
+    else work.catch(()=>{});
+    return shared;
+  }
+
+  return refresh(env,cache,cacheKey);
 }
