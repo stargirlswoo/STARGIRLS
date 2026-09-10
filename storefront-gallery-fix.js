@@ -1,4 +1,4 @@
-/* STARGIRLS storefront gallery: keep the initial product render light. */
+/* STARGIRLS storefront gallery: keep the initial product render light and product-only. */
 (function(){
   const safeUrl=value=>/^(?:images\/|https:\/\/)/i.test(String(value||''))?String(value):'';
   const add=(out,u)=>{u=safeUrl(u);if(u&&!out.includes(u))out.push(u);};
@@ -28,9 +28,8 @@
     if(!target||!image)return;
 
     const clean=image.replace(/["\\]/g,'');
-    target.style.backgroundImage=`url("${clean}")`;
-    target.style.backgroundSize='cover';
-    target.style.backgroundPosition='center';
+    target.style.backgroundImage='none';
+    target.style.backgroundColor='#f3f0ea';
     target.style.position='relative';
 
     let img=target.querySelector(':scope > img.sg-product-image');
@@ -41,7 +40,7 @@
       img.loading='lazy';
       img.decoding='async';
       img.referrerPolicy='no-referrer';
-      img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;z-index:0;';
+      img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;display:block;pointer-events:none;z-index:0;padding:3%;';
       target.prepend(img);
     }
     if(img.dataset.src!==clean){img.dataset.src=clean;img.src=clean;}
