@@ -1,12 +1,6 @@
 {
-  "hero": "/images/juno/img_1727.jpeg",
+  "hero": "/images/juno/img_1724.jpeg",
   "product": "/images/juno/img_1724.jpeg",
-  "photo_break": "/images/juno/img_1728.jpeg",
-  "photos": [
-    {
-      "image": "/images/juno/img_1725.jpeg",
-      "caption": "",
-      "alt": ""
-    }
-  ]
+  "detail": "/images/juno/img_1725.jpeg",
+  "mood": "/images/juno/img_1727.jpeg"
 }
