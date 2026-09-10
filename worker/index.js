@@ -2,6 +2,8 @@ import { receiveStripeWebhook, getPrintfulCatalog } from "./stripe-fulfillment.j
 import { getPublicPrintfulCatalog } from "./catalog-public.js";
 
 const JSON_HEADERS = { "content-type": "application/json; charset=utf-8" };
+const REWARD_NAME = "STARFART";
+const REWARD_POINTS_PER_DOLLAR = 1;
 
 function json(data, status = 200, extraHeaders = {}) {
   return new Response(JSON.stringify(data), { status, headers: { ...JSON_HEADERS, ...extraHeaders } });
@@ -102,16 +104,25 @@ function validateCart(requestedItems, catalog, printfulCatalog) {
   });
 }
 
+function checkoutSuccessUrl(env) {
+  const base = String(env.SUCCESS_URL || "");
+  if (!base) throw new Error("SUCCESS_URL is not configured");
+  if (base.includes("{CHECKOUT_SESSION_ID}")) return base;
+  return `${base}${base.includes("?") ? "&" : "?"}session_id={CHECKOUT_SESSION_ID}`;
+}
+
 async function createStripeCheckout(items, env) {
   if (!env.STRIPE_SECRET_KEY) throw new Error("STRIPE_SECRET_KEY is not configured");
   if (!env.SUCCESS_URL || !env.CANCEL_URL) throw new Error("Checkout return URLs are not configured");
 
   const body = new URLSearchParams();
   body.set("mode", "payment");
-  body.set("success_url", env.SUCCESS_URL);
+  body.set("success_url", checkoutSuccessUrl(env));
   body.set("cancel_url", env.CANCEL_URL);
   body.set("billing_address_collection", "auto");
   body.set("shipping_address_collection[allowed_countries][0]", "US");
+  body.set("metadata[reward_program]", REWARD_NAME);
+  body.set("metadata[reward_points_per_dollar]", String(REWARD_POINTS_PER_DOLLAR));
 
   items.forEach(({ product, variant, quantity, unitPrice }, index) => {
     const cents = Math.round(unitPrice * 100);
@@ -150,6 +161,26 @@ async function createStripeCheckout(items, env) {
   return data;
 }
 
+async function verifyPurchaseReward(sessionId, env) {
+  if (!env.STRIPE_SECRET_KEY) throw new Error("STRIPE_SECRET_KEY is not configured");
+  if (!/^cs_[A-Za-z0-9_]+$/.test(String(sessionId || ""))) throw new Error("Invalid checkout session");
+  const response = await fetch(`https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}`, {
+    headers: { authorization: `Bearer ${env.STRIPE_SECRET_KEY}` }
+  });
+  const session = await response.json();
+  if (!response.ok) throw new Error(session?.error?.message || "Could not verify checkout");
+  const paid = session.status === "complete" && session.payment_status === "paid";
+  const cents = paid ? Number(session.amount_total || 0) : 0;
+  const points = paid ? Math.max(0, Math.floor((cents / 100) * REWARD_POINTS_PER_DOLLAR)) : 0;
+  return {
+    verified: paid,
+    reward_name: REWARD_NAME,
+    points,
+    amount_total: cents,
+    currency: String(session.currency || "usd").toUpperCase()
+  };
+}
+
 export default {
   async fetch(request, env, ctx) {
     const origin = request.headers.get("origin") || "";
@@ -157,7 +188,7 @@ export default {
     const url = new URL(request.url);
 
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders });
-    if (url.pathname === "/health") return json({ ok: true, fulfillment: "printful" }, 200, corsHeaders);
+    if (url.pathname === "/health") return json({ ok: true, fulfillment: "printful", rewards: REWARD_NAME }, 200, corsHeaders);
 
     try {
       if (url.pathname === "/stripe/webhook" && request.method === "POST") return await receiveStripeWebhook(request, env);
@@ -167,6 +198,11 @@ export default {
           "cache-control": "public, max-age=300, stale-while-revalidate=86400",
           "vary": "Origin"
         });
+      }
+      if (url.pathname === "/rewards/verify" && request.method === "GET") {
+        if (env.ALLOWED_ORIGIN && origin && origin !== env.ALLOWED_ORIGIN) return json({ error: "Origin not allowed" }, 403, corsHeaders);
+        const reward = await verifyPurchaseReward(url.searchParams.get("session_id") || "", env);
+        return json(reward, 200, { ...corsHeaders, "cache-control": "no-store" });
       }
       if (url.pathname !== "/checkout" || request.method !== "POST") return json({ error: "Not found" }, 404, corsHeaders);
       if (env.ALLOWED_ORIGIN && origin && origin !== env.ALLOWED_ORIGIN) return json({ error: "Origin not allowed" }, 403, corsHeaders);
