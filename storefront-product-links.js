@@ -9,7 +9,7 @@
       const js=document.createElement('script');js.src='storefront-conversion.js?v=20260910n';js.defer=true;js.dataset.storeConversion='1';document.body.appendChild(js);
     }
     if(!document.querySelector('script[data-store-retention]')){
-      const extra=document.createElement('script');extra.src='storefront-retention.js?v=20260910b';extra.defer=true;extra.dataset.storeRetention='1';document.body.appendChild(extra);
+      const extra=document.createElement('script');extra.src='storefront-retention.js?v=20260910c';extra.defer=true;extra.dataset.storeRetention='1';document.body.appendChild(extra);
     }
   }
   function productFor(id){try{return typeof products!=='undefined'?products.find(p=>p.id===id):null;}catch{return null;}}
@@ -18,7 +18,7 @@
     const p=productFor(id);
     const dynamic=/^printful-(\d+)$/.exec(String(id||''));
     const pfid=Number(p?.printful_product_id||dynamic?.[1]||0);
-    const q=new URLSearchParams({v:'20260910n',id:String(id)});
+    const q=new URLSearchParams({v:'20260910o',id:String(id)});
     if(pfid>0)q.set('pf',String(pfid));
     return`product.html?${q.toString()}`;
   }
