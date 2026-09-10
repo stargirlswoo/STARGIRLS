@@ -44,9 +44,9 @@ function compact(product,details){
   };
 }
 
-const CACHE_VERSION='v5';
-const EDGE_TTL_SECONDS=900;
-const FRESH_MS=15*60*1000;
+const CACHE_VERSION='v6';
+const EDGE_TTL_SECONDS=300;
+const FRESH_MS=5*60*1000;
 const KV_KEY=`printful:public-catalog:${CACHE_VERSION}`;
 
 function validSnapshot(value){
@@ -122,8 +122,7 @@ export async function getPublicPrintfulCatalog(env,ctx){
     }
 
     const work=refresh(env,cache,cacheKey).catch(error=>console.warn('STARGIRLS Printful background refresh',error));
-    if(ctx?.waitUntil)ctx.waitUntil(work);
-    else work.catch(()=>{});
+    if(ctx?.waitUntil)ctx.waitUntil(work);else await work;
     return shared;
   }
 
