@@ -1,12 +1,3 @@
 {
-  "feature": "/images/shop/img_1726.jpeg",
-  "product": "/images/shop/img_1723.jpeg",
-  "junoon": "/images/shop/img_1725.jpeg",
-  "photos": [
-    {
-      "image": "/images/shop/img_1724.jpeg",
-      "caption": "",
-      "alt": ""
-    }
-  ]
+  "hero": "/images/home/img_1571.jpeg"
 }
