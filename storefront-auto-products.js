@@ -3,9 +3,9 @@
   const api=window.STARGIRLS_STORE_API||'';
   if(!api)return;
 
-  const CACHE_KEY='stargirls-printful-catalog-v5';
-  const CLIENT_TTL=15*60*1000;
-  const MAX_STALE=7*24*60*60*1000;
+  const CACHE_KEY='stargirls-printful-catalog-v6';
+  const CLIENT_TTL=5*60*1000;
+  const MAX_STALE=24*60*60*1000;
   const state=window.__SG_PRINTFUL_STATE||(window.__SG_PRINTFUL_STATE={data:null,ts:0,promise:null});
 
   const inferCategory=name=>{
