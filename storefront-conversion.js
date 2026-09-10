@@ -1,30 +1,47 @@
-/* STARGIRLS storefront conversion enhancements. */
+/* STARGIRLS storefront experience: delight, trust, wishlist, recent views and live-feeling merchandising. */
 (()=>{
 'use strict';
-function injectTrust(){
-  if(document.querySelector('.store-conversion-trust'))return;
-  const tabs=document.querySelector('.shop-tabs');
-  if(!tabs)return;
-  tabs.insertAdjacentHTML('afterend','<section class="store-conversion-trust" aria-label="Store reassurance"><div><b>★</b>OFFICIAL STARGIRLS <span>Direct from the store</span></div><div><b>✓</b>SECURE CHECKOUT <span>Stripe protected payment</span></div><div><b>↗</b>SHIPPING SHOWN FIRST <span>See shipping before payment</span></div></section>');
-}
-function enhanceCards(){
-  document.querySelectorAll('[data-product-card]').forEach(card=>{
-    const body=card.querySelector('.catalog-body');
-    if(!body||body.querySelector('.card-shop-cta'))return;
-    body.insertAdjacentHTML('beforeend','<div class="card-shop-cta">VIEW ITEM →</div>');
-    card.setAttribute('aria-label',`${card.querySelector('.catalog-meta strong')?.textContent?.trim()||'STARGIRLS item'} — view product`);
-  });
-}
-function injectFooterNote(){
-  if(document.querySelector('.store-conversion-footer-note'))return;
-  const footer=document.querySelector('footer');
-  if(!footer)return;
-  footer.insertAdjacentHTML('beforebegin','<section class="store-conversion-footer-note"><strong>OFFICIAL STARGIRLS STORE</strong>Secure checkout · Shipping shown before payment · Made-to-order items use current product options</section>');
-}
-let queued=false;
-function apply(){queued=false;injectTrust();enhanceCards();injectFooterNote();}
-function schedule(){if(queued)return;queued=true;requestAnimationFrame(apply);}
+const WISH_KEY='stargirls-wishlist-v1';
+const RECENT_KEY='stargirls-recent-v1';
+const STATUS_MESSAGES=[
+  '★ PARTY TILL HELL MERCH IS LIVE ★',
+  '★ JUNO — COMING SOON ★',
+  '★ OFFICIAL STARGIRLS STORE ★',
+  '★ SECURE CHECKOUT · SHIPPING SHOWN BEFORE PAYMENT ★'
+];
 const grid=document.querySelector('[data-product-grid]');
-if(grid)new MutationObserver(schedule).observe(grid,{childList:true,subtree:true});
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply);else apply();
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const read=(key,fallback=[])=>{try{const v=JSON.parse(localStorage.getItem(key)||'null');return v??fallback}catch{return fallback}};
+const write=(key,v)=>{try{localStorage.setItem(key,JSON.stringify(v))}catch{}};
+const cleanImage=v=>/^(?:images\/|https:\/\/)/i.test(String(v||''))?String(v):'';
+function productHref(id=''){if(id==='juno-edp')return'fragrance.html';const m=/^printful-(\d+)$/.exec(String(id));return m?`product.html?v=20260910k&id=${encodeURIComponent(id)}&pf=${m[1]}`:`#catalog`;}
+function imageFromCard(card){const direct=$('img.sg-product-image',card)?.getAttribute('src')||'';if(cleanImage(direct))return direct;const bg=$('[data-main-image]',card)?.style?.backgroundImage||'';const m=bg.match(/url\(["']?(.*?)["']?\)/i);return cleanImage(m?.[1]||'');}
+function cardInfo(card){if(!card)return null;const id=String(card.dataset.productCard||'');if(!id)return null;return{id,name:$('.catalog-meta strong',card)?.textContent?.trim()||'STARGIRLS ITEM',category:$('.catalog-meta span',card)?.textContent?.trim()||'',price:$('.catalog-price',card)?.textContent?.trim()||'',image:imageFromCard(card),href:productHref(id)};}
+function normalizeWishes(){const raw=read(WISH_KEY,[]);if(!Array.isArray(raw))return[];return raw.map(x=>typeof x==='string'?{id:x,name:'STARGIRLS ITEM',price:'',image:'',href:productHref(x)}:x).filter(x=>x&&x.id);}
+function wishes(){return normalizeWishes()}
+function isSaved(id){return wishes().some(x=>String(x.id)===String(id))}
+function toggleSaved(info,button){if(!info)return;let list=wishes();const found=list.some(x=>String(x.id)===String(info.id));if(found)list=list.filter(x=>String(x.id)!==String(info.id));else list=[{...info,savedAt:Date.now()},...list.filter(x=>String(x.id)!==String(info.id))].slice(0,24);write(WISH_KEY,list);syncWishlistUI();renderSavedPanel();celebrate(button,found?'☆':'♥');}
+function celebrate(target,symbol='★'){if(!target||matchMedia('(prefers-reduced-motion: reduce)').matches)return;const r=target.getBoundingClientRect();const burst=document.createElement('span');burst.className='sg-burst';burst.style.left=`${r.left+r.width/2}px`;burst.style.top=`${r.top+r.height/2}px`;for(let i=0;i<7;i++){const s=document.createElement('i');s.textContent=symbol;s.style.setProperty('--a',`${i*51}deg`);s.style.setProperty('--d',`${24+(i%3)*9}px`);burst.appendChild(s);}document.body.appendChild(burst);setTimeout(()=>burst.remove(),700);try{navigator.vibrate?.(18)}catch{}}
+function injectTrust(){if($('.store-conversion-trust'))return;const tabs=$('.shop-tabs');if(!tabs)return;tabs.insertAdjacentHTML('afterend','<section class="store-conversion-trust" aria-label="Store reassurance"><div><b>★</b><span><strong>OFFICIAL STARGIRLS</strong><small>Direct from the store</small></span></div><div><b>✓</b><span><strong>SECURE CHECKOUT</strong><small>Stripe-protected payment</small></span></div><div><b>↗</b><span><strong>NO SURPRISE SHIPPING</strong><small>See shipping before payment</small></span></div></section><div class="shop-utility-row"><button type="button" data-open-saved>♡ SAVED <span data-saved-count>0</span></button><button type="button" data-jump-recent>↺ RECENTLY VIEWED</button><a href="help.html">NEED HELP?</a></div>');$('[data-open-saved]')?.addEventListener('click',openSavedPanel);$('[data-jump-recent]')?.addEventListener('click',()=>{$('.recently-viewed')?.scrollIntoView({behavior:'smooth',block:'start'});});}
+function enhanceCards(){$$('[data-product-card]').forEach(card=>{const info=cardInfo(card);if(!info)return;const wrap=$('.catalog-card-image-wrap',card);if(wrap&&!$('.wishlist-heart',wrap)){const b=document.createElement('button');b.type='button';b.className='wishlist-heart';b.setAttribute('aria-label',`Save ${info.name}`);b.innerHTML='<span aria-hidden="true">♡</span>';b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();toggleSaved(cardInfo(card),b);});wrap.appendChild(b);}const body=$('.catalog-body',card);if(body&&!$('.card-shop-cta',body))body.insertAdjacentHTML('beforeend','<div class="card-shop-cta">VIEW ITEM →</div>');const name=info.name.toLowerCase();if(/party\s*(?:till|til)\s*hell/.test(name)&&wrap&&!$('.card-era-badge',wrap))wrap.insertAdjacentHTML('afterbegin','<span class="card-era-badge">CURRENT ERA</span>');});syncWishlistUI();}
+function syncWishlistUI(){const list=wishes();$$('[data-saved-count]').forEach(x=>x.textContent=String(list.length));$$('[data-product-card]').forEach(card=>{const saved=isSaved(card.dataset.productCard);const b=$('.wishlist-heart',card);if(!b)return;b.classList.toggle('saved',saved);b.setAttribute('aria-pressed',saved?'true':'false');b.querySelector('span').textContent=saved?'♥':'♡';});}
+function ensureSavedPanel(){if($('.saved-panel'))return;document.body.insertAdjacentHTML('beforeend','<div class="saved-panel-backdrop" data-close-saved></div><aside class="saved-panel" aria-label="Saved items"><div class="saved-panel-head"><div><small>YOUR STARGIRLS LIST</small><h2>SAVED ★</h2></div><button type="button" data-close-saved aria-label="Close saved items">×</button></div><div class="saved-panel-items" data-saved-items></div><div class="saved-panel-foot"><button type="button" data-close-saved>KEEP SHOPPING →</button></div></aside>');$$('[data-close-saved]').forEach(x=>x.addEventListener('click',closeSavedPanel));}
+function openSavedPanel(){ensureSavedPanel();renderSavedPanel();$('.saved-panel')?.classList.add('open');$('.saved-panel-backdrop')?.classList.add('open');document.body.classList.add('sg-panel-open')}
+function closeSavedPanel(){$('.saved-panel')?.classList.remove('open');$('.saved-panel-backdrop')?.classList.remove('open');document.body.classList.remove('sg-panel-open')}
+function renderSavedPanel(){ensureSavedPanel();const box=$('[data-saved-items]');if(!box)return;const list=wishes();if(!list.length){box.innerHTML='<div class="saved-empty"><strong>NOTHING SAVED YET.</strong><p>Tap the heart on anything you want to come back to.</p></div>';return;}box.innerHTML=list.map(x=>`<div class="saved-line">${cleanImage(x.image)?`<a href="${esc(x.href||productHref(x.id))}"><img src="${esc(x.image)}" alt="${esc(x.name)}" loading="lazy"></a>`:'<div class="saved-placeholder">★</div>'}<div><a href="${esc(x.href||productHref(x.id))}"><strong>${esc(x.name)}</strong></a><span>${esc(x.price||'VIEW ITEM')}</span><button type="button" data-unsave="${esc(x.id)}">REMOVE</button></div></div>`).join('');$$('[data-unsave]',box).forEach(b=>b.addEventListener('click',()=>{write(WISH_KEY,wishes().filter(x=>String(x.id)!==String(b.dataset.unsave)));syncWishlistUI();renderSavedPanel();}));}
+function linkForRecent(x){return x.href||productHref(x.id)}
+function injectRecent(){const rec=(read(RECENT_KEY,[])||[]).filter(x=>x&&x.id&&x.name).slice(0,4);let section=$('.recently-viewed');if(!rec.length){section?.remove();return;}const html=`<div class="experience-head"><div><small>STILL THINKING ABOUT IT?</small><h2>YOU WERE LOOKING AT…</h2></div><p>Your recent pieces stay here on this device so you can jump back in.</p></div><div class="experience-grid">${rec.map(x=>`<a class="experience-card" href="${esc(linkForRecent(x))}">${cleanImage(x.image)?`<div class="experience-image"><img src="${esc(x.image)}" alt="${esc(x.name)}" loading="lazy"></div>`:'<div class="experience-image placeholder">★</div>'}<div class="experience-copy"><strong>${esc(x.name)}</strong><span>${esc(x.price||'VIEW AGAIN')} →</span></div></a>`).join('')}</div>`;if(!section){section=document.createElement('section');section.className='recently-viewed experience-section';const anchor=$('.store-signup')||$('footer');anchor?.before(section);}section.innerHTML=html;}
+function injectPicks(){if($('.experience-picks'))return;const infos=$$('[data-product-card]').map(cardInfo).filter(x=>x&&x.id!=='juno-edp'&&x.image);if(infos.length<2)return;infos.sort((a,b)=>Number(/party\s*(?:till|til)\s*hell/i.test(b.name))-Number(/party\s*(?:till|til)\s*hell/i.test(a.name)));const picks=infos.slice(0,3);const section=document.createElement('section');section.className='experience-picks experience-section';section.innerHTML=`<div class="experience-head"><div><small>START HERE</small><h2>STARGIRLS PICKS ★</h2></div><p>The current drop, pulled forward so you don't have to hunt for it.</p></div><div class="experience-grid">${picks.map((x,i)=>`<a class="experience-card" href="${esc(x.href)}"><div class="experience-image"><img src="${esc(x.image)}" alt="${esc(x.name)}" loading="lazy"><span>${i===0&&/party\s*(?:till|til)\s*hell/i.test(x.name)?'CURRENT ERA':(x.category||'STARGIRLS')}</span></div><div class="experience-copy"><strong>${esc(x.name)}</strong><span>${esc(x.price||'VIEW ITEM')} →</span></div></a>`).join('')}</div>`;const catalog=$('#catalog');catalog?.after(section);}
+function injectJunoTeaser(){if($('.juno-teaser'))return;const anchor=$('.store-signup')||$('footer');if(!anchor)return;anchor.insertAdjacentHTML('beforebegin','<section class="juno-teaser"><div class="juno-teaser-image"><img src="images/juno/img_1724.jpeg" alt="JUNO Eau de Parfum by STARGIRLS" loading="lazy"></div><div class="juno-teaser-copy"><small>COMING NEXT</small><h2>JUNO.</h2><p>The first fragrance by STARGIRLS. Get a look before the drop.</p><a href="fragrance.html">ENTER JUNO →</a></div></section>');}
+function injectFooterNote(){if($('.store-conversion-footer-note'))return;const footer=$('footer');if(!footer)return;footer.insertAdjacentHTML('beforebegin','<section class="store-conversion-footer-note"><strong>BUY WITH YOUR BRAIN OFF. NOT YOUR GUARD DOWN.</strong><span>Official STARGIRLS store · Secure Stripe checkout · Shipping shown before payment · <a href="shipping.html">Shipping</a> · <a href="returns.html">Returns</a> · <a href="help.html">Help</a></span></section>');}
+function updateCartMomentum(){const foot=$('.cart-footer');if(!foot)return;let box=$('.cart-momentum',foot);if(!box){foot.insertAdjacentHTML('afterbegin','<div class="cart-momentum"><strong data-bag-count>YOUR BAG IS WAITING.</strong><span data-bag-note>Choose your piece, then checkout stays simple.</span><button type="button" data-continue-shopping>CONTINUE SHOPPING</button></div>');box=$('.cart-momentum',foot);$('[data-continue-shopping]',box)?.addEventListener('click',()=>{$('[data-cart-close]')?.click();$('#catalog')?.scrollIntoView({behavior:'smooth',block:'start'});});}const c=read('stargirls-cart',[]);const count=Array.isArray(c)?c.reduce((n,x)=>n+Math.max(0,Number(x?.quantity||0)),0):0;$('[data-bag-count]',box).textContent=count?`${count} ${count===1?'PIECE':'PIECES'} IN YOUR BAG ★`:'YOUR BAG IS WAITING.';$('[data-bag-note]',box).textContent=count?'Everything looks good. Review your selections, then checkout securely.':'Choose your piece, then checkout stays simple.';}
+function startStatus(){const bar=$('.drop-bar');if(!bar||bar.dataset.sgRotating==='1')return;bar.dataset.sgRotating='1';let i=0;const show=()=>{bar.classList.add('sg-status-swap');setTimeout(()=>{bar.textContent=STATUS_MESSAGES[i++%STATUS_MESSAGES.length];bar.classList.remove('sg-status-swap');},140);};show();setInterval(show,4600);}
+function apply(){injectTrust();enhanceCards();injectPicks();injectRecent();injectJunoTeaser();injectFooterNote();updateCartMomentum();startStatus();renderSavedPanel();}
+let queued=false;function schedule(){if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;apply();});}
+if(grid)new MutationObserver(schedule).observe(grid,{childList:true});
+const cartItems=$('[data-cart-items]');if(cartItems)new MutationObserver(()=>{updateCartMomentum();}).observe(cartItems,{childList:true});
+window.addEventListener('storage',()=>{syncWishlistUI();injectRecent();updateCartMomentum();});
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule);else schedule();
 })();
