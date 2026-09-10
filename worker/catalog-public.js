@@ -29,6 +29,8 @@ function compact(product,details){
       sku:v.sku||'',
       catalog_variant_id:v.variant_id||null,
       retail_price:v.retail_price||null,
+      size:v.size||null,
+      color:v.color||null,
       synced:v.synced!==false,
       is_ignored:v.is_ignored===true,
       availability_status:v.availability_status||null,
