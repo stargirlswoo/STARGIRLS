@@ -1,11 +1,18 @@
-/* STARGIRLS storefront: clean collection cards that open dedicated product pages. */
+/* STARGIRLS storefront: cards open the exact current Printful product. */
 (function(){
-  function destination(id){return id==='juno-edp'?'fragrance.html':`product.html?id=${encodeURIComponent(id)}`;}
+  function productFor(id){try{return typeof products!=='undefined'?products.find(p=>p.id===id):null;}catch{return null;}}
+  function destination(id){
+    if(id==='juno-edp')return'fragrance.html';
+    const p=productFor(id);
+    const dynamic=/^printful-(\d+)$/.exec(String(id||''));
+    const pfid=Number(p?.printful_product_id||dynamic?.[1]||0);
+    const q=new URLSearchParams({id:String(id)});
+    if(pfid>0)q.set('pf',String(pfid));
+    return`product.html?${q.toString()}`;
+  }
   function simplify(card){
     const body=card.querySelector('.catalog-body');
-    if(body){
-      body.querySelectorAll('.variant-group,.catalog-selection,.catalog-buy,.catalog-status,.product-details').forEach(el=>el.remove());
-    }
+    if(body)body.querySelectorAll('.variant-group,.catalog-selection,.catalog-buy,.catalog-status,.product-details').forEach(el=>el.remove());
     card.querySelector('.catalog-thumbs')?.remove();
     card.querySelector('.catalog-image-tools')?.remove();
   }
@@ -19,10 +26,7 @@
       card.setAttribute('tabindex','0');
       card.style.cursor='pointer';
       const go=()=>location.href=destination(id);
-      card.addEventListener('click',e=>{
-        if(e.target.closest('button,a,input,select,summary,details'))return;
-        go();
-      });
+      card.addEventListener('click',e=>{if(e.target.closest('button,a,input,select,summary,details'))return;go();});
       card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}});
       const image=card.querySelector('[data-main-image]');
       if(image){
@@ -37,10 +41,4 @@
   const grid=document.querySelector('[data-product-grid]');
   if(grid)new MutationObserver(apply).observe(grid,{childList:true,subtree:true});
   apply();
-  if(!document.querySelector('script[data-hayati-image-guard]')){
-    const s=document.createElement('script');
-    s.src='hayati-image-guard.js?v=20260909a';
-    s.dataset.hayatiImageGuard='1';
-    document.body.appendChild(s);
-  }
 })();
