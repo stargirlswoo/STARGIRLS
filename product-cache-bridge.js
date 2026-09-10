@@ -1,26 +1,38 @@
 /* STARGIRLS product page cache bridge.
-   Product clicks should never wait on a second live Printful request when the storefront
-   already has the catalog. Reuse the storefront v5 cache immediately; direct product
-   visits fall back to a bounded cached API request instead of hanging indefinitely. */
+   A product clicked from the storefront is rendered from a tiny per-product snapshot,
+   so navigation never waits for another full Printful catalog request. */
 (()=>{
+  const SNAPSHOT_KEY='stargirls-clicked-product-v1';
   const NEW_KEY='stargirls-printful-catalog-v5';
   const LEGACY_KEY='stargirls-printful-catalog-v4';
   const API=window.STARGIRLS_STORE_API||'';
   const nativeFetch=window.fetch.bind(window);
   let cached=null;
 
+  // Fastest path: the storefront saves the exact product before navigating here.
   try{
-    const raw=JSON.parse(localStorage.getItem(NEW_KEY)||'null');
-    if(raw?.data&&Array.isArray(raw.data.products)&&raw.data.products.length){
-      cached=raw.data;
-      // The current product loader still reads the legacy session key.
-      // Seed it from the storefront cache and make it look fresh for this navigation.
-      sessionStorage.setItem(LEGACY_KEY,JSON.stringify({ts:Date.now(),data:cached}));
+    const snap=JSON.parse(sessionStorage.getItem(SNAPSHOT_KEY)||'null');
+    if(snap?.source&&Array.isArray(snap.source.variants)&&snap.source.variants.length){
+      const q=new URLSearchParams(location.search);
+      const wantedPf=Number(q.get('pf')||0);
+      const wantedId=String(q.get('id')||'');
+      if((!wantedPf||Number(snap.pfid)===wantedPf)&&(!wantedId||String(snap.id)===wantedId)){
+        cached={products:[snap.source],refreshed_at:new Date(Number(snap.ts)||Date.now()).toISOString()};
+      }
     }
-  }catch(error){
-    console.warn('STARGIRLS product cache bridge:',error);
+  }catch{}
+
+  // Next fastest path: reuse the full storefront cache already on this device.
+  if(!cached){
+    try{
+      const raw=JSON.parse(localStorage.getItem(NEW_KEY)||'null');
+      if(raw?.data&&Array.isArray(raw.data.products)&&raw.data.products.length)cached=raw.data;
+    }catch(error){console.warn('STARGIRLS product cache bridge:',error);}
   }
 
+  if(cached){
+    try{sessionStorage.setItem(LEGACY_KEY,JSON.stringify({ts:Date.now(),data:cached}));}catch{}
+  }
   if(!API)return;
 
   const isCatalog=input=>{
@@ -36,19 +48,16 @@
     if(!isCatalog(input))return nativeFetch(input,init);
     if(cached)return Promise.resolve(cachedResponse(cached));
 
-    // Direct product-page visit with no storefront cache: use Cloudflare's normal cache
-    // and cap the request so the UI can fail cleanly instead of showing LOADING forever.
+    // Direct URL visit with no storefront cache: cap the wait so it can never sit on
+    // LOADING PRODUCT for an extended period.
     const controller=new AbortController();
-    const timer=setTimeout(()=>controller.abort(),6000);
+    const timer=setTimeout(()=>controller.abort(),3000);
     return nativeFetch(`${API}/printful/catalog`,{
-      cache:'default',
-      mode:'cors',
-      signal:controller.signal
+      cache:'default',mode:'cors',signal:controller.signal
     }).then(async response=>{
       if(response.ok){
         try{
-          const clone=response.clone();
-          const data=await clone.json();
+          const data=await response.clone().json();
           if(data&&Array.isArray(data.products)&&data.products.length){
             cached=data;
             const wrapped={ts:Date.now(),data};
