@@ -23,7 +23,7 @@ function requireProductsKv(env) {
 
 async function loadCatalog(env) {
   if (!env.CATALOG_URL) throw new Error("CATALOG_URL is not configured");
-  const response = await fetch(env.CATALOG_URL, { cf: { cacheTtl: 60 } });
+  const response = await fetch(env.CATALOG_URL, { cf: { cacheTtl: 300 } });
   if (!response.ok) throw new Error("Could not load product catalog");
   const data = await response.json();
   return Array.isArray(data.products) ? data.products : [];
@@ -151,7 +151,7 @@ async function createStripeCheckout(items, env) {
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const origin = request.headers.get("origin") || "";
     const corsHeaders = cors(origin, env.ALLOWED_ORIGIN);
     const url = new URL(request.url);
@@ -162,9 +162,10 @@ export default {
     try {
       if (url.pathname === "/stripe/webhook" && request.method === "POST") return await receiveStripeWebhook(request, env);
       if (url.pathname === "/printful/catalog" && request.method === "GET") {
-        return json(await getPublicPrintfulCatalog(env), 200, {
+        return json(await getPublicPrintfulCatalog(env, ctx), 200, {
           ...corsHeaders,
-          "cache-control": "no-store"
+          "cache-control": "public, max-age=300, stale-while-revalidate=86400",
+          "vary": "Origin"
         });
       }
       if (url.pathname !== "/checkout" || request.method !== "POST") return json({ error: "Not found" }, 404, corsHeaders);
