@@ -1,136 +1,144 @@
 (()=>{
   const nativeFetch=window.fetch.bind(window);
   const api=window.STARGIRLS_STORE_API||'';
-  const CATALOG_CACHE_KEY='stargirls-printful-catalog-v2';
+  if(!api)return;
+
+  const CACHE_KEY='stargirls-printful-catalog-v4';
+  const CLIENT_TTL=60000;
+  const state=window.__SG_PRINTFUL_STATE||(window.__SG_PRINTFUL_STATE={data:null,ts:0,promise:null});
 
   const inferCategory=name=>{
     const n=String(name||'').toLowerCase();
-    if(/juno|perfume|parfum|fragrance|eau de/.test(n)) return 'perfume';
-    if(/party\s*(?:till|til)\s*hell/.test(n)) return 'merch';
-    if(/\b(?:hayati|anew)\b/.test(n)) return 'merch';
-    if(/\bstargirls?\b.*\b(?:tee|t-?shirt|shirt|pullover|hoodie|sweatshirt|sweater)\b/.test(n)) return 'merch';
-    return 'fashion';
+    if(/juno|perfume|parfum|fragrance|eau de/.test(n))return'perfume';
+    if(/party\s*(?:till|til)\s*hell/.test(n))return'merch';
+    if(/\b(?:hayati|anew)\b/.test(n))return'merch';
+    if(/\bstargirls?\b.*\b(?:tee|t-?shirt|shirt|pullover|hoodie|sweatshirt|sweater)\b/.test(n))return'merch';
+    return'fashion';
   };
 
   const safeUrl=value=>/^https:\/\//i.test(String(value||''))?String(value):'';
-  const fileMeta=file=>`${String(file?.type||'')} ${String(file?.preview_url||'')} ${String(file?.thumbnail_url||'')}`.toLowerCase();
-  const isArtwork=file=>/printfile|print[_ -]?file|artwork|design|template|pattern|logo|digitization|inside|label/.test(fileMeta(file));
-  const likelyMockup=file=>!!(file?.preview_url||file?.thumbnail_url)&&!isArtwork(file)&&/mockup|preview/.test(fileMeta(file));
-  const activeVariant=v=>{
+  const meta=f=>`${String(f?.type||'')} ${String(f?.preview_url||'')} ${String(f?.thumbnail_url||'')}`.toLowerCase();
+  const isArtwork=f=>/printfile|print[_ -]?file|artwork|design|template|pattern|logo|digitization|inside|label|embroidery/.test(meta(f));
+  const active=v=>{
     const status=String(v?.availability_status||'').toLowerCase();
     return !!v&&v.synced!==false&&v.is_ignored!==true&&status!=='inactive'&&status!=='discontinued'&&Number(v.sync_variant_id||0)>0;
   };
+  const add=(out,u)=>{u=safeUrl(u);if(u&&!out.includes(u))out.push(u);};
 
-  const variantParts=(v,productName='')=>{
+  function variantParts(v,productName=''){
     const parts=String(v?.name||'').split(' / ').map(x=>x.trim()).filter(Boolean);
-    const explicitColor=String(v?.color||'').trim();
-    const explicitSize=String(v?.size||'').trim();
-    let color=explicitColor;
-    let size=explicitSize;
-    if(!color){
-      if(parts.length>=3) color=parts.at(-2)||'';
-      else if(parts.length===2) color=parts[0]||'';
-    }
-    if(!size&&parts.length>=2) size=parts.at(-1)||'';
+    let color=String(v?.color||'').trim();
+    let size=String(v?.size||'').trim();
+    if(!color){if(parts.length>=3)color=parts.at(-2)||'';else if(parts.length===2)color=parts[0]||'';}
+    if(!size&&parts.length>=2)size=parts.at(-1)||'';
     color=color||'Default';
     size=size||'One Size';
-    return {color,size,name:`${productName||parts[0]||'STARGIRLS PIECE'} / ${color} / ${size}`};
-  };
+    return{color,size,name:`${productName||parts[0]||'STARGIRLS PIECE'} / ${color} / ${size}`};
+  }
 
-  const imageCandidates=(source,v)=>{
+  function imageCandidates(source,v){
     const out=[];
-    const add=u=>{u=safeUrl(u);if(u&&!out.includes(u))out.push(u);};
-    add(source?.thumbnail_url);
-    add(source?.image_url);
-    for(const f of v?.files||[]){if(likelyMockup(f)){add(f.preview_url);add(f.thumbnail_url);}}
-    add(v?.catalog_image);
-    add(v?.product?.image);
-    for(const f of v?.files||[]){if(!isArtwork(f)){add(f.preview_url);add(f.thumbnail_url);}}
+    add(out,source?.thumbnail_url);
+    add(out,source?.image_url);
+    for(const f of v?.files||[]){if(!isArtwork(f)&&/mockup|preview/.test(meta(f))){add(out,f.preview_url);add(out,f.thumbnail_url);}}
+    add(out,v?.catalog_image);
+    add(out,v?.product?.image);
+    for(const f of v?.files||[]){if(!isArtwork(f)){add(out,f.preview_url);add(out,f.thumbnail_url);}}
     return out;
-  };
+  }
 
-  const normalizeVariant=(v,source)=>{
+  function normalizeVariant(v,source){
     const {color,size,name}=variantParts(v,source?.name||'');
     const price=Number(v?.retail_price);
     const images=imageCandidates(source,v);
-    return {
-      ...v,
-      name,
-      color,
-      size,
+    const primary=images[0]||safeUrl(source?.thumbnail_url)||'';
+    const cleanFiles=(v?.files||[]).filter(f=>f&&!isArtwork(f)&&(f.preview_url||f.thumbnail_url));
+    const files=primary
+      ? [{preview_url:primary,thumbnail_url:primary,type:'mockup'},...cleanFiles.filter(f=>f.preview_url!==primary&&f.thumbnail_url!==primary)].slice(0,4)
+      : cleanFiles.slice(0,4);
+    return{
+      ...v,name,color,size,
       price:Number.isFinite(price)?price:null,
       sku:v?.sku||`PF-${Number(v?.sync_variant_id||0)}`,
       printful_sync_variant_id:Number(v?.sync_variant_id||0),
       images,
-      image:images[0]||safeUrl(source?.thumbnail_url)||''
+      image:primary,
+      files
     };
-  };
+  }
 
-  const cleanSource=source=>{
-    const variants=(source?.variants||[]).filter(activeVariant).map(v=>normalizeVariant(v,source));
-    const image=safeUrl(source?.thumbnail_url)||variants.map(v=>v.image).find(Boolean)||'';
-    return {...source,thumbnail_url:image||null,image_url:image||null,variants};
-  };
+  function normalizeProduct(source){
+    const variants=(source?.variants||[]).filter(active).map(v=>normalizeVariant(v,source));
+    const image=safeUrl(source?.thumbnail_url||source?.image_url)||variants.map(v=>v.image).find(Boolean)||'';
+    return{...source,thumbnail_url:image||null,image_url:image||null,variants};
+  }
+  const normalize=data=>({...data,products:Array.isArray(data?.products)?data.products.map(normalizeProduct).filter(p=>p&&p.id&&p.variants.length):[]});
 
-  const cleanCatalog=data=>({...data,products:Array.isArray(data?.products)?data.products.map(cleanSource).filter(p=>p&&p.id&&p.variants.length):[]});
-  const isProductsRequest=input=>{
+  function readCache(){
+    try{
+      const cached=JSON.parse(sessionStorage.getItem(CACHE_KEY)||'null');
+      if(cached?.data&&Array.isArray(cached.data.products))return cached;
+    }catch{}
+    return null;
+  }
+  function save(data){
+    state.data=data;state.ts=Date.now();window.__SG_PRINTFUL_CATALOG=data;
+    try{sessionStorage.setItem(CACHE_KEY,JSON.stringify({ts:state.ts,data}));}catch{}
+  }
+  const responseFor=data=>new Response(JSON.stringify(data),{status:200,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store'}});
+
+  async function getCatalog(){
+    const now=Date.now();
+    if(state.data&&now-state.ts<CLIENT_TTL)return state.data;
+    const cached=readCache();
+    if(cached&&now-Number(cached.ts||0)<CLIENT_TTL){save(cached.data);return cached.data;}
+    if(state.promise)return state.promise;
+    state.promise=(async()=>{
+      try{
+        const bucket=Math.floor(Date.now()/60000);
+        const r=await nativeFetch(`${api}/printful/catalog?v=${bucket}`,{cache:'no-store',mode:'cors'});
+        if(!r.ok)throw new Error(`Catalog ${r.status}`);
+        const data=normalize(await r.json());
+        save(data);
+        return data;
+      }catch(error){
+        const stale=state.data||cached?.data;
+        if(stale)return stale;
+        throw error;
+      }finally{state.promise=null;}
+    })();
+    return state.promise;
+  }
+
+  function isProductsRequest(input){
     const u=typeof input==='string'?input:(input&&input.url)||'';
     return /(?:^|\/)content\/products\.json(?:\?|$)/.test(u);
-  };
-  const isPrintfulCatalogRequest=input=>{
+  }
+  function isCatalogRequest(input){
     const u=typeof input==='string'?input:(input&&input.url)||'';
-    return !!api&&u.startsWith(`${api}/printful/catalog`);
-  };
-
-  const saveCatalog=data=>{try{sessionStorage.setItem(CATALOG_CACHE_KEY,JSON.stringify(data));}catch{}};
-  const loadCachedCatalog=()=>{try{const d=JSON.parse(sessionStorage.getItem(CATALOG_CACHE_KEY)||'null');return d&&Array.isArray(d.products)?d:null;}catch{return null;}};
+    return u.startsWith(`${api}/printful/catalog`);
+  }
 
   window.fetch=async(input,init)=>{
-    if(isPrintfulCatalogRequest(input)){
-      try{
-        const response=await nativeFetch(input,init);
-        if(!response.ok){
-          const cached=loadCachedCatalog();
-          if(cached)return new Response(JSON.stringify(cached),{status:200,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store'}});
-          return response;
-        }
-        const data=cleanCatalog(await response.clone().json());
-        saveCatalog(data);
-        return new Response(JSON.stringify(data),{status:response.status,statusText:response.statusText,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store'}});
-      }catch(error){
-        const cached=loadCachedCatalog();
-        if(cached)return new Response(JSON.stringify(cached),{status:200,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store'}});
-        throw error;
-      }
-    }
+    if(isCatalogRequest(input))return responseFor(await getCatalog());
+    if(!isProductsRequest(input))return nativeFetch(input,init);
 
-    if(!isProductsRequest(input)||!api) return nativeFetch(input,init);
     const baseResponse=await nativeFetch(input,init);
-    if(!baseResponse.ok) return baseResponse;
+    if(!baseResponse.ok)return baseResponse;
     try{
-      const [base,printfulResponse]=await Promise.all([
-        baseResponse.clone().json(),
-        window.fetch(`${api}/printful/catalog?v=${Date.now()}`,{cache:'no-store',mode:'cors'})
-      ]);
-      if(!printfulResponse.ok) return baseResponse;
-      const sources=cleanCatalog(await printfulResponse.json()).products;
-      saveCatalog({products:sources});
-      const baseProducts=Array.isArray(base.products)?base.products.filter(p=>!p.printful_product_id):[];
-      const liveProducts=sources.map(source=>({
+      const [base,catalog]=await Promise.all([baseResponse.clone().json(),getCatalog()]);
+      const staticProducts=Array.isArray(base.products)?base.products.filter(p=>!p.printful_product_id):[];
+      const liveProducts=(catalog.products||[]).map(source=>({
         id:`printful-${source.id}`,
         name:source.name||'STARGIRLS PIECE',
         category:inferCategory(source.name),
-        status:'AVAILABLE',
-        available:true,
-        fulfillment:'printful',
-        printful_product_id:Number(source.id),
-        price_mode:'printful',
+        status:'AVAILABLE',available:true,fulfillment:'printful',
+        printful_product_id:Number(source.id),price_mode:'printful',
         image:source.thumbnail_url||source.image_url||'',
         variants:source.variants||[]
       }));
-      return new Response(JSON.stringify({products:[...liveProducts,...baseProducts]}),{
-        status:baseResponse.status,
-        statusText:baseResponse.statusText,
+      return new Response(JSON.stringify({products:[...liveProducts,...staticProducts]}),{
+        status:baseResponse.status,statusText:baseResponse.statusText,
         headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store'}
       });
     }catch(error){
@@ -138,4 +146,6 @@
       return baseResponse;
     }
   };
+
+  window.STARGIRLS_GET_PRINTFUL_CATALOG=getCatalog;
 })();
