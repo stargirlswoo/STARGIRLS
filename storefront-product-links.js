@@ -1,20 +1,12 @@
-/* STARGIRLS storefront: cards open the exact current Printful product. */
+/* STARGIRLS storefront: cards open the exact current Printful product + load one unified experience layer. */
 (function(){
   const SNAPSHOT_KEY='stargirls-clicked-product-v1';
-  function ensureConversionAssets(){
+  function ensureExperienceAssets(){
     if(!document.querySelector('link[data-store-conversion]')){
-      const css=document.createElement('link');css.rel='stylesheet';css.href='storefront-conversion.css?v=20260910a';css.dataset.storeConversion='1';document.head.appendChild(css);
+      const css=document.createElement('link');css.rel='stylesheet';css.href='storefront-conversion.css?v=20260910k';css.dataset.storeConversion='1';document.head.appendChild(css);
     }
     if(!document.querySelector('script[data-store-conversion]')){
-      const js=document.createElement('script');js.src='storefront-conversion.js?v=20260910a';js.defer=true;js.dataset.storeConversion='1';document.body.appendChild(js);
-    }
-  }
-  function ensureEngagementAssets(){
-    if(!document.querySelector('link[data-store-engagement]')){
-      const css=document.createElement('link');css.rel='stylesheet';css.href='store-engagement.css?v=20260910b';css.dataset.storeEngagement='1';document.head.appendChild(css);
-    }
-    if(!document.querySelector('script[data-store-engagement]')){
-      const js=document.createElement('script');js.src='store-engagement.js?v=20260910b';js.defer=true;js.dataset.storeEngagement='1';document.body.appendChild(js);
+      const js=document.createElement('script');js.src='storefront-conversion.js?v=20260910k';js.defer=true;js.dataset.storeConversion='1';document.body.appendChild(js);
     }
   }
   function productFor(id){try{return typeof products!=='undefined'?products.find(p=>p.id===id):null;}catch{return null;}}
@@ -23,7 +15,7 @@
     const p=productFor(id);
     const dynamic=/^printful-(\d+)$/.exec(String(id||''));
     const pfid=Number(p?.printful_product_id||dynamic?.[1]||0);
-    const q=new URLSearchParams({v:'20260910l',id:String(id)});
+    const q=new URLSearchParams({v:'20260910k',id:String(id)});
     if(pfid>0)q.set('pf',String(pfid));
     return`product.html?${q.toString()}`;
   }
@@ -53,8 +45,7 @@
       if(image){image.style.cursor='pointer';image.setAttribute('aria-label',`Open ${id.replaceAll('-',' ')} product page`);}
     });
   }
-  ensureConversionAssets();
-  ensureEngagementAssets();
+  ensureExperienceAssets();
   const grid=document.querySelector('[data-product-grid]');
   if(grid)new MutationObserver(apply).observe(grid,{childList:true});
   apply();
