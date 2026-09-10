@@ -36,15 +36,16 @@ function compact(product,details){
       availability_status:v.availability_status||null,
       catalog_image:v?.product?.image||null,
       product:v.product||null,
-      files:Array.isArray(v.files)?v.files.filter(f=>f&&f.preview_url).map(f=>({preview_url:f.preview_url,thumbnail_url:f.thumbnail_url||null,type:f.type||null})):[]
+      files:Array.isArray(v.files)?v.files.filter(f=>f&&f.preview_url).slice(0,6).map(f=>({preview_url:f.preview_url,thumbnail_url:f.thumbnail_url||null,type:f.type||null})):[]
     }))
   };
 }
 export async function getPublicPrintfulCatalog(env){
   const cache=caches.default;
   const store=String(env.PRINTFUL_STORE_ID||'default');
-  const bucket=Math.floor(Date.now()/30000);
-  const cacheKey=new Request(`https://stargirls.maison/__cache/printful-catalog-${encodeURIComponent(store)}-${bucket}`);
+  // Versioned stable key: most visitors get the cached catalog instead of triggering
+  // a full Printful product-detail fanout. Bump the version when an immediate refresh is needed.
+  const cacheKey=new Request(`https://stargirls.maison/__cache/printful-catalog-v4-${encodeURIComponent(store)}`);
   const cached=await cache.match(cacheKey);
   if(cached) return cached.json();
 
@@ -62,7 +63,10 @@ export async function getPublicPrintfulCatalog(env){
   }
 
   const payload={products,refreshed_at:new Date().toISOString()};
-  const response=new Response(JSON.stringify(payload),{headers:{'content-type':'application/json; charset=utf-8','cache-control':'public, max-age=30, stale-while-revalidate=30'}});
+  const response=new Response(JSON.stringify(payload),{headers:{
+    'content-type':'application/json; charset=utf-8',
+    'cache-control':'public, max-age=120, stale-while-revalidate=60'
+  }});
   await cache.put(cacheKey,response.clone());
   return payload;
 }
