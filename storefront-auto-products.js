@@ -24,13 +24,15 @@
   };
 
   const cleanSource=source=>{
-    const baseVariants=(source?.variants||[]).map(v=>normalizeVariant(v,source?.name||''));
+    const baseVariants=(source?.variants||[])
+      .filter(v=>v&&v.synced!==false&&v.availability_status!=='inactive'&&Number(v.sync_variant_id||0)>0)
+      .map(v=>normalizeVariant(v,source?.name||''));
     if(!needsMockupOnly(source?.name)) return {...source,variants:baseVariants};
     const variants=baseVariants.map(v=>({...v,files:(v.files||[]).filter(trustedMockup)}));
     return {...source,variants,thumbnail_url:source?.thumbnail_url||null};
   };
 
-  const cleanCatalog=data=>({...data,products:Array.isArray(data?.products)?data.products.map(cleanSource):[]});
+  const cleanCatalog=data=>({...data,products:Array.isArray(data?.products)?data.products.map(cleanSource).filter(p=>p&&p.id&&p.variants.length):[]});
   const isProductsRequest=input=>{
     const u=typeof input==='string'?input:(input&&input.url)||'';
     return /(?:^|\/)content\/products\.json(?:\?|$)/.test(u);
@@ -60,14 +62,19 @@
       ]);
       if(!printfulResponse.ok) return baseResponse;
       const sources=cleanCatalog(await printfulResponse.json()).products;
+      const sourceById=new Map(sources.map(source=>[Number(source.id),source]));
       const baseProducts=Array.isArray(base.products)?base.products:[];
-      const mappedIds=new Set(baseProducts.map(p=>Number(p.printful_product_id||0)).filter(Boolean));
+
+      // Keep non-Printful items, but only keep mapped Printful items that still exist in Printful.
+      // This removes deleted products/SKUs from the storefront automatically.
       const merged=baseProducts.map(product=>{
         if(!product.printful_product_id) return product;
-        const source=sources.find(s=>Number(s.id)===Number(product.printful_product_id));
-        if(!source) return product;
+        const source=sourceById.get(Number(product.printful_product_id));
+        if(!source) return null;
         return {...product,name:source.name||product.name};
-      });
+      }).filter(Boolean);
+
+      const mappedIds=new Set(merged.map(p=>Number(p.printful_product_id||0)).filter(Boolean));
       for(const source of sources){
         if(mappedIds.has(Number(source.id))) continue;
         merged.push({
