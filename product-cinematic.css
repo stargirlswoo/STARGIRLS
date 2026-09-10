@@ -1,0 +1,45 @@
+/* STARGIRLS cinematic product page: desire first, buying effortless, belonging after the decision. */
+:root{--cine-ink:#0a0a0a;--cine-paper:#f7f4ef;--cine-purple:#6b46ff;--cine-muted:#746d66;--cine-line:#ddd6cf}
+.cinematic-kicker{margin:0 0 10px;color:var(--cine-purple);font-size:8px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}
+.cinematic-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin:0 0 8px}
+.cinematic-title-row .product-title{margin:0!important;flex:1;min-width:0}
+.cinematic-title-row .product-save{flex:0 0 40px;width:40px;height:40px;padding:0!important;margin:1px 0 0!important;border:1px solid #d8d1ca!important;border-radius:50%;background:rgba(255,255,255,.72)!important;color:#111!important;display:grid;place-items:center;font-size:19px!important;line-height:1!important;letter-spacing:0!important;box-shadow:0 5px 18px rgba(20,12,5,.04)}
+.cinematic-title-row .product-save.saved{background:var(--cine-purple)!important;border-color:var(--cine-purple)!important;color:#fff!important}
+.product-info .price{font-size:22px!important;line-height:1!important;margin:0 0 10px!important}
+.product-info .product-desire-line{margin:0 0 22px!important;color:#645e58!important;font-size:12px!important;font-style:normal!important;font-weight:600!important;line-height:1.5!important;max-width:470px}
+.purchase-security-line{margin-top:10px!important;color:#8b837b!important;font-size:8px!important;letter-spacing:.025em!important}
+.cinematic-era-line{margin:12px 0 0;padding-top:12px;border-top:1px solid rgba(150,139,128,.22);color:#6e675f;font-size:8px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;text-align:center}
+.product-details summary{font-weight:900!important}
+.product-details details:first-child summary:after{content:'  ·  THE PIECE';color:#999;font-size:.8em;font-weight:700}
+.add.primary-conversion{position:relative;overflow:hidden}
+.add.primary-conversion.cinematic-confirmed{animation:cineConfirm .75s ease}
+@keyframes cineConfirm{0%{filter:brightness(1)}38%{filter:brightness(1.18);transform:scale(.995)}100%{filter:brightness(1)}}
+.related-products{position:relative}
+.cinematic-world-invite{position:relative;overflow:hidden;min-height:360px;padding:62px max(22px,6vw);background:#080808;color:#fff;display:flex;flex-direction:column;justify-content:center;align-items:flex-start}
+.cinematic-world-invite:before{content:'';position:absolute;width:420px;height:420px;border-radius:50%;right:-110px;top:-150px;background:radial-gradient(circle,rgba(107,70,255,.42),rgba(107,70,255,0) 68%);pointer-events:none}
+.cinematic-world-invite>*{position:relative;z-index:1}
+.cinematic-world-invite small{font-size:8px;font-weight:900;letter-spacing:.18em;color:#9e86ff;text-transform:uppercase}
+.cinematic-world-invite h2{max-width:760px;margin:12px 0 16px;font-size:clamp(42px,7vw,92px);line-height:.88;letter-spacing:-.055em}
+.cinematic-world-invite p{max-width:540px;margin:0;color:#aaa;font-size:11px;line-height:1.65}
+.cinematic-world-invite a{display:inline-flex;align-items:center;justify-content:center;min-height:48px;margin-top:24px;padding:0 19px;border-radius:999px;background:#fff;color:#111;text-decoration:none;font-size:9px;font-weight:900;letter-spacing:.08em}
+.cinematic-world-invite a:hover{background:var(--cine-purple);color:#fff}
+@media(max-width:900px){
+  .breadcrumbs{display:none!important}
+  .product-info{padding-top:22px!important}
+  .cinematic-kicker{margin-bottom:8px;font-size:7px}
+  .cinematic-title-row{align-items:center;gap:10px;margin-bottom:7px}
+  .cinematic-title-row .product-save{width:37px;height:37px;flex-basis:37px;font-size:18px!important}
+  .product-info .product-title{font-size:32px!important;line-height:.95!important}
+  .product-info .price{font-size:21px!important;margin-bottom:9px!important}
+  .product-info .product-desire-line{font-size:11px!important;margin-bottom:19px!important}
+  .cinematic-era-line{font-size:7px;margin-top:11px;padding-top:11px}
+  .cinematic-world-invite{min-height:310px;padding:48px 18px}
+  .cinematic-world-invite h2{font-size:13vw;max-width:92%}
+  .cinematic-world-invite p{font-size:10px;max-width:90%}
+}
+@media(max-width:520px){
+  .product-info .product-title{font-size:30px!important}
+  .cinematic-title-row .product-save{width:35px;height:35px;flex-basis:35px}
+  .cinematic-world-invite h2{font-size:14vw}
+}
+@media(prefers-reduced-motion:reduce){.add.primary-conversion.cinematic-confirmed{animation:none}}
