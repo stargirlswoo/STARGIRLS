@@ -1,6 +1,6 @@
 /* STARGIRLS storefront gallery: keep the initial product render light. */
 (function(){
-  const safeUrl=value=>/^https:\/\//i.test(String(value||''))?String(value):'';
+  const safeUrl=value=>/^(?:images\/|https:\/\/)/i.test(String(value||''))?String(value):'';
   const add=(out,u)=>{u=safeUrl(u);if(u&&!out.includes(u))out.push(u);};
 
   window.galleryFor=function(product){
@@ -48,16 +48,8 @@
   }
 
   let scheduled=false;
-  function apply(){
-    scheduled=false;
-    document.querySelectorAll('[data-product-card]').forEach(applyImage);
-  }
-  function schedule(){
-    if(scheduled)return;
-    scheduled=true;
-    requestAnimationFrame(apply);
-  }
-
+  function apply(){scheduled=false;document.querySelectorAll('[data-product-card]').forEach(applyImage);}
+  function schedule(){if(scheduled)return;scheduled=true;requestAnimationFrame(apply);}
   const grid=document.querySelector('[data-product-grid]');
   if(grid)new MutationObserver(schedule).observe(grid,{childList:true,subtree:true});
   schedule();
