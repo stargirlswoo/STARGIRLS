@@ -39,6 +39,21 @@ function categoryName(){
   if(/hat|cap|jacket|short|pant|skirt|bikini|swim/.test(n))return'FASHION';
   return'STARGIRLS';
 }
+function desireLine(){
+  const n=String(source?.name||'').toLowerCase();
+  if(/party\s*(?:till|til)\s*hell/.test(n))return'For the nights that turn into stories.';
+  if(/hoodie|pullover|sweatshirt|sweater/.test(n))return'The layer you reach for first.';
+  if(/hat|cap/.test(n))return'The last piece that makes the fit.';
+  if(/tee|shirt/.test(n))return'The one you keep reaching for.';
+  return'A piece of the STARGIRLS world, made to wear your way.';
+}
+function detailsCopy(){
+  const n=String(source?.name||'').toLowerCase();
+  if(/hoodie|pullover|sweatshirt|sweater/.test(n))return'A STARGIRLS layer built around the artwork and made to live in your rotation. Choose your color and size above.';
+  if(/hat|cap/.test(n))return'A STARGIRLS finishing piece made to pull the whole look together. Choose your available option above.';
+  if(/tee|shirt/.test(n))return'A STARGIRLS tee built around the artwork and made to wear on repeat. Choose your color and size above.';
+  return'A piece from the STARGIRLS world, made to wear your way. Choose your available options above.';
+}
 function loadSnapshot(){
   try{
     const snap=JSON.parse(sessionStorage.getItem(SNAPSHOT_KEY)||'null');
@@ -90,18 +105,15 @@ function render(){
           ${imgs.length?`<div class="thumbs">${imgs.map((u,i)=>`<button type="button" data-img="${i}" class="${i===activeImage?'active':''}" aria-label="View product image ${i+1}"><img src="${esc(u)}" alt="" loading="lazy" decoding="async"></button>`).join('')}</div>`:''}
         </div>
         <div class="product-info">
-          <div class="crumb-rule"></div>
           <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="index.html#catalog">Home</a><span class="dot"></span><a href="index.html#catalog">${esc(cat.charAt(0)+cat.slice(1).toLowerCase())}</a><span class="dot"></span><span>${esc(source?.name||'Product')}</span></nav>
           <h1 class="product-title">${esc(source?.name||'STARGIRLS PIECE')}</h1>
+          <p class="product-desire-line">${esc(desireLine())}</p>
           <div class="price">${Number.isFinite(price)?money(price):'AVAILABLE'}</div>
-          <p class="payment-note">Secure checkout with <strong>Stripe</strong>. Shipping and taxes are calculated at checkout.</p>
           ${showColorOptions(colors)?`<div class="option"><div class="option-label"><span>Color</span><span>${selection.color?esc(selection.color):'Select one'}</span></div><div class="choices">${colors.map(c=>`<button class="choice ${selection.color===c?'active':''}" type="button" data-color="${esc(c)}">${esc(c)}</button>`).join('')}</div></div>`:''}
           ${showSizeOptions(sizes)?`<div class="option"><div class="option-label"><span>Size</span><span>${selection.size?esc(selection.size):'Select one'}</span></div><div class="choices">${sizes.map(s=>`<button class="choice ${selection.size===s?'active':''}" type="button" data-size="${esc(s)}" ${selection.color&&!availableSizes.has(s)?'disabled':''}>${esc(s)}</button>`).join('')}</div></div>`:''}
           <div class="buy-row"><select class="qty-select" id="qty" aria-label="Quantity">${Array.from({length:10},(_,i)=>`<option value="${i+1}" ${selection.qty===i+1?'selected':''}>${i+1}</option>`).join('')}</select><button class="add" type="button" id="add" ${selected?'':'disabled'}>${selected?'ADD TO CART':'SELECT OPTIONS'}</button></div>
-          <button class="stripe-buy" type="button" id="buyNow" ${selected?'':'disabled'}>BUY NOW</button>
-          <div class="more-payment">Secure payment options at checkout</div>
-          <div class="product-details"><details open><summary>PRODUCT DETAILS</summary><p>Official STARGIRLS item produced to order through our fulfillment partner. Choose your exact color and size above where applicable.</p></details><details><summary>SHIPPING + RETURNS</summary><p>Shipping price and delivery estimate are shown at checkout. Made-to-order items follow the STARGIRLS returns policy.</p></details></div>
-          <p class="product-note">Please double-check your selection and shipping information before placing your order.</p>
+          <div class="purchase-security-line">Secure checkout · Shipping shown before payment · No account required</div>
+          <div class="product-details"><details><summary>PRODUCT DETAILS</summary><p>${esc(detailsCopy())}</p></details><details><summary>SHIPPING + RETURNS</summary><p>Shipping cost and delivery estimate are shown before payment. See the STARGIRLS shipping and returns policies for full details.</p></details></div>
         </div>
       </div>
     </section>`;
@@ -110,7 +122,6 @@ function render(){
   app.querySelectorAll('[data-size]').forEach(b=>b.onclick=()=>{selection.size=b.dataset.size;render();});
   const qty=document.getElementById('qty');if(qty)qty.onchange=()=>{selection.qty=Math.max(1,Math.min(10,Number(qty.value)||1));};
   const add=document.getElementById('add');if(add)add.onclick=addToCart;
-  const buyNow=document.getElementById('buyNow');if(buyNow)buyNow.onclick=()=>{addToCart();checkout();};
 }
 function fail(){app.innerHTML=`<div class="error-state"><div><h1>COULDN'T OPEN THIS ITEM</h1><p>This product didn't load correctly.</p><p><a href="index.html#catalog">← BACK TO SHOP</a></p></div></div>`;}
 async function fetchDirect(){
