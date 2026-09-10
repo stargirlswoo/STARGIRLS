@@ -1,7 +1,7 @@
 (()=>{
 'use strict';
 const API='https://stargirls.stargirlswoo.workers.dev';
-const SNAPSHOT_KEY='stargirls-clicked-product-v1';
+const SNAPSHOT_KEY='stargirls-clicked-product-v2';
 const CACHE_KEYS=['stargirls-printful-catalog-v7'];
 const q=new URLSearchParams(location.search);
 const requestedId=q.get('id')||'';
@@ -25,7 +25,6 @@ function variantParts(v){
   const price=Number(v?.price??v?.retail_price);
   const sync=Number(v?.printful_sync_variant_id||v?.sync_variant_id||0);
   const images=[];
-  /* v.images is already curated by the storefront catalog normalizer when a shopper clicks from the store. */
   for(const u of v?.images||[])if(safe(u))images.push(u);
   for(const f of v?.files||[]){if(!cleanFile(f))continue;for(const u of [f?.preview_url,f?.thumbnail_url])if(safe(u))images.push(u);}
   for(const u of [v?.catalog_image,v?.product?.image])if(safe(u))images.push(u);
@@ -36,7 +35,6 @@ function productImages(){
   const out=[];
   const relevant=selection.color?variants.filter(v=>v.color===selection.color):variants;
   for(const v of relevant)for(const u of v.images||[])out.push(u);
-  /* Never lead with the Printful sync-product thumbnail: it can be an unrelated on-model lifestyle photo. */
   if(!out.length){for(const u of [source?.image_url,source?.thumbnail_url])if(safe(u))out.push(u);}
   return uniq(out).slice(0,5);
 }
