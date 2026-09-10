@@ -1,0 +1,12 @@
+/* Layout helpers for image slots controlled from Sveltia CMS. */
+.about-hero-new{isolation:isolate}
+.about-hero-split{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr;z-index:0;background:#080808}
+.about-hero-half{min-width:0;background-size:cover;background-repeat:no-repeat;background-position:center 32%;filter:saturate(.9) contrast(1.04)}
+.about-hero-new:after{z-index:1;background:linear-gradient(180deg,rgba(0,0,0,.08) 5%,rgba(0,0,0,.35) 52%,rgba(0,0,0,.9) 100%)}
+.about-hero-new .page-hero-copy{z-index:2}
+@media(max-width:700px){
+  .about-hero-new{min-height:78svh}
+  .about-hero-split{grid-template-columns:1fr 1fr}
+  .about-hero-half{background-position:center 28%}
+  .about-hero-new .page-hero-copy{padding-bottom:2vh}
+}
