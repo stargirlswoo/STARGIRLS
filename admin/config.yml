@@ -6,7 +6,7 @@ backend:
 
 site_url: https://stargirls.maison
 display_url: https://stargirls.maison
-media_folder: images
+media_folder: /images
 public_folder: /images
 
 media_libraries:
@@ -22,7 +22,7 @@ collections:
         label: WORLD — Homepage
         file: content/home.json
         format: json
-        media_folder: images/home
+        media_folder: /images/home
         public_folder: /images/home
         fields:
           - name: hero
@@ -43,7 +43,7 @@ collections:
         label: MOON + SUN — Main Photos
         file: content/about.json
         format: json
-        media_folder: images/about
+        media_folder: /images/about
         public_folder: /images/about
         fields:
           - name: moon
@@ -61,7 +61,7 @@ collections:
         label: SHOP — Current Era
         file: content/shop.json
         format: json
-        media_folder: images/shop
+        media_folder: /images/shop
         public_folder: /images/shop
         fields:
           - name: hero
@@ -74,7 +74,7 @@ collections:
         label: MUSIC — HAYATI
         file: content/music.json
         format: json
-        media_folder: images/music
+        media_folder: /images/music
         public_folder: /images/music
         fields:
           - name: hero
@@ -90,7 +90,7 @@ collections:
         label: JUNO — Fragrance
         file: content/juno.json
         format: json
-        media_folder: images/juno
+        media_folder: /images/juno
         public_folder: /images/juno
         fields:
           - { name: hero, label: "JUNO Hero", widget: image, required: false }
@@ -102,7 +102,7 @@ collections:
         label: ANEW — Archive / Era
         file: content/anew.json
         format: json
-        media_folder: images/anew
+        media_folder: /images/anew
         public_folder: /images/anew
         fields:
           - { name: hero, label: "ANEW Hero", widget: image, required: false }
