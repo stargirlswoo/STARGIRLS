@@ -11,14 +11,20 @@
 
   async function read(file){
     try{
-      const response=await fetch(`content/${file}.json?cms=${Date.now()}`,{cache:'no-store'});
+      const response=await fetch(`/content/${file}.json?cms=${Date.now()}`,{
+        cache:'no-store',
+        headers:{'cache-control':'no-cache'}
+      });
       return response.ok?await response.json():{};
     }catch{return{};}
   }
 
   function bg(selector,value){
     const url=clean(value);if(!url)return;
-    document.querySelectorAll(selector).forEach(el=>{el.style.backgroundImage=`url("${url.replace(/["\\]/g,'')}")`;});
+    const safe=url.replace(/["\\]/g,'');
+    document.querySelectorAll(selector).forEach(el=>{
+      el.style.setProperty('background-image',`url("${safe}")`,'important');
+    });
   }
 
   function img(selector,value){
@@ -60,10 +66,11 @@
     bg('[data-cms-juno-mood]',data.mood);
   }
 
-  const page=(location.pathname.split('/').pop()||'index.html').toLowerCase();
-  if(page==='index.html'||page==='')home();
-  else if(page==='shop.html')shop();
-  else if(page==='about.html')about();
-  else if(page==='music.html')music();
-  else if(page==='fragrance.html')juno();
+  // Detect the actual CMS hooks on the rendered page instead of depending on
+  // whether the host serves /music, /music.html, or another rewritten URL.
+  if(document.querySelector('[data-cms-home-hero],[data-cms-home-hayati],[data-cms-home-moon],[data-cms-home-sun],[data-cms-home-juno]'))home();
+  if(document.querySelector('[data-cms-shop-hero]'))shop();
+  if(document.querySelector('[data-cms-about-moon],[data-cms-about-sun]'))about();
+  if(document.querySelector('[data-cms-music-hero],[data-cms-music-merch]'))music();
+  if(document.querySelector('[data-cms-juno-hero],img[data-cms-juno-product],img[data-cms-juno-detail],[data-cms-juno-mood]'))juno();
 })();
