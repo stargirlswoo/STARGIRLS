@@ -4,14 +4,13 @@
 const WISH_KEY='stargirls-wishlist-v1';
 const RECENT_KEY='stargirls-recent-v1';
 const VISIT_KEY='stargirls-last-visit-v1';
-const SNAPSHOT_KEY='stargirls-clicked-product-v1';
 const isProduct=!!document.getElementById('app')&&/product\.html/i.test(location.pathname);
 const isStore=!!document.querySelector('[data-product-grid]');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const safe=u=>/^(?:images\/|https:\/\/)/i.test(String(u||''))?String(u):'';
 function read(key,fallback){try{const x=JSON.parse(localStorage.getItem(key)||'null');return x??fallback}catch{return fallback}}
 function write(key,value){try{localStorage.setItem(key,JSON.stringify(value))}catch{}}
-function wishlist(){const x=read(WISH_KEY,[]);return Array.isArray(x)?x:[]}
+function wishlist(){const x=read(WISH_KEY,[]);return Array.isArray(x)?x.map(String):[]}
 function setWishlist(x){write(WISH_KEY,[...new Set(x.map(String))])}
 function recent(){const x=read(RECENT_KEY,[]);return Array.isArray(x)?x:[]}
 function setRecent(x){write(RECENT_KEY,x.slice(0,8))}
@@ -31,7 +30,7 @@ function dynamicStatus(){
   if(!matchMedia('(prefers-reduced-motion: reduce)').matches)setInterval(set,5200);
 }
 function toggleWish(id,button){
-  const list=wishlist();const key=String(id);const saved=list.includes(key);const next=saved?list.filter(x=>x!==key):[key,...list];setWishlist(next);syncWishButtons();burst(button);toast(saved?'REMOVED FROM SAVED':'SAVED ★');
+  const list=wishlist();const key=String(id);const saved=list.includes(key);setWishlist(saved?list.filter(x=>x!==key):[key,...list]);syncWishButtons();renderSavedSection();burst(button);toast(saved?'REMOVED FROM SAVED':'SAVED ★');
 }
 function syncWishButtons(){
   const list=wishlist();
@@ -47,19 +46,29 @@ function enhanceStoreCards(){
   syncWishButtons();
 }
 function imageFromCard(card){const img=card.querySelector('.catalog-card-image img')?.src;if(img)return img;const bg=card.querySelector('.catalog-card-image')?.style?.backgroundImage||'';const m=bg.match(/url\(["']?(.*?)["']?\)/);return m?.[1]||''}
+function cardData(card){return{id:card.dataset.productCard||'',name:card.querySelector('.catalog-meta strong')?.textContent?.trim()||'STARGIRLS ITEM',price:card.querySelector('.catalog-price')?.textContent?.trim()||'VIEW ITEM',image:imageFromCard(card)}}
+function openOriginal(id){const card=document.querySelector(`[data-product-card="${CSS.escape(String(id))}"]`);if(card){card.click();return true}return false}
+function miniCard(x,label='FROM THE DROP',attr=''){return `<button class="sg-mini-card" type="button" ${attr}><div class="sg-mini-image">${safe(x.image)?`<img src="${esc(x.image)}" alt="${esc(x.name)}" loading="lazy" decoding="async">`:''}</div><div class="sg-mini-copy"><small>${esc(label)}</small><strong>${esc(x.name)}</strong><span>${esc(x.price||'VIEW ITEM')} →</span></div></button>`}
 function injectFeatured(){
   if(!isStore||document.querySelector('.sg-featured'))return;
   const cards=[...document.querySelectorAll('[data-product-card]')].filter(c=>c.querySelector('.catalog-meta strong')).slice(0,3);if(!cards.length)return;
-  const section=document.createElement('section');section.className='sg-featured';section.innerHTML=`<div class="sg-section-head"><div><p>START HERE</p><h2>FEATURED RIGHT NOW</h2></div><span>A quick way into the current STARGIRLS drop.</span></div><div class="sg-card-rail">${cards.map((c,i)=>{const id=c.dataset.productCard,name=c.querySelector('.catalog-meta strong')?.textContent?.trim()||'STARGIRLS ITEM',price=c.querySelector('.catalog-price')?.textContent?.trim()||'VIEW ITEM',img=imageFromCard(c);return `<button class="sg-mini-card" type="button" data-feature-id="${esc(id)}"><div class="sg-mini-image">${safe(img)?`<img src="${esc(img)}" alt="${esc(name)}" loading="lazy" decoding="async">`:''}</div><div class="sg-mini-copy"><small>${i===0?'FEATURED':'FROM THE DROP'}</small><strong>${esc(name)}</strong><span>${esc(price)} →</span></div></button>`}).join('')}</div>`;
-  const catalog=document.querySelector('.catalog-section');catalog?.insertAdjacentElement('beforebegin',section);
-  section.querySelectorAll('[data-feature-id]').forEach(b=>b.addEventListener('click',()=>{document.querySelector(`[data-product-card="${CSS.escape(b.dataset.featureId)}"]`)?.click()}));
+  const section=document.createElement('section');section.className='sg-featured';section.innerHTML=`<div class="sg-section-head"><div><p>START HERE</p><h2>FEATURED RIGHT NOW</h2></div><span>A quick way into the current STARGIRLS drop.</span></div><div class="sg-card-rail">${cards.map((c,i)=>{const x=cardData(c);return miniCard(x,i===0?'FEATURED':'FROM THE DROP',`data-feature-id="${esc(x.id)}"`)}).join('')}</div>`;
+  document.querySelector('.catalog-section')?.insertAdjacentElement('beforebegin',section);
+  section.querySelectorAll('[data-feature-id]').forEach(b=>b.addEventListener('click',()=>openOriginal(b.dataset.featureId)));
 }
 function injectSavedChip(){
-  if(!isStore||document.querySelector('.sg-saved-chip'))return;const tabs=document.querySelector('.shop-tabs');if(!tabs)return;const chip=document.createElement('div');chip.className='sg-saved-chip';chip.innerHTML='♡ SAVED <strong data-saved-count>0</strong>';tabs.insertAdjacentElement('afterend',chip);syncWishButtons();
+  if(!isStore||document.querySelector('.sg-saved-chip'))return;const tabs=document.querySelector('.shop-tabs');if(!tabs)return;const chip=document.createElement('button');chip.type='button';chip.className='sg-saved-chip';chip.innerHTML='♡ SAVED <strong data-saved-count>0</strong>';chip.onclick=()=>{renderSavedSection(true);document.querySelector('.sg-saved')?.scrollIntoView({behavior:'smooth',block:'start'})};tabs.insertAdjacentElement('afterend',chip);syncWishButtons();
 }
+function renderSavedSection(forceOpen=false){
+  if(!isStore)return;const old=document.querySelector('.sg-saved');const ids=wishlist();const map=new Map([...document.querySelectorAll('[data-product-card]')].map(c=>[String(c.dataset.productCard),cardData(c)]));const items=ids.map(id=>map.get(id)).filter(Boolean);
+  if(!items.length){old?.remove();return}
+  if(old&&!forceOpen){const rail=old.querySelector('.sg-card-rail');if(rail)rail.innerHTML=items.slice(0,4).map(x=>miniCard(x,'SAVED',`data-saved-open="${esc(x.id)}"`)).join('');wireSaved(old);return}
+  old?.remove();const section=document.createElement('section');section.className='sg-saved';section.innerHTML=`<div class="sg-section-head"><div><p>YOUR PICKS</p><h2>SAVED ITEMS</h2></div><span>Saved on this device so you can come back without hunting for them.</span></div><div class="sg-card-rail">${items.slice(0,4).map(x=>miniCard(x,'SAVED',`data-saved-open="${esc(x.id)}"`)).join('')}</div>`;const anchor=document.querySelector('.sg-featured')||document.querySelector('.catalog-section');anchor?.insertAdjacentElement('afterend',section);wireSaved(section);
+}
+function wireSaved(section){section.querySelectorAll('[data-saved-open]').forEach(b=>b.onclick=()=>openOriginal(b.dataset.savedOpen))}
 function injectRecent(){
-  if(!isStore||document.querySelector('.sg-recent'))return;const items=recent().filter(x=>x&&x.href&&x.name).slice(0,4);if(!items.length)return;
-  const section=document.createElement('section');section.className='sg-recent';section.innerHTML=`<div class="sg-section-head"><div><p>YOU WERE LOOKING AT</p><h2>RECENTLY VIEWED</h2></div><span>Your recent STARGIRLS pieces stay here on this device.</span></div><div class="sg-card-rail">${items.map(x=>`<a class="sg-mini-card" href="${esc(x.href)}"><div class="sg-mini-image">${safe(x.image)?`<img src="${esc(x.image)}" alt="${esc(x.name)}" loading="lazy" decoding="async">`:''}</div><div class="sg-mini-copy"><small>RECENT</small><strong>${esc(x.name)}</strong><span>${esc(x.price||'VIEW ITEM')} →</span></div></a>`).join('')}</div>`;document.querySelector('.catalog-section')?.insertAdjacentElement('afterend',section);
+  if(!isStore||document.querySelector('.sg-recent'))return;const items=recent().filter(x=>x&&x.name).slice(0,4);if(!items.length)return;
+  const section=document.createElement('section');section.className='sg-recent';section.innerHTML=`<div class="sg-section-head"><div><p>YOU WERE LOOKING AT</p><h2>RECENTLY VIEWED</h2></div><span>Your recent STARGIRLS pieces stay here on this device.</span></div><div class="sg-card-rail">${items.map(x=>miniCard(x,'RECENT',`data-recent-id="${esc(x.id)}"`)).join('')}</div>`;document.querySelector('.catalog-section')?.insertAdjacentElement('afterend',section);section.querySelectorAll('[data-recent-id]').forEach(b=>b.onclick=()=>openOriginal(b.dataset.recentId));
 }
 function currentProductId(){const q=new URLSearchParams(location.search);return q.get('id')||''}
 function enhanceProduct(){
@@ -68,7 +77,7 @@ function enhanceProduct(){
   syncWishButtons();recordCurrentProduct();
 }
 function recordCurrentProduct(){
-  const id=currentProductId();const title=document.querySelector('.product-title')?.textContent?.trim();if(!id||!title)return;const price=document.querySelector('.price')?.textContent?.trim()||'';const image=document.querySelector('.hero-stage img')?.src||'';const item={id,name:title,price,image,href:location.pathname.split('/').pop()+location.search,ts:Date.now()};const next=[item,...recent().filter(x=>x.id!==id)].slice(0,8);setRecent(next);
+  const id=currentProductId();const title=document.querySelector('.product-title')?.textContent?.trim();if(!id||!title)return;const price=document.querySelector('.price')?.textContent?.trim()||'';const image=document.querySelector('.hero-stage img')?.src||'';const item={id,name:title,price,image,href:location.pathname.split('/').pop()+location.search,ts:Date.now()};setRecent([item,...recent().filter(x=>x.id!==id)]);
 }
 function cartMomentum(){
   const foot=document.querySelector('.cart-foot,.cart-footer');if(!foot)return;let el=foot.querySelector('.sg-cart-momentum');if(!el){el=document.createElement('div');el.className='sg-cart-momentum';foot.insertBefore(el,foot.firstChild)}
@@ -76,13 +85,15 @@ function cartMomentum(){
   el.innerHTML=count?`<strong>${count} ${count===1?'PIECE':'PIECES'}</strong> IN YOUR BAG ★`:'YOUR BAG IS READY WHEN YOU ARE.';
 }
 function wireRewards(){
-  document.addEventListener('click',e=>{const add=e.target.closest?.('#add,[data-add-to-cart]');if(add&&!add.disabled){setTimeout(()=>{burst(add);toast('ADDED TO YOUR BAG ★');cartMomentum()},20)}},true);
+  document.addEventListener('click',e=>{
+    const add=e.target.closest?.('#add,[data-add-to-cart]');if(add&&!add.disabled)setTimeout(()=>{burst(add);toast('ADDED TO YOUR BAG ★');cartMomentum()},20);
+    if(e.target.closest?.('[data-cart-inc],[data-cart-dec],[data-cart-remove],[data-remove]'))setTimeout(cartMomentum,30);
+  },true);
 }
-function apply(){if(isStore){enhanceStoreCards();injectFeatured();injectSavedChip();injectRecent()}if(isProduct)enhanceProduct();cartMomentum()}
+function apply(){if(isStore){enhanceStoreCards();injectFeatured();injectSavedChip();renderSavedSection();injectRecent()}if(isProduct)enhanceProduct();cartMomentum()}
 let queued=false;function schedule(){if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;apply()})}
 dynamicStatus();wireRewards();
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule);else schedule();
 const grid=document.querySelector('[data-product-grid]');if(grid)new MutationObserver(schedule).observe(grid,{childList:true,subtree:true});
 if(isProduct)new MutationObserver(schedule).observe(document.getElementById('app'),{childList:true,subtree:true});
-new MutationObserver(cartMomentum).observe(document.body,{childList:true,subtree:true});
 })();
