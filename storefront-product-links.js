@@ -1,55 +1,20 @@
-/* STARGIRLS storefront: cards open the exact current Printful product + load one unified experience layer. */
+/* STARGIRLS storefront: cards open exact current Printful products + compact conversion/Club layers. */
 (function(){
   const SNAPSHOT_KEY='stargirls-clicked-product-v1';
   function ensureExperienceAssets(){
     if(!document.querySelector('link[data-store-conversion]')){
-      const css=document.createElement('link');css.rel='stylesheet';css.href='storefront-conversion.css?v=20260910n';css.dataset.storeConversion='1';document.head.appendChild(css);
+      const css=document.createElement('link');css.rel='stylesheet';css.href='storefront-conversion.css?v=20260910p';css.dataset.storeConversion='1';document.head.appendChild(css);
     }
     if(!document.querySelector('script[data-store-conversion]')){
-      const js=document.createElement('script');js.src='storefront-conversion.js?v=20260910n';js.defer=true;js.dataset.storeConversion='1';document.body.appendChild(js);
+      const js=document.createElement('script');js.src='storefront-conversion.js?v=20260910p';js.defer=true;js.dataset.storeConversion='1';document.body.appendChild(js);
     }
     if(!document.querySelector('script[data-store-retention]')){
-      const extra=document.createElement('script');extra.src='storefront-retention.js?v=20260910c';extra.defer=true;extra.dataset.storeRetention='1';document.body.appendChild(extra);
+      const extra=document.createElement('script');extra.src='storefront-retention.js?v=20260910d';extra.defer=true;extra.dataset.storeRetention='1';document.body.appendChild(extra);
     }
   }
-  function productFor(id){try{return typeof products!=='undefined'?products.find(p=>p.id===id):null;}catch{return null;}}
-  function destination(id){
-    if(id==='juno-edp')return'fragrance.html';
-    const p=productFor(id);
-    const dynamic=/^printful-(\d+)$/.exec(String(id||''));
-    const pfid=Number(p?.printful_product_id||dynamic?.[1]||0);
-    const q=new URLSearchParams({v:'20260910o',id:String(id)});
-    if(pfid>0)q.set('pf',String(pfid));
-    return`product.html?${q.toString()}`;
-  }
-  function saveSnapshot(id){
-    const p=productFor(id);
-    const dynamic=/^printful-(\d+)$/.exec(String(id||''));
-    const pfid=Number(p?.printful_product_id||dynamic?.[1]||0);
-    if(!pfid)return;
-    let source=null;
-    try{source=(window.__SG_PRINTFUL_CATALOG?.products||[]).find(x=>Number(x.id)===pfid)||null;}catch{}
-    if(!source&&p){source={id:pfid,name:p.name||'STARGIRLS PIECE',thumbnail_url:p.image||null,image_url:p.image||null,variants:Array.isArray(p.variants)?p.variants:[]};}
-    if(!source)return;
-    try{sessionStorage.setItem(SNAPSHOT_KEY,JSON.stringify({ts:Date.now(),id:String(id),pfid,source}));}catch{}
-  }
-  function apply(){
-    document.querySelectorAll('[data-product-card]').forEach(card=>{
-      const id=card.dataset.productCard;
-      if(!id||card.dataset.productLinked==='1')return;
-      card.dataset.productLinked='1';
-      card.setAttribute('role','link');
-      card.setAttribute('tabindex','0');
-      card.style.cursor='pointer';
-      const go=()=>{saveSnapshot(id);location.href=destination(id);};
-      card.addEventListener('click',e=>{if(e.target.closest('button,a,input,select,summary,details'))return;go();});
-      card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}});
-      const image=card.querySelector('[data-main-image]');
-      if(image){image.style.cursor='pointer';image.setAttribute('aria-label',`Open ${id.replaceAll('-',' ')} product page`);}
-    });
-  }
-  ensureExperienceAssets();
-  const grid=document.querySelector('[data-product-grid]');
-  if(grid)new MutationObserver(apply).observe(grid,{childList:true});
-  apply();
+  function productFor(id){try{return typeof products!=='undefined'?products.find(p=>p.id===id):null}catch{return null}}
+  function destination(id){if(id==='juno-edp')return'fragrance.html';const p=productFor(id),dynamic=/^printful-(\d+)$/.exec(String(id||'')),pfid=Number(p?.printful_product_id||dynamic?.[1]||0),q=new URLSearchParams({v:'20260910p',id:String(id)});if(pfid>0)q.set('pf',String(pfid));return`product.html?${q.toString()}`}
+  function saveSnapshot(id){const p=productFor(id),dynamic=/^printful-(\d+)$/.exec(String(id||'')),pfid=Number(p?.printful_product_id||dynamic?.[1]||0);if(!pfid)return;let source=null;try{source=(window.__SG_PRINTFUL_CATALOG?.products||[]).find(x=>Number(x.id)===pfid)||null}catch{}if(!source&&p)source={id:pfid,name:p.name||'STARGIRLS PIECE',thumbnail_url:p.image||null,image_url:p.image||null,variants:Array.isArray(p.variants)?p.variants:[]};if(!source)return;try{sessionStorage.setItem(SNAPSHOT_KEY,JSON.stringify({ts:Date.now(),id:String(id),pfid,source}))}catch{}}
+  function apply(){document.querySelectorAll('[data-product-card]').forEach(card=>{const id=card.dataset.productCard;if(!id||card.dataset.productLinked==='1')return;card.dataset.productLinked='1';card.setAttribute('role','link');card.setAttribute('tabindex','0');card.style.cursor='pointer';const go=()=>{saveSnapshot(id);location.href=destination(id)};card.addEventListener('click',e=>{if(e.target.closest('button,a,input,select,summary,details'))return;go()});card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go()}});const image=card.querySelector('[data-main-image]');if(image){image.style.cursor='pointer';image.setAttribute('aria-label',`Open ${id.replaceAll('-',' ')} product page`)}})}
+  ensureExperienceAssets();const grid=document.querySelector('[data-product-grid]');if(grid)new MutationObserver(apply).observe(grid,{childList:true});apply();
 })();
