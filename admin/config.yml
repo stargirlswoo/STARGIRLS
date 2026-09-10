@@ -4,7 +4,9 @@ backend:
   branch: main
   auth_methods: [token]
 
-media_folder: /images
+site_url: https://stargirls.maison
+display_url: https://stargirls.maison
+media_folder: images
 public_folder: /images
 
 media_libraries:
@@ -13,340 +15,80 @@ media_libraries:
       slugify_filename: true
 
 collections:
-
-  - name: site
-    label: STARGIRLS
-
+  - name: cinematic_site
+    label: STARGIRLS — SITE IMAGES
     files:
-
-      # HOMEPAGE
       - name: home
-        label: Homepage
+        label: WORLD — Homepage
         file: content/home.json
         format: json
-
-        media_folder: /images/home
+        media_folder: images/home
         public_folder: /images/home
-
         fields:
-          - name: hero
-            label: Homepage Hero
-            widget: image
-            required: false
+          - { name: hero, label: "SCENE 00 — YOU FOUND US / Homepage Hero", widget: image, required: false }
+          - { name: hayati, label: "SCENE 02 — HAYATI / Soundtrack Image", widget: image, required: false }
+          - { name: moon, label: "SCENE 03 — Moon Photo", widget: image, required: false }
+          - { name: sun, label: "SCENE 03 — Sun Photo", widget: image, required: false }
+          - { name: juno, label: "SCENE 04 — JUNO Image", widget: image, required: false }
 
-          - name: siren
-            label: SIREN Photo
-            widget: image
-            required: false
+      - name: shop
+        label: SHOP — Current Era
+        file: content/shop.json
+        format: json
+        media_folder: images/shop
+        public_folder: /images/shop
+        fields:
+          - { name: hero, label: "Shop Hero", widget: image, required: false }
 
-          - name: risen
-            label: RISEN Photo
-            widget: image
-            required: false
-
-          - name: stargirls
-            label: STARGIRLS Photo
-            widget: image
-            required: false
-
-          - name: world_bts
-            label: Our World — Behind The Scenes
-            widget: image
-            required: false
-
-          - name: world_life
-            label: Our World — Life
-            widget: image
-            required: false
-
-          - name: world_studio
-            label: Our World — Studio
-            widget: image
-            required: false
-
-          - name: world_travel
-            label: Our World — Travel
-            widget: image
-            required: false
-
-          - name: shop
-            label: Shop Photo
-            widget: image
-            required: false
-
-
-      # ABOUT
       - name: about
-        label: About
+        label: MOON + SUN — YOU FOUND US
         file: content/about.json
         format: json
-
-        media_folder: /images/about
+        media_folder: images/about
         public_folder: /images/about
-
         fields:
-          - name: hero
-            label: About Hero Photo
-            widget: image
-            required: false
+          - { name: moon, label: "Moon Photo — Hero + Cast Card", widget: image, required: false }
+          - { name: sun, label: "Sun Photo — Hero + Cast Card", widget: image, required: false }
 
-          - name: photo_break
-            label: Candid Photo Break
-            widget: image
-            required: false
-
-          - name: sun
-            label: Sun Photo
-            widget: image
-            required: false
-
-          - name: moon
-            label: Moon Photo
-            widget: image
-            required: false
-
-          - name: photos
-            label: Life Lately
-            label_singular: Photo
-            widget: list
-            summary: "{{fields.caption}}"
-
-            fields:
-              - name: image
-                label: Photo
-                widget: image
-
-              - name: caption
-                label: Caption
-                widget: string
-                required: false
-
-              - name: alt
-                label: Photo Description
-                widget: string
-                required: false
-
-
-      # OUR WORLD
-      - name: world
-        label: Our World
-        file: content/world.json
+      - name: music
+        label: MUSIC — HAYATI
+        file: content/music.json
         format: json
-
-        media_folder: /images/world
-        public_folder: /images/world
-
+        media_folder: images/music
+        public_folder: /images/music
         fields:
-          - name: hero
-            label: Our World Hero Photo
-            widget: image
-            required: false
+          - { name: hero, label: "HAYATI Hero", widget: image, required: false }
+          - { name: merch_scene, label: "Wear The Era / Merch Scene", widget: image, required: false }
 
-          - name: photos
-            label: Camera Roll
-            label_singular: Photo
-            widget: list
-            summary: "{{fields.caption}}"
+      - name: juno
+        label: JUNO — Fragrance
+        file: content/juno.json
+        format: json
+        media_folder: images/juno
+        public_folder: /images/juno
+        fields:
+          - { name: hero, label: "JUNO Hero", widget: image, required: false }
+          - { name: product, label: "Main Product Photo", widget: image, required: false }
+          - { name: detail, label: "Campaign Detail", widget: image, required: false }
+          - { name: mood, label: "Mood Scene", widget: image, required: false }
 
-            fields:
-              - name: image
-                label: Photo
-                widget: image
-
-              - name: caption
-                label: Caption
-                widget: string
-                required: false
-
-              - name: alt
-                label: Photo Description
-                widget: string
-                required: false
-
-
-      # ANEW
       - name: anew
-        label: ANEW
+        label: ANEW — Archive / Era
         file: content/anew.json
         format: json
-
-        media_folder: /images/anew
+        media_folder: images/anew
         public_folder: /images/anew
-
         fields:
-          - name: hero
-            label: ANEW Hero Photo
-            widget: image
-            required: false
-
-          - name: cover
-            label: ANEW Cover
-            widget: image
-            required: false
-
-          - name: personal_break
-            label: Behind-the-Scenes Candid
-            widget: image
-            required: false
-
+          - { name: hero, label: "ANEW Hero", widget: image, required: false }
+          - { name: cover, label: "ANEW Cover", widget: image, required: false }
+          - { name: personal_break, label: "Behind-the-Scenes Candid", widget: image, required: false }
           - name: photos
             label: ANEW Photo Diary
             label_singular: Photo
             widget: list
+            required: false
             summary: "{{fields.caption}}"
-
             fields:
-              - name: image
-                label: Photo
-                widget: image
-
-              - name: caption
-                label: Caption
-                widget: string
-                required: false
-
-              - name: alt
-                label: Photo Description
-                widget: string
-                required: false
-
-
-      # JUNOON
-      - name: junoon
-        label: JUNOON
-        file: content/junoon.json
-        format: json
-
-        media_folder: /images/junoon
-        public_folder: /images/junoon
-
-        fields:
-          - name: hero
-            label: JUNOON Hero Photo
-            widget: image
-            required: false
-
-          - name: photo_break
-            label: JUNOON Second Photo
-            widget: image
-            required: false
-
-          - name: juno_image
-            label: JUNO Fragrance Photo
-            widget: image
-            required: false
-
-          - name: photos
-            label: Making JUNOON
-            label_singular: Photo
-            widget: list
-            summary: "{{fields.caption}}"
-
-            fields:
-              - name: image
-                label: Photo
-                widget: image
-
-              - name: caption
-                label: Caption
-                widget: string
-                required: false
-
-              - name: alt
-                label: Photo Description
-                widget: string
-                required: false
-
-
-      # JUNO
-      - name: juno
-        label: JUNO
-        file: content/juno.json
-        format: json
-
-        media_folder: /images/juno
-        public_folder: /images/juno
-
-        fields:
-          - name: hero
-            label: JUNO Hero Photo
-            widget: image
-            required: false
-
-          - name: product
-            label: Main Product Photo
-            widget: image
-            required: false
-
-          - name: photo_break
-            label: JUNO Campaign Photo
-            widget: image
-            required: false
-
-          - name: photos
-            label: Making JUNO
-            label_singular: Photo
-            widget: list
-            summary: "{{fields.caption}}"
-
-            fields:
-              - name: image
-                label: Photo
-                widget: image
-
-              - name: caption
-                label: Caption
-                widget: string
-                required: false
-
-              - name: alt
-                label: Photo Description
-                widget: string
-                required: false
-
-
-      # SHOP
-      - name: shop
-        label: Shop
-        file: content/shop.json
-        format: json
-
-        media_folder: /images/shop
-        public_folder: /images/shop
-
-        fields:
-          - name: feature
-            label: JUNO Shop Feature
-            widget: image
-            required: false
-
-          - name: product
-            label: JUNO Product Photo
-            widget: image
-            required: false
-
-          - name: junoon
-            label: JUNOON Shop Photo
-            widget: image
-            required: false
-
-          - name: photos
-            label: Making JUNO
-            label_singular: Photo
-            widget: list
-            summary: "{{fields.caption}}"
-
-            fields:
-              - name: image
-                label: Photo
-                widget: image
-
-              - name: caption
-                label: Caption
-                widget: string
-                required: false
-
-              - name: alt
-                label: Photo Description
-                widget: string
-                required: false
+              - { name: image, label: Photo, widget: image }
+              - { name: caption, label: Caption, widget: string, required: false }
+              - { name: alt, label: Photo Description, widget: string, required: false }
