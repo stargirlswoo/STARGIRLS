@@ -3,10 +3,10 @@
   const SNAPSHOT_KEY='stargirls-clicked-product-v1';
   function ensureExperienceAssets(){
     if(!document.querySelector('link[data-store-conversion]')){
-      const css=document.createElement('link');css.rel='stylesheet';css.href='storefront-conversion.css?v=20260910k';css.dataset.storeConversion='1';document.head.appendChild(css);
+      const css=document.createElement('link');css.rel='stylesheet';css.href='storefront-conversion.css?v=20260910n';css.dataset.storeConversion='1';document.head.appendChild(css);
     }
     if(!document.querySelector('script[data-store-conversion]')){
-      const js=document.createElement('script');js.src='storefront-conversion.js?v=20260910k';js.defer=true;js.dataset.storeConversion='1';document.body.appendChild(js);
+      const js=document.createElement('script');js.src='storefront-conversion.js?v=20260910n';js.defer=true;js.dataset.storeConversion='1';document.body.appendChild(js);
     }
   }
   function productFor(id){try{return typeof products!=='undefined'?products.find(p=>p.id===id):null;}catch{return null;}}
@@ -15,7 +15,7 @@
     const p=productFor(id);
     const dynamic=/^printful-(\d+)$/.exec(String(id||''));
     const pfid=Number(p?.printful_product_id||dynamic?.[1]||0);
-    const q=new URLSearchParams({v:'20260910k',id:String(id)});
+    const q=new URLSearchParams({v:'20260910n',id:String(id)});
     if(pfid>0)q.set('pf',String(pfid));
     return`product.html?${q.toString()}`;
   }
