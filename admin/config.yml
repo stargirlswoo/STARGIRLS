@@ -25,11 +25,37 @@ collections:
         media_folder: images/home
         public_folder: /images/home
         fields:
-          - { name: hero, label: "SCENE 00 — YOU FOUND US / Homepage Hero", widget: image, required: false }
-          - { name: hayati, label: "SCENE 02 — HAYATI / Soundtrack Image", widget: image, required: false }
-          - { name: moon, label: "SCENE 03 — Moon Photo", widget: image, required: false }
-          - { name: sun, label: "SCENE 03 — Sun Photo", widget: image, required: false }
-          - { name: juno, label: "SCENE 04 — JUNO Image", widget: image, required: false }
+          - name: hero
+            label: SCENE 00 — COME WITH US / Homepage Hero
+            widget: image
+            required: false
+            hint: The giant image visitors see first on stargirls.maison.
+          - name: hayati
+            label: SCENE 02 — HAYATI / Soundtrack Image
+            widget: image
+            required: false
+          - name: juno
+            label: SCENE 04 — JUNO Image
+            widget: image
+            required: false
+
+      - name: about
+        label: MOON + SUN — Main Photos
+        file: content/about.json
+        format: json
+        media_folder: images/about
+        public_folder: /images/about
+        fields:
+          - name: moon
+            label: Moon Photo
+            widget: image
+            required: false
+            hint: Changes Moon on the WORLD homepage AND the YOU FOUND US page.
+          - name: sun
+            label: Sun Photo
+            widget: image
+            required: false
+            hint: Changes Sun on the WORLD homepage AND the YOU FOUND US page.
 
       - name: shop
         label: SHOP — Current Era
@@ -38,17 +64,11 @@ collections:
         media_folder: images/shop
         public_folder: /images/shop
         fields:
-          - { name: hero, label: "Shop Hero", widget: image, required: false }
-
-      - name: about
-        label: MOON + SUN — YOU FOUND US
-        file: content/about.json
-        format: json
-        media_folder: images/about
-        public_folder: /images/about
-        fields:
-          - { name: moon, label: "Moon Photo — Hero + Cast Card", widget: image, required: false }
-          - { name: sun, label: "Sun Photo — Hero + Cast Card", widget: image, required: false }
+          - name: hero
+            label: Shop Hero
+            widget: image
+            required: false
+            hint: Large image above the product grid.
 
       - name: music
         label: MUSIC — HAYATI
@@ -57,8 +77,14 @@ collections:
         media_folder: images/music
         public_folder: /images/music
         fields:
-          - { name: hero, label: "HAYATI Hero", widget: image, required: false }
-          - { name: merch_scene, label: "Wear The Era / Merch Scene", widget: image, required: false }
+          - name: hero
+            label: HAYATI Hero
+            widget: image
+            required: false
+          - name: merch_scene
+            label: Wear The Era / Merch Scene
+            widget: image
+            required: false
 
       - name: juno
         label: JUNO — Fragrance
