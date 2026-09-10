@@ -2,15 +2,19 @@
 
 /* 2026-09-10 PHOTO DIRECTION — fewer images, stronger jobs, one cinematic grade. */
 .world-page .cine-hero-bg,.world-page .page-hero-bg,.world-page .scene-split-media,.world-page .duo-photo{filter:saturate(.88) contrast(1.07) brightness(.93);-webkit-filter:saturate(.88) contrast(1.07) brightness(.93)}
-.world-page .cine-hero-bg,.world-page .page-hero-bg{background-position:center 30%!important}
+/* One image, one job: homepage = invitation; about = the duo; music = soundtrack; JUNO = fragrance. */
+.world-page .about-hero-new .page-hero-bg{background-image:url('images/home/img_3146.jpeg')!important;background-position:center 26%!important}
+.world-page .music-hero .page-hero-bg{background-image:url('images/home/img_1571.jpeg')!important;background-position:center 32%!important}
+.world-page .juno-hero-new .page-hero-bg{background-image:url('images/juno/img_1724.jpeg')!important;background-position:center 45%!important}
+.world-page .cine-hero-bg,.world-page .page-hero-bg{background-position:center 30%}
 .world-page .scene-split-media{background-position:center 38%!important}
 .world-page .duo-photo{background-position:center 24%!important}
 .world-page .cine-hero:after,.world-page .page-hero:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(22,4,8,.02),rgba(8,8,8,.08) 45%,rgba(8,8,8,.2)),radial-gradient(circle at 82% 18%,rgba(107,70,255,.08),transparent 34%);mix-blend-mode:multiply;z-index:1}
 .world-page .cine-hero-copy,.world-page .page-hero-copy{position:relative;z-index:2}
 .world-page .juno-gallery-new img{filter:saturate(.9) contrast(1.08) brightness(.94);-webkit-filter:saturate(.9) contrast(1.08) brightness(.94)}
-/* The old three-photo lore strip read like a miscellaneous gallery. Keep the narrative moving instead. */
+/* The old three-photo lore strips read like miscellaneous galleries. */
 .world-page .image-strip{display:none!important}
 /* Remove decorative/repeated imagery on small screens: one strong frame beats a collage. */
-@media(max-width:800px){.world-page .cine-hero-bg,.world-page .page-hero-bg{background-position:center 25%!important}.world-page .scene-split-media{min-height:62svh;background-position:center 28%!important}.world-page .duo-photo{background-position:center 20%!important}.world-page .juno-gallery-stack img:nth-child(n+2){display:none!important}}
+@media(max-width:800px){.world-page .cine-hero-bg{background-position:center 25%!important}.world-page .about-hero-new .page-hero-bg{background-position:center 20%!important}.world-page .music-hero .page-hero-bg{background-position:center 28%!important}.world-page .scene-split-media{min-height:62svh;background-position:center 28%!important}.world-page .duo-photo{background-position:center 20%!important}.world-page .juno-gallery-stack img:nth-child(n+2){display:none!important}}
 /* Product/catalog imagery stays clean and neutral so the fantasy photos do the emotional work. */
 .storefront-home .catalog-card-image,.storefront-home .sg-product-image{background-color:#f3f0ea!important;filter:none!important}
