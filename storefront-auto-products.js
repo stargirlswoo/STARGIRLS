@@ -3,7 +3,7 @@
   const api=window.STARGIRLS_STORE_API||'';
   if(!api)return;
 
-  const CACHE_KEY='stargirls-printful-catalog-v6';
+  const CACHE_KEY='stargirls-printful-catalog-v7';
   const CLIENT_TTL=5*60*1000;
   const MAX_STALE=24*60*60*1000;
   const state=window.__SG_PRINTFUL_STATE||(window.__SG_PRINTFUL_STATE={data:null,ts:0,promise:null});
@@ -18,8 +18,10 @@
   };
 
   const safeUrl=value=>/^https:\/\//i.test(String(value||''))?String(value):'';
-  const meta=f=>`${String(f?.type||'')} ${String(f?.preview_url||'')} ${String(f?.thumbnail_url||'')}`.toLowerCase();
+  const meta=f=>`${String(f?.type||'')} ${String(f?.filename||'')} ${String(f?.name||'')} ${String(f?.preview_url||'')} ${String(f?.thumbnail_url||'')}`.toLowerCase();
   const isArtwork=f=>/printfile|print[_ -]?file|artwork|design|template|pattern|logo|digitization|inside|label|embroidery/.test(meta(f));
+  const looksLikeModel=f=>/\b(model|lifestyle|person|people|woman|women|man|men|male|female|wearing|on[-_ ]?model|street[-_ ]?style)\b/.test(meta(f));
+  const cleanFile=f=>f&&!isArtwork(f)&&!looksLikeModel(f)&&(safeUrl(f.preview_url)||safeUrl(f.thumbnail_url));
   const active=v=>{
     const status=String(v?.availability_status||'').toLowerCase();
     return !!v&&v.synced!==false&&v.is_ignored!==true&&status!=='inactive'&&status!=='discontinued'&&Number(v.sync_variant_id||0)>0;
@@ -39,21 +41,22 @@
 
   function imageCandidates(source,v){
     const out=[];
-    add(out,source?.thumbnail_url);
-    add(out,source?.image_url);
-    for(const f of v?.files||[]){if(!isArtwork(f)&&/mockup|preview/.test(meta(f))){add(out,f.preview_url);add(out,f.thumbnail_url);}}
+    const clean=(v?.files||[]).filter(cleanFile);
+    for(const f of clean){if(/mockup|preview/.test(meta(f))){add(out,f.preview_url);add(out,f.thumbnail_url);}}
+    for(const f of clean){add(out,f.preview_url);add(out,f.thumbnail_url);}
     add(out,v?.catalog_image);
     add(out,v?.product?.image);
-    for(const f of v?.files||[]){if(!isArtwork(f)){add(out,f.preview_url);add(out,f.thumbnail_url);}}
-    return out;
+    /* Printful's product thumbnail can be an on-model/lifestyle shot. Keep it only as a last-resort fallback. */
+    if(!out.length){add(out,source?.image_url);add(out,source?.thumbnail_url);}
+    return out.slice(0,5);
   }
 
   function normalizeVariant(v,source){
     const {color,size,name}=variantParts(v,source?.name||'');
     const price=Number(v?.retail_price);
     const images=imageCandidates(source,v);
-    const primary=images[0]||safeUrl(source?.thumbnail_url)||'';
-    const cleanFiles=(v?.files||[]).filter(f=>f&&!isArtwork(f)&&(f.preview_url||f.thumbnail_url));
+    const primary=images[0]||'';
+    const cleanFiles=(v?.files||[]).filter(cleanFile);
     const files=primary
       ? [{preview_url:primary,thumbnail_url:primary,type:'mockup'},...cleanFiles.filter(f=>f.preview_url!==primary&&f.thumbnail_url!==primary)].slice(0,4)
       : cleanFiles.slice(0,4);
@@ -70,7 +73,7 @@
 
   function normalizeProduct(source){
     const variants=(source?.variants||[]).filter(active).map(v=>normalizeVariant(v,source));
-    const image=safeUrl(source?.thumbnail_url||source?.image_url)||variants.map(v=>v.image).find(Boolean)||'';
+    const image=variants.map(v=>v.image).find(Boolean)||safeUrl(source?.image_url)||safeUrl(source?.thumbnail_url)||'';
     return{...source,thumbnail_url:image||null,image_url:image||null,variants};
   }
   const normalize=data=>({...data,products:Array.isArray(data?.products)?data.products.map(normalizeProduct).filter(p=>p&&p.id&&p.variants.length):[]});
@@ -101,7 +104,7 @@
     if(state.promise)return state.promise;
     state.promise=(async()=>{
       try{
-        const r=await nativeFetch(`${api}/printful/catalog`,{cache:'default',mode:'cors'});
+        const r=await nativeFetch(`${api}/printful/catalog?v=20260910-photo-cut`,{cache:'no-store',mode:'cors'});
         if(!r.ok)throw new Error(`Catalog ${r.status}`);
         const data=normalize(await r.json());
         save(data);
