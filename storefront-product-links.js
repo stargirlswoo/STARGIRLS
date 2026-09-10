@@ -14,6 +14,9 @@
     if(!document.querySelector('script[data-store-retention]')){
       const extra=document.createElement('script');extra.src='storefront-retention.js?v=20260910d';extra.defer=true;extra.dataset.storeRetention='1';document.body.appendChild(extra);
     }
+    if(!document.querySelector('script[data-store-fantasy]')){
+      const fx=document.createElement('script');fx.src='storefront-fantasy.js?v=20260910a';fx.defer=true;fx.dataset.storeFantasy='1';document.body.appendChild(fx);
+    }
   }
   function productFor(id){try{return typeof products!=='undefined'?products.find(p=>p.id===id):null}catch{return null}}
   function destination(id){if(id==='juno-edp')return'fragrance.html';const p=productFor(id),dynamic=/^printful-(\d+)$/.exec(String(id||'')),pfid=Number(p?.printful_product_id||dynamic?.[1]||0),q=new URLSearchParams({v:'20260910q',id:String(id)});if(pfid>0)q.set('pf',String(pfid));return`product.html?${q.toString()}`}
