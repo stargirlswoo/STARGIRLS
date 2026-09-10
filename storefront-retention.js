@@ -1,0 +1,33 @@
+/* STARGIRLS retention layer: truthful novelty, exploration progress, returning-visitor cues and cart recovery. */
+(()=>{
+'use strict';
+const SEEN_KEY='stargirls-seen-products-v1';
+const SESSION_NEW_KEY='stargirls-new-this-session-v1';
+const LAST_VISIT_KEY='stargirls-store-last-visit-v1';
+const RECENT_KEY='stargirls-recent-v1';
+const grid=document.querySelector('[data-product-grid]');
+if(!grid)return;
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const read=(key,fallback)=>{try{const v=JSON.parse(localStorage.getItem(key)||'null');return v??fallback}catch{return fallback}};
+const write=(key,value)=>{try{localStorage.setItem(key,JSON.stringify(value))}catch{}};
+const readSession=(key,fallback)=>{try{const v=JSON.parse(sessionStorage.getItem(key)||'null');return v??fallback}catch{return fallback}};
+const writeSession=(key,value)=>{try{sessionStorage.setItem(key,JSON.stringify(value))}catch{}};
+function addStyle(){if($('#sg-retention-style'))return;const s=document.createElement('style');s.id='sg-retention-style';s.textContent=`
+  .sg-new-badge,.sg-spotlight-badge{position:absolute;left:12px;z-index:7;padding:7px 9px;font-size:8px;font-weight:900;letter-spacing:.09em;pointer-events:none}
+  .sg-new-badge{bottom:12px;background:#5f35ff;color:#fff}.sg-spotlight-badge{top:48px;background:#fff;color:#111;border:1px solid rgba(0,0,0,.14)}
+  .sg-discovery{padding:14px 4vw 16px;background:#090909;border-bottom:1px solid #252525;color:#fff}.sg-discovery-top{display:flex;justify-content:space-between;gap:16px;align-items:center;font-size:9px;font-weight:900;letter-spacing:.07em}.sg-discovery-top span{color:#888;font-weight:700;letter-spacing:0}.sg-discovery-track{height:5px;background:#242424;margin-top:9px;overflow:hidden}.sg-discovery-fill{height:100%;background:#5f35ff;transition:width .35s ease}.sg-surprise{border:1px solid #4f35c8!important;color:#fff!important;background:#5f35ff!important}.sg-returning-flash{animation:sgReturnFlash .65s ease}@keyframes sgReturnFlash{0%{filter:brightness(1)}50%{filter:brightness(1.35)}100%{filter:brightness(1)}}
+  @media(max-width:800px){.sg-new-badge,.sg-spotlight-badge{left:9px}.sg-new-badge{bottom:9px}.sg-spotlight-badge{top:44px}.sg-discovery{padding:12px 14px}.sg-discovery-top{align-items:flex-start;flex-direction:column;gap:4px}.shop-utility-row{grid-template-columns:1fr 1fr}.shop-utility-row .sg-surprise{grid-column:1/-1}}
+  @media(prefers-reduced-motion:reduce){.sg-discovery-fill{transition:none}.sg-returning-flash{animation:none}}
+`;document.head.appendChild(s)}
+function cards(){return $$('[data-product-card]').filter(c=>c.dataset.productCard)}
+function currentIds(){return cards().map(c=>String(c.dataset.productCard))}
+function determineNew(ids){let session=readSession(SESSION_NEW_KEY,null);if(Array.isArray(session))return session;const prev=read(SEEN_KEY,null);const prior=Array.isArray(prev?.ids)?prev.ids.map(String):[];const fresh=prior.length?ids.filter(id=>!prior.includes(id)):[];writeSession(SESSION_NEW_KEY,fresh);write(SEEN_KEY,{ids,ts:Date.now()});return fresh}
+function decorateNovelty(){const cs=cards();if(!cs.length)return false;const ids=currentIds(),fresh=determineNew(ids);cs.forEach(card=>{const wrap=$('.catalog-card-image-wrap',card);if(!wrap)return;const id=String(card.dataset.productCard);if(fresh.includes(id)&&!$('.sg-new-badge',wrap))wrap.insertAdjacentHTML('beforeend','<span class="sg-new-badge">NEW SINCE YOUR LAST VISIT</span>');});const eligible=cs.filter(c=>c.dataset.productCard!=='juno-edp');if(eligible.length){const day=Math.floor(Date.now()/86400000);const chosen=eligible[day%eligible.length];const wrap=$('.catalog-card-image-wrap',chosen);if(wrap&&!$('.sg-spotlight-badge',wrap))wrap.insertAdjacentHTML('beforeend','<span class="sg-spotlight-badge">TODAY\'S SPOTLIGHT</span>');}return true}
+function discovery(){const ids=currentIds();if(!ids.length)return;const recent=read(RECENT_KEY,[]);const viewed=new Set((Array.isArray(recent)?recent:[]).map(x=>String(x?.id||'')));const explored=ids.filter(id=>viewed.has(id)).length;let box=$('.sg-discovery');if(!box){box=document.createElement('section');box.className='sg-discovery';const utility=$('.shop-utility-row');(utility||$('.store-conversion-trust')||$('.shop-tabs'))?.insertAdjacentElement('afterend',box)}if(!box)return;const pct=Math.max(0,Math.min(100,ids.length?Math.round(explored/ids.length*100):0));box.innerHTML=`<div class="sg-discovery-top"><strong>YOU'VE EXPLORED ${explored}/${ids.length} PIECES ★</strong><span>${explored===ids.length&&ids.length?'YOU FOUND THE WHOLE DROP.':'OPEN A PRODUCT TO KEEP DISCOVERING.'}</span></div><div class="sg-discovery-track" aria-label="Drop exploration progress"><div class="sg-discovery-fill" style="width:${pct}%"></div></div>`}
+function addSurprise(){const utility=$('.shop-utility-row');if(!utility||$('[data-sg-surprise]',utility))return;const b=document.createElement('button');b.type='button';b.className='sg-surprise';b.dataset.sgSurprise='1';b.textContent='SURPRISE ME ★';b.addEventListener('click',()=>{const cs=cards().filter(c=>c.dataset.productCard!=='juno-edp');if(!cs.length)return;const chosen=cs[Math.floor(Math.random()*cs.length)];chosen?.click();});utility.insertBefore(b,utility.lastElementChild)}
+function returningCue(){if(document.body.dataset.sgReturnChecked==='1')return;document.body.dataset.sgReturnChecked='1';const last=Number(localStorage.getItem(LAST_VISIT_KEY)||0);localStorage.setItem(LAST_VISIT_KEY,String(Date.now()));if(!last||Date.now()-last>45*24*60*60*1000)return;const bar=$('.drop-bar');if(!bar)return;setTimeout(()=>{bar.textContent='★ YOU’RE BACK — SEE WHAT CHANGED ★';bar.classList.add('sg-returning-flash');setTimeout(()=>bar.classList.remove('sg-returning-flash'),700);},500)}
+function recoverCart(){const q=new URLSearchParams(location.search);if(q.get('cart')!=='open')return;setTimeout(()=>{document.querySelector('[data-cart-open]')?.click();history.replaceState(null,'',location.pathname+'#catalog');},350)}
+function run(){addStyle();addSurprise();decorateNovelty();discovery();returningCue();recoverCart()}
+let done=false;const tryRun=()=>{if(done)return;if(run(),cards().length){done=true;observer.disconnect();setTimeout(discovery,250)}};const observer=new MutationObserver(tryRun);observer.observe(grid,{childList:true});if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',tryRun);else tryRun();
+})();
