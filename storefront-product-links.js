@@ -9,7 +9,7 @@
       const js=document.createElement('script');js.src='storefront-conversion.js?v=20260910n';js.defer=true;js.dataset.storeConversion='1';document.body.appendChild(js);
     }
     if(!document.querySelector('script[data-store-retention]')){
-      const extra=document.createElement('script');extra.src='storefront-retention.js?v=20260910a';extra.defer=true;extra.dataset.storeRetention='1';document.body.appendChild(extra);
+      const extra=document.createElement('script');extra.src='storefront-retention.js?v=20260910b';extra.defer=true;extra.dataset.storeRetention='1';document.body.appendChild(extra);
     }
   }
   function productFor(id){try{return typeof products!=='undefined'?products.find(p=>p.id===id):null;}catch{return null;}}
