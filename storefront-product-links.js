@@ -5,7 +5,7 @@
     if(!document.querySelector('link[data-store-conversion]')){const css=document.createElement('link');css.rel='stylesheet';css.href='storefront-conversion.css?v=20260910q';css.dataset.storeConversion='1';document.head.appendChild(css)}
     if(!document.querySelector('script[data-store-conversion]')){const js=document.createElement('script');js.src='storefront-conversion.js?v=20260910q';js.defer=true;js.dataset.storeConversion='1';document.body.appendChild(js)}
     if(!document.querySelector('script[data-store-retention]')){const extra=document.createElement('script');extra.src='storefront-retention.js?v=20260910e';extra.defer=true;extra.dataset.storeRetention='1';document.body.appendChild(extra)}
-    if(!document.querySelector('script[data-store-club-handoff]')){const handoff=document.createElement('script');handoff.src='storefront-club-handoff.js?v=20260910a';handoff.defer=true;handoff.dataset.storeClubHandoff='1';document.body.appendChild(handoff)}
+    if(!document.querySelector('script[data-store-club-handoff]')){const handoff=document.createElement('script');handoff.src='storefront-club-handoff.js?v=20260910b';handoff.defer=true;handoff.dataset.storeClubHandoff='1';document.body.appendChild(handoff)}
   }
   function productFor(id){try{return typeof products!=='undefined'?products.find(p=>p.id===id):null}catch{return null}}
   function destination(id){if(id==='juno-edp')return'fragrance.html';const p=productFor(id),dynamic=/^printful-(\d+)$/.exec(String(id||'')),pfid=Number(p?.printful_product_id||dynamic?.[1]||0),q=new URLSearchParams({v:'20260910t',id:String(id)});if(pfid>0)q.set('pf',String(pfid));return`product.html?${q.toString()}`}
