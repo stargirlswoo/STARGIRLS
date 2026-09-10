@@ -1,4 +1,4 @@
-/* STARGIRLS storefront gallery: render current product images without extra network requests. */
+/* STARGIRLS storefront gallery: keep the initial product render light. */
 (function(){
   const safeUrl=value=>/^https:\/\//i.test(String(value||''))?String(value):'';
   const add=(out,u)=>{u=safeUrl(u);if(u&&!out.includes(u))out.push(u);};
@@ -9,9 +9,10 @@
     for(const v of product?.variants||[]){
       if(Array.isArray(v?.images))for(const u of v.images)add(out,u);
       add(out,v?.image);
+      if(out.length>=4)break;
     }
-    if(!product?.printful_product_id)for(const u of product?.gallery||[])add(out,u);
-    return out.slice(0,10);
+    if(!product?.printful_product_id)for(const u of product?.gallery||[]){add(out,u);if(out.length>=4)break;}
+    return out.slice(0,4);
   };
   try{galleryFor=window.galleryFor;}catch{}
 
