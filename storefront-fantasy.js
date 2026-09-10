@@ -3,10 +3,12 @@
 'use strict';
 const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
 function style(){if($('#sg-fantasy-behavior-style'))return;const s=document.createElement('style');s.id='sg-fantasy-behavior-style';s.textContent=`
+.storefront-home .site-header,.storefront-home .speed-header{top:26px!important}
+@media(min-width:901px){.shop-tabs,.shop-universe-tabs{top:94px!important}}
 .fantasy-hero-cta{position:relative;z-index:2;align-self:flex-start;margin-top:22px;display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 20px;border-radius:999px;background:#fff;color:#111;text-decoration:none;font-size:9px;font-weight:900;letter-spacing:.09em;box-shadow:0 8px 28px rgba(0,0,0,.14)}
 .shop-utility-row{opacity:0;transform:translateY(8px);pointer-events:none;transition:opacity .2s ease,transform .2s ease}.sg-dock-visible .shop-utility-row{opacity:1;transform:none;pointer-events:auto}
 .catalog-card.sg-reveal{opacity:0;transform:translateY(12px)}.catalog-card.sg-reveal.sg-in{opacity:1;transform:none;transition:opacity .38s ease,transform .38s ease}.catalog-card.sg-in:hover{transform:translateY(-2px)!important}
-@media(max-width:900px){.fantasy-hero-cta{min-height:44px;padding:0 17px;font-size:8px;margin-top:18px}}
+@media(max-width:900px){.shop-tabs,.shop-universe-tabs{top:86px!important}.fantasy-hero-cta{min-height:44px;padding:0 17px;font-size:8px;margin-top:18px}}
 @media(prefers-reduced-motion:reduce){.shop-utility-row,.catalog-card.sg-reveal{transition:none;transform:none;opacity:1}}
 `;document.head.appendChild(s)}
 function heroCTA(){const hero=$('.home-store-intro');if(!hero||$('.fantasy-hero-cta',hero))return;const a=document.createElement('a');a.className='fantasy-hero-cta';a.href='#catalog';a.textContent='SHOP THE DROP ↓';a.addEventListener('click',e=>{e.preventDefault();$('#catalog')?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'})});hero.appendChild(a)}
