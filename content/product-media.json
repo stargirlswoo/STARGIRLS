@@ -238,7 +238,14 @@
       "name": "HUNT Flip-Flops",
       "printful_product_id": null,
       "card_image": "/images/products/img_6665.webp",
-      "gallery": [],
+      "gallery": [
+        {
+          "image": "/images/products/img_6667.webp"
+        },
+        {
+          "image": "/images/products/img_6669.webp"
+        }
+      ],
       "colors": []
     }
   ]
