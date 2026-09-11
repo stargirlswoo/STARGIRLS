@@ -1,5 +1,6 @@
 import { receiveStripeWebhook, getPrintfulCatalog } from "./stripe-fulfillment.js";
 import { getPublicPrintfulCatalog } from "./catalog-public.js";
+import { getPublicPrintfulMockups } from "./mockup-public.js";
 
 const JSON_HEADERS = { "content-type": "application/json; charset=utf-8" };
 const REWARD_NAME = "STARFART";
@@ -196,6 +197,14 @@ export default {
         return json(await getPublicPrintfulCatalog(env, ctx), 200, {
           ...corsHeaders,
           "cache-control": "public, max-age=300, stale-while-revalidate=86400",
+          "vary": "Origin"
+        });
+      }
+      if (url.pathname === "/printful/mockups" && request.method === "GET") {
+        const productId = Number(url.searchParams.get("product_id") || url.searchParams.get("pf") || 0);
+        return json(await getPublicPrintfulMockups(productId, env), 200, {
+          ...corsHeaders,
+          "cache-control": "private, max-age=300",
           "vary": "Origin"
         });
       }
