@@ -299,7 +299,11 @@
       "name": "IVY Bikini Top",
       "printful_product_id": null,
       "card_image": "/images/products/img_6634.webp",
-      "gallery": [],
+      "gallery": [
+        {
+          "image": "/images/products/img_6635.webp"
+        }
+      ],
       "colors": []
     }
   ]
