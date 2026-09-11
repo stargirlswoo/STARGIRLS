@@ -122,7 +122,11 @@
       "name": "ANEW Hoodie",
       "printful_product_id": null,
       "card_image": "/images/products/img_6636.webp",
-      "gallery": [],
+      "gallery": [
+        {
+          "image": "/images/products/5bc857c1-6335-411f-9221-2d5d3b713e7d.webp"
+        }
+      ],
       "colors": [
         {
           "name": "White",
