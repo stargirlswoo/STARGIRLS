@@ -102,7 +102,11 @@
       "name": "HAYATI Hoodie",
       "printful_product_id": null,
       "card_image": "/images/products/img_6642.webp",
-      "gallery": [],
+      "gallery": [
+        {
+          "image": "/images/products/6c321b7b-53d6-4806-9aea-7a03a4f550fb.webp"
+        }
+      ],
       "colors": [
         {
           "name": "White",
