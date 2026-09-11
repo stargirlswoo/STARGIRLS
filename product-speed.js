@@ -2,21 +2,43 @@
 'use strict';
 const API='https://stargirls.stargirlswoo.workers.dev';
 const SNAPSHOT_KEY='stargirls-clicked-product-v2';
-const CACHE_KEYS=['stargirls-printful-catalog-v7'];
+const CACHE_KEYS=['stargirls-printful-catalog-v9','stargirls-printful-catalog-v8','stargirls-printful-catalog-v7'];
 const q=new URLSearchParams(location.search);
 const requestedId=q.get('id')||'';
 const requestedPf=Number(q.get('pf')||(/^printful-(\d+)$/.exec(requestedId)?.[1]||0));
 const app=document.getElementById('app');
 const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(Number(n||0));
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]));
 const safe=u=>/^https:\/\//i.test(String(u||''))?String(u):'';
 const uniq=a=>[...new Set(a.filter(Boolean))];
 let source=null,variants=[],selection={color:'',size:'',qty:1},activeImage=0;
 
-const fileMeta=f=>`${String(f?.type||'')} ${String(f?.filename||'')} ${String(f?.name||'')} ${String(f?.preview_url||'')} ${String(f?.thumbnail_url||'')}`.toLowerCase();
-const isArtwork=f=>/printfile|print[_ -]?file|artwork|design|template|pattern|logo|digitization|inside|label|embroidery/.test(fileMeta(f));
-const looksLikeModel=f=>/\b(model|lifestyle|person|people|woman|women|man|men|male|female|wearing|on[-_ ]?model|street[-_ ]?style)\b/.test(fileMeta(f));
-const cleanFile=f=>f&&!isArtwork(f)&&!looksLikeModel(f);
+const fileLabel=f=>`${String(f?.type||'')} ${String(f?.filename||'')} ${String(f?.name||'')}`.toLowerCase();
+const fileType=f=>String(f?.type||'').trim().toLowerCase();
+const isPrintPlacement=f=>/^(?:default|front|back|inside|outside|label(?:_|$)|sleeve(?:_|$)|embroidery(?:_|$)|chest(?:_|$)|left(?:_|$)|right(?:_|$))/.test(fileType(f));
+const isArtwork=f=>isPrintPlacement(f)||/printfile|print[_ -]?file|artwork|design|template|pattern|logo|digitization/.test(fileLabel(f));
+const isExplicitMockup=f=>{
+  if(!f||isArtwork(f))return false;
+  return /mockup|garment[_ -]?preview|product[_ -]?preview|product[_ -]?photo/.test(fileLabel(f));
+};
+const placement=(f,u='')=>{
+  const m=`${fileLabel(f)} ${String(u||'').toLowerCase()}`;
+  if(/(?:^|[^a-z])back(?:[^a-z]|$)|rear/.test(m))return'back';
+  if(/(?:^|[^a-z])front(?:[^a-z]|$)/.test(m))return'front';
+  if(/side/.test(m))return'side';
+  return'extra';
+};
+const addItem=(out,url,place='extra')=>{url=safe(url);if(url&&!out.some(x=>x.url===url))out.push({url,placement:place});};
+
+function blockedUrls(v){
+  const blocked=new Set();
+  for(const f of v?.files||[]){
+    if(isExplicitMockup(f))continue;
+    for(const u of [f?.preview_url,f?.thumbnail_url]){const clean=safe(u);if(clean)blocked.add(clean);}
+  }
+  for(const u of [v?.catalog_image,v?.product?.image]){const clean=safe(u);if(clean)blocked.add(clean);}
+  return blocked;
+}
 
 function variantParts(v){
   const parts=String(v?.name||'').split(' / ').map(x=>x.trim()).filter(Boolean);
@@ -24,19 +46,72 @@ function variantParts(v){
   const size=String(v?.size||'').trim()||(parts.length>=2?parts.at(-1):'One Size')||'One Size';
   const price=Number(v?.price??v?.retail_price);
   const sync=Number(v?.printful_sync_variant_id||v?.sync_variant_id||0);
-  const images=[];
-  for(const u of v?.images||[])if(safe(u))images.push(u);
-  for(const f of v?.files||[]){if(!cleanFile(f))continue;for(const u of [f?.preview_url,f?.thumbnail_url])if(safe(u))images.push(u);}
-  for(const u of [v?.catalog_image,v?.product?.image])if(safe(u))images.push(u);
-  for(const u of [v?.image])if(safe(u))images.push(u);
-  return {...v,color,size,price:Number.isFinite(price)?price:null,printful_sync_variant_id:sync,images:uniq(images).slice(0,5)};
+  const blocked=blockedUrls(v);
+  const items=[];
+
+  const mockups=(v?.files||[]).filter(isExplicitMockup).slice().sort((a,b)=>{
+    const rank=x=>placement(x)==='front'?0:placement(x)==='back'?1:placement(x)==='side'?2:3;
+    return rank(a)-rank(b);
+  });
+  for(const f of mockups){
+    const u=safe(f?.preview_url)||safe(f?.thumbnail_url);
+    addItem(items,u,placement(f,u));
+  }
+
+  /* Preserve already-normalized real mockups, but reject exact raw print-file URLs
+     and Printful catalog/model images. */
+  for(const u of v?.images||[]){
+    const clean=safe(u);
+    if(clean&&!blocked.has(clean))addItem(items,clean,placement(null,clean));
+  }
+  const own=safe(v?.image);
+  if(own&&!blocked.has(own))addItem(items,own,placement(null,own));
+
+  const images=items.map(x=>x.url);
+  return {...v,color,size,price:Number.isFinite(price)?price:null,printful_sync_variant_id:sync,images,galleryItems:items};
 }
+
+function rawSourceUrls(){
+  const blocked=new Set();
+  for(const v of source?.variants||[]){
+    for(const f of v?.files||[]){
+      if(isExplicitMockup(f))continue;
+      for(const u of [f?.preview_url,f?.thumbnail_url]){const clean=safe(u);if(clean)blocked.add(clean);}
+    }
+    for(const u of [v?.catalog_image,v?.product?.image]){const clean=safe(u);if(clean)blocked.add(clean);}
+  }
+  return blocked;
+}
+
+function publishedImage(){
+  const blocked=rawSourceUrls();
+  for(const u of [source?.thumbnail_url,source?.image_url]){
+    const clean=safe(u);
+    if(clean&&!blocked.has(clean))return clean;
+  }
+  return'';
+}
+
 function productImages(){
   const out=[];
+  const hero=publishedImage();
+  if(hero)out.push(hero);
   const relevant=selection.color?variants.filter(v=>v.color===selection.color):variants;
-  for(const v of relevant)for(const u of v.images||[])out.push(u);
-  if(!out.length){for(const u of [source?.image_url,source?.thumbnail_url])if(safe(u))out.push(u);}
-  return uniq(out).slice(0,5);
+  const fronts=[],backs=[],sides=[],extras=[];
+  const addBucket=(bucket,u)=>{u=safe(u);if(u&&u!==hero&&!bucket.includes(u))bucket.push(u);};
+  for(const v of relevant){
+    for(const item of v.galleryItems||[]){
+      if(item.placement==='back')addBucket(backs,item.url);
+      else if(item.placement==='front')addBucket(fronts,item.url);
+      else if(item.placement==='side')addBucket(sides,item.url);
+      else addBucket(extras,item.url);
+    }
+  }
+  /* The published thumbnail is normally the front. Put an available back view
+     immediately after it so customers don't have to hunt through duplicates. */
+  const ordered=hero?[...backs,...fronts,...sides,...extras]:[...fronts,...backs,...sides,...extras];
+  for(const u of ordered)if(!out.includes(u))out.push(u);
+  return out.slice(0,5);
 }
 function currentVariant(){return variants.find(v=>v.color===selection.color&&v.size===selection.size)||null;}
 function categoryName(){
@@ -134,7 +209,7 @@ function fail(){app.innerHTML=`<div class="error-state"><div><h1>COULDN'T OPEN T
 async function fetchDirect(){
   if(!requestedPf)return null;
   const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),3000);
-  try{const r=await fetch(`${API}/printful/catalog?v=20260910-photo-cut`,{cache:'no-store',mode:'cors',signal:controller.signal});if(!r.ok)return null;const data=await r.json();return(data?.products||[]).find(p=>Number(p.id)===requestedPf)||null;}catch{return null;}finally{clearTimeout(timer);}
+  try{const r=await fetch(`${API}/printful/catalog?v=20260911-gallery-clean`,{cache:'no-store',mode:'cors',signal:controller.signal});if(!r.ok)return null;const data=await r.json();return(data?.products||[]).find(p=>Number(p.id)===requestedPf)||null;}catch{return null;}finally{clearTimeout(timer);}
 }
 function cart(){try{const c=JSON.parse(localStorage.getItem('stargirls-cart')||'[]');return Array.isArray(c)?c:[]}catch{return[];}}
 function saveCart(c){localStorage.setItem('stargirls-cart',JSON.stringify(c));renderCart();}
@@ -150,7 +225,7 @@ function renderCart(){
   const c=cart();document.getElementById('cartCount').textContent=String(c.reduce((n,x)=>n+Number(x.quantity||0),0));
   let total=0;const box=document.getElementById('cartItems');
   if(!c.length){box.innerHTML='<div class="empty">YOUR CART IS EMPTY.</div>';document.getElementById('cartSubtotal').textContent=money(0);document.getElementById('checkout').disabled=true;return;}
-  box.innerHTML=c.map((x,i)=>{const local=(x.id===(requestedId||`printful-${requestedPf}`))?variants.find(v=>v.color===x.color&&v.size===x.size):null;const price=Number(local?.price||0);if(price)total+=price*Number(x.quantity||0);const img=local?.images?.[0]||'';return`<div class="cart-line">${safe(img)?`<img class="cart-thumb" src="${esc(img)}" alt="">`:'<div class="cart-thumb"></div>'}<div class="cart-copy"><strong>${esc(x.id===(requestedId||`printful-${requestedPf}`)?source?.name||'STARGIRLS ITEM':'STARGIRLS ITEM')}</strong><div>${esc(x.color)}${x.size?` · ${esc(x.size)}`:''} · QTY ${Number(x.quantity||0)}</div><button type="button" data-remove="${i}">REMOVE</button></div></div>`;}).join('');
+  box.innerHTML=c.map((x,i)=>{const local=(x.id===(requestedId||`printful-${requestedPf}`))?variants.find(v=>v.color===x.color&&v.size===x.size):null;const price=Number(local?.price||0);if(price)total+=price*Number(x.quantity||0);const img=publishedImage()||local?.images?.[0]||'';return`<div class="cart-line">${safe(img)?`<img class="cart-thumb" src="${esc(img)}" alt="">`:'<div class="cart-thumb"></div>'}<div class="cart-copy"><strong>${esc(x.id===(requestedId||`printful-${requestedPf}`)?source?.name||'STARGIRLS ITEM':'STARGIRLS ITEM')}</strong><div>${esc(x.color)}${x.size?` · ${esc(x.size)}`:''} · QTY ${Number(x.quantity||0)}</div><button type="button" data-remove="${i}">REMOVE</button></div></div>`;}).join('');
   box.querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>{const next=cart();next.splice(Number(b.dataset.remove),1);saveCart(next);});
   document.getElementById('cartSubtotal').textContent=total?money(total):'Calculated at checkout';document.getElementById('checkout').disabled=false;
 }
