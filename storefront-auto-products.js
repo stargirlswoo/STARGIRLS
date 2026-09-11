@@ -3,7 +3,7 @@
   const api=window.STARGIRLS_STORE_API||'';
   if(!api)return;
 
-  const CACHE_KEY='stargirls-printful-catalog-v7';
+  const CACHE_KEY='stargirls-printful-catalog-v8';
   const CLIENT_TTL=5*60*1000;
   const MAX_STALE=24*60*60*1000;
   const state=window.__SG_PRINTFUL_STATE||(window.__SG_PRINTFUL_STATE={data:null,ts:0,promise:null});
@@ -46,7 +46,7 @@
     for(const f of clean){add(out,f.preview_url);add(out,f.thumbnail_url);}
     add(out,v?.catalog_image);
     add(out,v?.product?.image);
-    /* Printful's product thumbnail can be an on-model/lifestyle shot. Keep it only as a last-resort fallback. */
+    /* Printful's product thumbnail can be an on-model/lifestyle shot. Keep it only as a last-resort fallback for variant-specific galleries. */
     if(!out.length){add(out,source?.image_url);add(out,source?.thumbnail_url);}
     return out.slice(0,5);
   }
@@ -73,7 +73,8 @@
 
   function normalizeProduct(source){
     const variants=(source?.variants||[]).filter(active).map(v=>normalizeVariant(v,source));
-    const image=variants.map(v=>v.image).find(Boolean)||safeUrl(source?.image_url)||safeUrl(source?.thumbnail_url)||'';
+    /* Use the exact published Printful product thumbnail for shop cards. Variant mockups stay available inside the product page/gallery. */
+    const image=safeUrl(source?.thumbnail_url)||safeUrl(source?.image_url)||variants.map(v=>v.image).find(Boolean)||'';
     return{...source,thumbnail_url:image||null,image_url:image||null,variants};
   }
   const normalize=data=>({...data,products:Array.isArray(data?.products)?data.products.map(normalizeProduct).filter(p=>p&&p.id&&p.variants.length):[]});
@@ -104,7 +105,7 @@
     if(state.promise)return state.promise;
     state.promise=(async()=>{
       try{
-        const r=await nativeFetch(`${api}/printful/catalog?v=20260910-photo-cut`,{cache:'no-store',mode:'cors'});
+        const r=await nativeFetch(`${api}/printful/catalog?v=20260910-published-thumb`,{cache:'no-store',mode:'cors'});
         if(!r.ok)throw new Error(`Catalog ${r.status}`);
         const data=normalize(await r.json());
         save(data);
