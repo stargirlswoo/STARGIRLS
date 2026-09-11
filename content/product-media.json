@@ -107,6 +107,71 @@
           ]
         }
       ]
+    },
+    {
+      "name": "ANEW Hoodie",
+      "printful_product_id": null,
+      "card_image": "/images/products/img_6636.webp",
+      "gallery": [],
+      "colors": [
+        {
+          "name": "White",
+          "images": [
+            {
+              "image": "/images/products/img_6637.webp"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PARTY TILL HELL Hoodie",
+      "printful_product_id": null,
+      "card_image": "/images/products/img_6599.webp",
+      "gallery": [],
+      "colors": [
+        {
+          "name": "White",
+          "images": [
+            {
+              "image": "/images/products/img_6600.webp"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "STARGIRLS Hat",
+      "printful_product_id": null,
+      "card_image": "/images/products/img_6602.webp",
+      "gallery": [
+        {
+          "image": "/images/products/img_6606.webp"
+        },
+        {
+          "image": "/images/products/img_6603.webp"
+        },
+        {
+          "image": "/images/products/img_6601.webp"
+        }
+      ],
+      "colors": []
+    },
+    {
+      "name": "STARGIRLS Hoodie",
+      "printful_product_id": null,
+      "card_image": "/images/products/img_6607.webp",
+      "gallery": [],
+      "colors": [
+        {
+          "name": "White",
+          "images": [
+            {
+              "image": "/images/products/img_6608.webp"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
