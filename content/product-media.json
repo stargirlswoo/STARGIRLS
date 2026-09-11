@@ -250,6 +250,17 @@
         }
       ],
       "colors": []
+    },
+    {
+      "name": "HUNT Bandeau Top",
+      "printful_product_id": null,
+      "card_image": "/images/products/img_6627.webp",
+      "gallery": [
+        {
+          "image": "/images/products/img_6628.webp"
+        }
+      ],
+      "colors": []
     }
   ]
 }
