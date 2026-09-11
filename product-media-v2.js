@@ -200,7 +200,7 @@ function liveImage(p){
 function rebuildRelated(){
   const related=app.querySelector('.related-products');
   const grid=related?.querySelector('.related-grid');
-  if(!related||!grid||!Array.isArray(liveCatalog.products)||!liveCatalog.products.length)return;
+  if(!related||!grid||related.dataset.sgLiveRelated==='1'||!Array.isArray(liveCatalog.products)||!liveCatalog.products.length)return;
   const current=liveCatalog.products.find(p=>Number(p?.id)===pf);
   const category=inferCategory(current?.name||app.querySelector('.product-title')?.textContent||'');
   const candidates=liveCatalog.products.filter(p=>Number(p?.id)!==pf&&Array.isArray(p?.variants)&&p.variants.length&&liveImage(p));
