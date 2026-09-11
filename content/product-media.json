@@ -1,3 +1,27 @@
 {
-  "products": []
+  "products": [
+    {
+      "name": "STARGIRLS Tee",
+      "printful_product_id": null,
+      "card_image": "/images/products/img_6591.webp",
+      "gallery": [
+        {
+          "image": "/images/products/img_6592.webp"
+        }
+      ],
+      "colors": [
+        {
+          "name": "White",
+          "images": [
+            {
+              "image": "/images/products/img_6649.webp"
+            },
+            {
+              "image": "/images/products/img_6650.webp"
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }
