@@ -76,6 +76,59 @@ collections:
             required: false
             hint: Large image above the product grid.
 
+      - name: product_media
+        label: SHOP — Product Photos
+        file: content/product-media.json
+        format: json
+        media_folder: /images/products
+        public_folder: /images/products
+        fields:
+          - name: products
+            label: Product Galleries
+            label_singular: Product
+            widget: list
+            required: false
+            summary: "{{fields.name}}"
+            hint: These photos control the storefront and product galleries. Printful still controls sizes, variants, checkout, and fulfillment.
+            fields:
+              - name: name
+                label: Product Name
+                widget: string
+                hint: Use the exact product name shown in the shop.
+              - name: printful_product_id
+                label: Printful Product ID
+                widget: number
+                value_type: int
+                required: false
+                hint: Optional but recommended. This keeps the photos attached even if the product title changes.
+              - name: card_image
+                label: Main Shop Card Photo
+                widget: image
+                required: false
+                hint: The main image shown on the shop grid and in search.
+              - name: gallery
+                label: Default Gallery
+                label_singular: Photo
+                widget: list
+                required: false
+                fields:
+                  - { name: image, label: Photo, widget: image }
+              - name: colors
+                label: Color Galleries
+                label_singular: Color
+                widget: list
+                required: false
+                summary: "{{fields.name}}"
+                fields:
+                  - { name: name, label: Color Name, widget: string, hint: "Match the store color exactly, such as Black or White." }
+                  - name: images
+                    label: Photos for This Color
+                    label_singular: Photo
+                    widget: list
+                    required: false
+                    fields:
+                      - { name: image, label: Photo, widget: image }
+
       - name: music
         label: MUSIC — HAYATI
         file: content/music.json
