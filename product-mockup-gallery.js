@@ -47,14 +47,14 @@ function colorEntry(entry,color){
 function fallbackColor(entry){return colors(entry).find(c=>imageList(c?.images).length)||null;}
 function imagesFor(entry,color=''){
   if(!entry)return[];
+  const card=cleanPath(entry?.card_image);
   const exact=colorEntry(entry,color);
   const exactImages=imageList(exact?.images);
-  if(exactImages.length)return uniq(exactImages).slice(0,8);
+  if(exactImages.length)return uniq([card,...exactImages]).slice(0,8);
   const gallery=imageList(entry?.gallery);
-  if(gallery.length)return uniq(gallery).slice(0,8);
+  if(gallery.length)return uniq([card,...gallery]).slice(0,8);
   const first=imageList(fallbackColor(entry)?.images);
-  if(first.length)return uniq(first).slice(0,8);
-  const card=cleanPath(entry?.card_image);
+  if(first.length)return uniq([card,...first]).slice(0,8);
   return card?[card]:[];
 }
 function primaryFor(entry,color=''){
