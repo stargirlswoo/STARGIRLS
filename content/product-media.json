@@ -288,7 +288,11 @@
       "name": "VENOM KISS Swimsuit",
       "printful_product_id": null,
       "card_image": "/images/products/img_6625.webp",
-      "gallery": [],
+      "gallery": [
+        {
+          "image": "/images/products/img_6624.webp"
+        }
+      ],
       "colors": []
     }
   ]
