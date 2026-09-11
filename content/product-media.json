@@ -68,6 +68,45 @@
           ]
         }
       ]
+    },
+    {
+      "name": "HAYATI Tee",
+      "printful_product_id": null,
+      "card_image": "/images/products/img_6593.webp",
+      "gallery": [
+        {
+          "image": "/images/products/img_6592.webp"
+        }
+      ],
+      "colors": [
+        {
+          "name": "White",
+          "images": [
+            {
+              "image": "/images/products/img_6656.webp"
+            },
+            {
+              "image": "/images/products/img_6650.webp"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "HAYATI Hoodie",
+      "printful_product_id": null,
+      "card_image": "/images/products/img_6642.webp",
+      "gallery": [],
+      "colors": [
+        {
+          "name": "White",
+          "images": [
+            {
+              "image": "/images/products/img_6643.webp"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
