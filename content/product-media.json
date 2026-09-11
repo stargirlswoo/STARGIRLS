@@ -22,6 +22,36 @@
           ]
         }
       ]
+    },
+    {
+      "name": "ANEW Tee",
+      "printful_product_id": null,
+      "card_image": "/images/products/img_6595.webp",
+      "gallery": [
+        {
+          "image": "/images/products/img_6592.webp"
+        }
+      ],
+      "colors": [
+        {
+          "name": "White",
+          "images": [
+            {
+              "image": "/images/products/img_6653.webp"
+            },
+            {
+              "image": "/images/products/img_6650.webp"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PARTY TILL HELL Tee",
+      "printful_product_id": null,
+      "card_image": "/images/products/img_6597.webp",
+      "gallery": [],
+      "colors": []
     }
   ]
 }
