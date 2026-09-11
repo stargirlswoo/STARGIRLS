@@ -3,7 +3,7 @@
   const api=window.STARGIRLS_STORE_API||'';
   if(!api)return;
 
-  const CACHE_KEY='stargirls-printful-catalog-v8';
+  const CACHE_KEY='stargirls-printful-catalog-v9';
   const CLIENT_TTL=5*60*1000;
   const MAX_STALE=24*60*60*1000;
   const state=window.__SG_PRINTFUL_STATE||(window.__SG_PRINTFUL_STATE={data:null,ts:0,promise:null});
@@ -18,10 +18,22 @@
   };
 
   const safeUrl=value=>/^https:\/\//i.test(String(value||''))?String(value):'';
-  const meta=f=>`${String(f?.type||'')} ${String(f?.filename||'')} ${String(f?.name||'')} ${String(f?.preview_url||'')} ${String(f?.thumbnail_url||'')}`.toLowerCase();
-  const isArtwork=f=>/printfile|print[_ -]?file|artwork|design|template|pattern|logo|digitization|inside|label|embroidery/.test(meta(f));
-  const looksLikeModel=f=>/\b(model|lifestyle|person|people|woman|women|man|men|male|female|wearing|on[-_ ]?model|street[-_ ]?style)\b/.test(meta(f));
-  const cleanFile=f=>f&&!isArtwork(f)&&!looksLikeModel(f)&&(safeUrl(f.preview_url)||safeUrl(f.thumbnail_url));
+  const fileLabel=f=>`${String(f?.type||'')} ${String(f?.filename||'')} ${String(f?.name||'')}`.toLowerCase();
+  const fileType=f=>String(f?.type||'').trim().toLowerCase();
+  const isPrintPlacement=f=>/^(?:default|front|back|inside|outside|label(?:_|$)|sleeve(?:_|$)|embroidery(?:_|$)|chest(?:_|$)|left(?:_|$)|right(?:_|$))/.test(fileType(f));
+  const isArtwork=f=>isPrintPlacement(f)||/printfile|print[_ -]?file|artwork|design|template|pattern|logo|digitization/.test(fileLabel(f));
+  const isExplicitMockup=f=>{
+    if(!f||isArtwork(f))return false;
+    const label=fileLabel(f);
+    return /mockup|garment[_ -]?preview|product[_ -]?preview|product[_ -]?photo/.test(label);
+  };
+  const mockupRank=f=>{
+    const m=fileLabel(f);
+    if(/front/.test(m))return 0;
+    if(/back|rear/.test(m))return 1;
+    if(/side/.test(m))return 2;
+    return 3;
+  };
   const active=v=>{
     const status=String(v?.availability_status||'').toLowerCase();
     return !!v&&v.synced!==false&&v.is_ignored!==true&&status!=='inactive'&&status!=='discontinued'&&Number(v.sync_variant_id||0)>0;
@@ -41,13 +53,17 @@
 
   function imageCandidates(source,v){
     const out=[];
-    const clean=(v?.files||[]).filter(cleanFile);
-    for(const f of clean){if(/mockup|preview/.test(meta(f))){add(out,f.preview_url);add(out,f.thumbnail_url);}}
-    for(const f of clean){add(out,f.preview_url);add(out,f.thumbnail_url);}
-    add(out,v?.catalog_image);
-    add(out,v?.product?.image);
-    /* Printful's product thumbnail can be an on-model/lifestyle shot. Keep it only as a last-resort fallback for variant-specific galleries. */
-    if(!out.length){add(out,source?.image_url);add(out,source?.thumbnail_url);}
+    /* The Sync Product thumbnail is the published Printful product mockup. */
+    add(out,source?.thumbnail_url);
+    add(out,source?.image_url);
+
+    /* Sync Variant files are normally print files (raw artwork), not product photos.
+       Only admit files explicitly identified as mockups/product previews. */
+    const mockups=(v?.files||[]).filter(isExplicitMockup).slice().sort((a,b)=>mockupRank(a)-mockupRank(b));
+    for(const f of mockups){add(out,f.preview_url);if(!safeUrl(f.preview_url))add(out,f.thumbnail_url);}
+
+    /* Never use v.product.image / catalog_image here: Printful supplies a generic
+       catalog garment/model image there, which is where the random model came from. */
     return out.slice(0,5);
   }
 
@@ -56,10 +72,6 @@
     const price=Number(v?.retail_price);
     const images=imageCandidates(source,v);
     const primary=images[0]||'';
-    const cleanFiles=(v?.files||[]).filter(cleanFile);
-    const files=primary
-      ? [{preview_url:primary,thumbnail_url:primary,type:'mockup'},...cleanFiles.filter(f=>f.preview_url!==primary&&f.thumbnail_url!==primary)].slice(0,4)
-      : cleanFiles.slice(0,4);
     return{
       ...v,name,color,size,
       price:Number.isFinite(price)?price:null,
@@ -67,13 +79,12 @@
       printful_sync_variant_id:Number(v?.sync_variant_id||0),
       images,
       image:primary,
-      files
+      files:Array.isArray(v?.files)?v.files:[]
     };
   }
 
   function normalizeProduct(source){
     const variants=(source?.variants||[]).filter(active).map(v=>normalizeVariant(v,source));
-    /* Use the exact published Printful product thumbnail for shop cards. Variant mockups stay available inside the product page/gallery. */
     const image=safeUrl(source?.thumbnail_url)||safeUrl(source?.image_url)||variants.map(v=>v.image).find(Boolean)||'';
     return{...source,thumbnail_url:image||null,image_url:image||null,variants};
   }
@@ -105,7 +116,7 @@
     if(state.promise)return state.promise;
     state.promise=(async()=>{
       try{
-        const r=await nativeFetch(`${api}/printful/catalog?v=20260910-published-thumb`,{cache:'no-store',mode:'cors'});
+        const r=await nativeFetch(`${api}/printful/catalog?v=20260911-gallery-clean`,{cache:'no-store',mode:'cors'});
         if(!r.ok)throw new Error(`Catalog ${r.status}`);
         const data=normalize(await r.json());
         save(data);
