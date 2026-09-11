@@ -50,8 +50,24 @@
       "name": "PARTY TILL HELL Tee",
       "printful_product_id": null,
       "card_image": "/images/products/img_6597.webp",
-      "gallery": [],
-      "colors": []
+      "gallery": [
+        {
+          "image": "/images/products/img_6592.webp"
+        }
+      ],
+      "colors": [
+        {
+          "name": "White",
+          "images": [
+            {
+              "image": "/images/products/img_6651.webp"
+            },
+            {
+              "image": "/images/products/img_6650.webp"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
