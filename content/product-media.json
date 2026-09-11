@@ -214,6 +214,25 @@
           ]
         }
       ]
+    },
+    {
+      "name": "HUNT Men’s slides",
+      "printful_product_id": null,
+      "card_image": "/images/products/img_6614.webp",
+      "gallery": [],
+      "colors": [
+        {
+          "name": "White",
+          "images": [
+            {
+              "image": "/images/products/img_6618.webp"
+            },
+            {
+              "image": "/images/products/img_6620.webp"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
