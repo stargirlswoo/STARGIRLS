@@ -3,7 +3,7 @@ import { getPublicPrintfulCatalog } from "./catalog-public.js";
 import { getPublicPrintfulMockups } from "./mockup-public.js";
 
 const JSON_HEADERS = { "content-type": "application/json; charset=utf-8" };
-const REWARD_NAME = "STARFART";
+const REWARD_NAME = "STARDUST";
 const REWARD_POINTS_PER_DOLLAR = 1;
 
 function json(data, status = 200, extraHeaders = {}) {
