@@ -14,30 +14,44 @@ let products=[],cart=loadCart(),activeFilter='all';
 const money=v=>Number.isFinite(Number(v))?new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(Number(v)):'';
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const safeImage=v=>/^(?:images\/|https:\/\/)/i.test(String(v||''))?String(v).replace(/["'()\\]/g,''):'';
+const brandMeta=p=>window.STARGIRLS_BRAND?.productMeta?.(p?.name||'')||{title:String(p?.name||'STARGIRLS PIECE').toUpperCase(),side:'joint',label:'☀☾ JOINT CUSTODY'};
 function loadCart(){try{const v=JSON.parse(localStorage.getItem('stargirls-cart')||'[]');return Array.isArray(v)?v:[]}catch{return[]}}
 function saveCart(){localStorage.setItem('stargirls-cart',JSON.stringify(cart));renderCart()}
 const productById=id=>products.find(p=>String(p.id)===String(id));
 function variantFor(p,item){return (p?.variants||[]).find(v=>Number(v.printful_sync_variant_id||v.sync_variant_id||0)===Number(item.printful_sync_variant_id||0)||(String(v.color||'')===String(item.color||'')&&String(v.size||'')===String(item.size||'')))||null}
 function productPrice(p){const prices=(p?.variants||[]).map(v=>Number(v.price??v.retail_price)).filter(Number.isFinite);if(prices.length)return Math.min(...prices);const x=Number(p?.price);return Number.isFinite(x)?x:null}
+function matchesFilter(p){
+  if(activeFilter==='all')return true;
+  if(activeFilter==='perfume')return String(p?.category||'').toLowerCase()==='perfume';
+  const meta=brandMeta(p);
+  if(activeFilter==='core')return meta.side==='joint'&&String(p?.category||'').toLowerCase()!=='perfume';
+  if(activeFilter==='moon'||activeFilter==='sun')return meta.side===activeFilter;
+  return String(p?.category||'').toLowerCase()===activeFilter;
+}
 function renderProducts(){
   if(!productGrid)return;
-  const visible=activeFilter==='all'?products:products.filter(p=>String(p.category||'').toLowerCase()===activeFilter);
-  if(!visible.length){productGrid.innerHTML='<div class="catalog-empty"><strong>NOTHING HERE YET.</strong><p>Try another category.</p></div>';return;}
+  const visible=products.filter(matchesFilter);
+  if(!visible.length){
+    const copy=activeFilter==='moon'?'Moon Side is still being built. New beauty, fitted pieces and jewelry will land here as they are ready.':activeFilter==='sun'?'Sun Side is still being built. New fashion, jewelry and beauty will land here as they are ready.':'Try another section.';
+    productGrid.innerHTML=`<div class="catalog-empty"><strong>NOTHING ON THIS SIDE YET.</strong><p>${esc(copy)}</p></div>`;return;
+  }
   productGrid.innerHTML=visible.map(p=>{
     const image=safeImage(p.image||'');
     const price=productPrice(p);
     const status=p.available===false?(p.status||'COMING SOON'):(price!==null?money(price):(p.status||'AVAILABLE'));
-    return `<article class="catalog-card" data-product-card="${esc(p.id)}"><div class="catalog-card-image-wrap"><div class="catalog-card-image" data-main-image="${esc(p.id)}" style="${image?`background-image:url(&quot;${image}&quot;)`:''}" role="img" aria-label="${esc(p.name)}"></div></div><div class="catalog-body"><div class="catalog-meta"><div><strong>${esc(p.name)}</strong><span>${esc(String(p.category||'drop').toUpperCase())}</span></div><div class="catalog-price">${esc(status)}</div></div></div></article>`;
+    const meta=brandMeta(p);
+    const sub=String(p?.category||'').toLowerCase()==='perfume'?'JUNO':meta.label.replace(/^☀☾\s|^☾\s|^☀\s/,'');
+    return `<article class="catalog-card" data-product-card="${esc(p.id)}" data-brand-side="${esc(meta.side)}"><div class="catalog-card-image-wrap"><div class="catalog-card-image" data-main-image="${esc(p.id)}" style="${image?`background-image:url(&quot;${image}&quot;)`:''}" role="img" aria-label="${esc(meta.title)}"></div></div><div class="catalog-body"><div class="catalog-meta"><div><strong>${esc(meta.title)}</strong><span>${esc(sub)}</span></div><div class="catalog-price">${esc(status)}</div></div></div></article>`;
   }).join('');
 }
 function renderCart(){
   const count=cart.reduce((n,i)=>n+Math.max(0,Number(i.quantity||0)),0);cartCount.forEach(el=>el.textContent=String(count));
   if(!cartItems||!cartSubtotal||!checkoutButton)return;
-  if(!cart.length){cartItems.innerHTML='<div class="cart-empty"><strong>NOTHING IN YOUR BAG YET.</strong><p>Pick something from the drop and it will show up here.</p></div>';cartSubtotal.textContent=money(0);checkoutButton.disabled=true;if(checkoutNote)checkoutNote.textContent='Add an item to continue to secure checkout.';return;}
+  if(!cart.length){cartItems.innerHTML='<div class="cart-empty"><strong>NOTHING IN YOUR BAG YET.</strong><p>Pick something and it will show up here.</p></div>';cartSubtotal.textContent=money(0);checkoutButton.disabled=true;if(checkoutNote)checkoutNote.textContent='Add an item to continue to secure checkout.';return;}
   let total=0;
   cartItems.innerHTML=cart.map((item,i)=>{
-    const p=productById(item.id),v=variantFor(p,item),price=Number(v?.price??v?.retail_price??0),qty=Math.max(1,Number(item.quantity||1));if(Number.isFinite(price))total+=price*qty;const img=safeImage(v?.image||p?.image||'');
-    return `<div class="cart-line"><div class="cart-thumb" style="${img?`background-image:url(&quot;${img}&quot;)`:''}"></div><div class="cart-line-copy"><strong>${esc(p?.name||'STARGIRLS ITEM')}</strong><span>${esc(item.color||'')} ${item.size?`· SIZE ${esc(item.size)}`:''}</span>${price?`<span>${money(price)}</span>`:''}<div class="qty-controls"><button type="button" data-cart-dec="${i}">−</button><span>${qty}</span><button type="button" data-cart-inc="${i}">+</button></div><button class="cart-remove" type="button" data-cart-remove="${i}">REMOVE</button></div></div>`;
+    const p=productById(item.id),v=variantFor(p,item),price=Number(v?.price??v?.retail_price??0),qty=Math.max(1,Number(item.quantity||1));if(Number.isFinite(price))total+=price*qty;const img=safeImage(v?.image||p?.image||'');const meta=brandMeta(p);
+    return `<div class="cart-line"><div class="cart-thumb" style="${img?`background-image:url(&quot;${img}&quot;)`:''}"></div><div class="cart-line-copy"><strong>${esc(meta.title)}</strong><span>${esc(item.color||'')} ${item.size?`· SIZE ${esc(item.size)}`:''}</span>${price?`<span>${money(price)}</span>`:''}<div class="qty-controls"><button type="button" data-cart-dec="${i}">−</button><span>${qty}</span><button type="button" data-cart-inc="${i}">+</button></div><button class="cart-remove" type="button" data-cart-remove="${i}">REMOVE</button></div></div>`;
   }).join('');
   cartSubtotal.textContent=money(total);checkoutButton.disabled=!STORE_API_BASE;
   if(checkoutNote)checkoutNote.textContent='Taxes and shipping are calculated at checkout.';
