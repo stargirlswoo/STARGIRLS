@@ -5,24 +5,24 @@ const norm=value=>String(value||'').trim();
 const sideLabel=side=>side==='moon'?'☾ MOON SIDE':side==='sun'?'☀ SUN SIDE':'☀☾ JOINT CUSTODY';
 
 const rules=[
-  {test:/^STARGIRLS\s+Tee$/i,title:'STARGIRLS CORE TEE',side:'joint',tagline:'No side required. This one belongs to everybody.'},
-  {test:/^STARGIRLS\s+Hoodie$/i,title:'STARGIRLS CORE HOODIE',side:'joint',tagline:'The easy layer. Wear it however you want.'},
-  {test:/^STARGIRLS\s+Hat$/i,title:'STARGIRLS CAP',side:'joint',tagline:'Put it on and keep moving.'},
-  {test:/^ANEW\s+Tee$/i,title:'ANEW TEE',side:'joint',tagline:'From ANEW. Still in rotation.'},
-  {test:/^ANEW\s+Hoodie$/i,title:'ANEW HOODIE',side:'joint',tagline:'ANEW, but built for nights that run late.'},
-  {test:/^PARTY\s+TILL\s+HELL\s+Tee$/i,title:'PARTY TILL HELL TEE',side:'joint',tagline:'Wear the night out.'},
-  {test:/^PARTY\s+TILL\s+HELL\s+Hoodie$/i,title:'PARTY TILL HELL HOODIE',side:'joint',tagline:'For when the night gets cold and nobody is going home.'},
-  {test:/^HAYATI\s+Tee$/i,title:'HAYATI TEE',side:'joint',tagline:'The song, on a shirt.'},
-  {test:/^HAYATI\s+Hoodie$/i,title:'HAYATI HOODIE',side:'joint',tagline:'Play HAYATI. Put this on. Leave late.'},
-  {test:/STARGIRLS\s+UNIFORM.*CROPPED\s+TEE/i,title:'THE UNIFORM CROP',side:'moon',tagline:'Moon Side. Fitted, simple, meant to be worn on repeat.'},
-  {test:/^IVY\s+Bikini\s+Top$/i,title:'IVY BIKINI TOP',side:'moon',tagline:'Moon Side. Soft shape, clean lines, easy to style.'},
-  {test:/^HUNT\s+Women(?:’|'|’)s\s+slides$/i,title:"HUNT SLIDES — WOMEN'S",side:'sun',tagline:'Sun Side. Put them on and keep moving.'},
-  {test:/^HUNT\s+Men(?:’|'|’)s\s+slides$/i,title:"HUNT SLIDES — MEN'S",side:'sun',tagline:'Sun Side. Put them on and keep moving.'},
-  {test:/^HUNT\s+Flip-Flops$/i,title:'HUNT FLIP-FLOPS',side:'sun',tagline:'Sun Side. Easy, loud enough, no explanation needed.'},
-  {test:/^HUNT\s+Bandeau\s+Top$/i,title:'HUNT BANDEAU',side:'sun',tagline:'Sun Side. Small top. Strong attitude.'},
-  {test:/^HUNT\s+Bikini\s+Bottom$/i,title:'HUNT BIKINI BOTTOM',side:'sun',tagline:'Sun Side. Built to finish the look.'},
-  {test:/^VENOM\s+KISS\s+Bandeau\s+Top$/i,title:'VENOM KISS BANDEAU',side:'sun',tagline:'Sun Side. The point is not to blend in.'},
-  {test:/^VENOM\s+KISS\s+Swimsuit$/i,title:'VENOM KISS ONE-PIECE',side:'sun',tagline:'Sun Side. One piece. Whole look.'}
+  {test:/^STARGIRLS\s+Tee$/i,title:'STARGIRLS CORE TEE',side:'joint',tagline:"The easiest one. If you don't want to pick a side, start here."},
+  {test:/^STARGIRLS\s+Hoodie$/i,title:'STARGIRLS CORE HOODIE',side:'joint',tagline:'The one you throw on and keep.'},
+  {test:/^STARGIRLS\s+Hat$/i,title:'STARGIRLS CAP',side:'joint',tagline:'Bad hair, late plans, whatever. Put it on.'},
+  {test:/^ANEW\s+Tee$/i,title:'ANEW TEE',side:'joint',tagline:'From ANEW. We still like this one.'},
+  {test:/^ANEW\s+Hoodie$/i,title:'ANEW HOODIE',side:'joint',tagline:'ANEW, but warmer.'},
+  {test:/^PARTY\s+TILL\s+HELL\s+Tee$/i,title:'PARTY TILL HELL TEE',side:'joint',tagline:'Pretty self-explanatory.'},
+  {test:/^PARTY\s+TILL\s+HELL\s+Hoodie$/i,title:'PARTY TILL HELL HOODIE',side:'joint',tagline:'For when nobody planned to stay out this long.'},
+  {test:/^HAYATI\s+Tee$/i,title:'HAYATI TEE',side:'joint',tagline:'Yes, we put the song on a shirt.'},
+  {test:/^HAYATI\s+Hoodie$/i,title:'HAYATI HOODIE',side:'joint',tagline:'HAYATI, but you can wear it.'},
+  {test:/STARGIRLS\s+UNIFORM.*CROPPED\s+TEE/i,title:'THE UNIFORM CROP',side:'moon',tagline:'Moon Side. Fitted, simple, exactly the point.'},
+  {test:/^IVY\s+Bikini\s+Top$/i,title:'IVY BIKINI TOP',side:'moon',tagline:'Moon Side. Clean, fitted, not trying too hard.'},
+  {test:/^HUNT\s+Women(?:’|'|’)s\s+slides$/i,title:"HUNT SLIDES — WOMEN'S",side:'sun',tagline:'Sun Side. Put them on and go.'},
+  {test:/^HUNT\s+Men(?:’|'|’)s\s+slides$/i,title:"HUNT SLIDES — MEN'S",side:'sun',tagline:'Sun Side. Put them on and go.'},
+  {test:/^HUNT\s+Flip-Flops$/i,title:'HUNT FLIP-FLOPS',side:'sun',tagline:'Sun Side. Easy enough to wear with the weird outfit.'},
+  {test:/^HUNT\s+Bandeau\s+Top$/i,title:'HUNT BANDEAU',side:'sun',tagline:'Sun Side. Tiny top. Whole outfit.'},
+  {test:/^HUNT\s+Bikini\s+Bottom$/i,title:'HUNT BIKINI BOTTOM',side:'sun',tagline:'Sun Side. The piece that finishes it.'},
+  {test:/^VENOM\s+KISS\s+Bandeau\s+Top$/i,title:'VENOM KISS BANDEAU',side:'sun',tagline:"Sun Side. You're not wearing this to disappear."},
+  {test:/^VENOM\s+KISS\s+Swimsuit$/i,title:'VENOM KISS ONE-PIECE',side:'sun',tagline:"Sun Side. You don't need much else with it."}
 ];
 
 function cleanTitle(name){
@@ -36,7 +36,7 @@ function productMeta(name){
   let side='joint';
   if(/\b(?:HUNT|VENOM KISS)\b/i.test(raw))side='sun';
   else if(/\b(?:IVY|CROP|CROPPED)\b/i.test(raw))side='moon';
-  return{raw,title:cleanTitle(raw||'STARGIRLS PIECE'),side,label:sideLabel(side),tagline:side==='moon'?'Moon Side. Pretty on purpose.':side==='sun'?'Sun Side. Built to get noticed.':'No side required.'};
+  return{raw,title:cleanTitle(raw||'STARGIRLS PIECE'),side,label:sideLabel(side),tagline:side==='moon'?'Moon Side. Pretty, specific, easy to make yours.':side==='sun'?"Sun Side. The look does the explaining.":'Ours. Wear it your way.'};
 }
 
 window.STARGIRLS_BRAND={productMeta,sideLabel};
