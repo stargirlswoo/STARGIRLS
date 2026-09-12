@@ -1,0 +1,12 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Spectral:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap");
+:root{--display:"Spectral",Georgia,serif;--body:"Inter",Arial,sans-serif;--sg-paper:#f6f0e8}
+body{font-family:var(--body)!important;background:var(--sg-paper)!important}
+.product-wordmark{font-family:var(--display)!important;font-weight:400!important;letter-spacing:-.02em!important;text-transform:none!important}
+.product-wordmark .mark{filter:invert(1);opacity:.8}
+.product-header-panel{background:#fffaf2!important;color:#181514!important}
+.product-panel-title{font-family:var(--display)!important;font-weight:400!important;letter-spacing:-.04em!important;text-transform:none!important}
+.product-panel-kicker,.product-panel-note,.product-panel-links a{letter-spacing:0!important;text-transform:lowercase!important}
+.product-title,.related-head h2,.loading h1,.error-state h1{font-family:var(--display)!important;font-weight:400!important;letter-spacing:-.035em!important}
+.brand-side-pill,.cinematic-kicker,.related-eyebrow{font-family:var(--display)!important;font-style:italic!important;font-weight:400!important;letter-spacing:0!important;text-transform:lowercase!important}
+.product-desire-line{font-family:var(--display)!important;font-style:italic!important;font-size:17px!important;font-weight:400!important}
+.page-footer{text-transform:lowercase}
