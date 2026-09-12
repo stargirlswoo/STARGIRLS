@@ -1,22 +1,23 @@
-/* STARGIRLS cinematic product-page polish: hierarchy, belonging and light reward without purchase friction. */
+/* STARGIRLS product-page polish: simple hierarchy, Moon + Sun voice, no fake urgency. */
 (()=>{
 'use strict';
 const app=document.getElementById('app');
 if(!app)return;
-const CLUB_HANDOFF='stargirls-open-club-on-arrival-v1';
 const $=(s,r=document)=>r.querySelector(s);
 let queued=false;
 function eraCopy(name=''){
   const n=String(name).toLowerCase();
-  if(/party\s*(?:till|til)\s*hell/.test(n))return{label:'CURRENT ERA // PARTY TILL HELL',world:'A piece of the current STARGIRLS era.'};
-  if(/hoodie|pullover|sweatshirt|sweater/.test(n))return{label:'STARGIRLS // AFTER DARK',world:'Wear your way into the STARGIRLS world.'};
-  if(/hat|cap/.test(n))return{label:'STARGIRLS // THE FINISHING PIECE',world:'A small piece of the STARGIRLS world.'};
-  return{label:'STARGIRLS // OFFICIAL PIECE',world:'A piece of the STARGIRLS world.'};
+  if(/party\s*(?:till|til)\s*hell/.test(n))return{label:'MOON + SUN // PARTY TILL HELL',world:'We made it. Wear it however you want.'};
+  if(/hayati/.test(n))return{label:'MOON + SUN // HAYATI',world:'Yes, we put the song on something you can wear.'};
+  if(/anew/.test(n))return{label:'MOON + SUN // ANEW',world:'From ANEW. Still part of us.'};
+  if(/hoodie|pullover|sweatshirt|sweater/.test(n))return{label:'STARGIRLS // CORE',world:'The kind of thing you throw on and keep.'};
+  if(/hat|cap/.test(n))return{label:'STARGIRLS // CORE',world:'Put it on and go.'};
+  return{label:'MOON + SUN MADE THIS',world:'If it feels like you, take it.'};
 }
 function decorateInfo(){
   const info=$('.product-info',app),title=$('.product-title',info||document),price=$('.price',info||document),desire=$('.product-desire-line',info||document);
   if(!info||!title)return;
-  const copy=eraCopy(title.textContent);
+  const copy=eraCopy(title.dataset.sgRawTitle||title.textContent);
   let kicker=$('.cinematic-kicker',info);
   if(!kicker){kicker=document.createElement('div');kicker.className='cinematic-kicker';title.insertAdjacentElement('beforebegin',kicker)}
   if(kicker.textContent!==copy.label)kicker.textContent=copy.label;
@@ -45,11 +46,10 @@ function decorateRelated(){
   const related=$('.related-products',app);
   if(!related)return;
   const eyebrow=$('.related-eyebrow',related),heading=$('.related-head h2',related);
-  if(eyebrow&&eyebrow.textContent!=='NEXT SCENE')eyebrow.textContent='NEXT SCENE';
-  if(heading&&heading.textContent!=='Stay in the world.')heading.textContent='Stay in the world.';
+  if(eyebrow&&eyebrow.textContent!=='IF YOU WANT ANOTHER ONE')eyebrow.textContent='IF YOU WANT ANOTHER ONE';
+  if(heading&&heading.textContent!=='You might like these too.')heading.textContent='You might like these too.';
   if(!$('.cinematic-world-invite',app)){
-    related.insertAdjacentHTML('afterend','<section class="cinematic-world-invite"><small>STARGIRLS CLUB ★</small><h2>DON\'T LOSE YOUR PLACE IN THE WORLD.</h2><p>Keep your saved pieces, your side, and verified purchase rewards waiting for you when you come back.</p><a href="index.html#catalog" data-enter-club>ENTER STARGIRLS CLUB ★</a></section>');
-    $('[data-enter-club]',app)?.addEventListener('click',()=>{try{localStorage.setItem(CLUB_HANDOFF,'1')}catch{}});
+    related.insertAdjacentHTML('afterend','<section class="cinematic-world-invite"><small>YOU DO NOT HAVE TO KEEP SHOPPING ★</small><h2>COME HANG OUT INSTEAD.</h2><p>The store is one part of STARGIRLS. The lives, music, jokes and group chat are the rest.</p><a href="https://discord.gg/yKSeYDfZxN" target="_blank" rel="noopener">GET IN THE GROUP CHAT ★</a></section>');
   }
 }
 function wireAdd(){
@@ -60,7 +60,7 @@ function wireAdd(){
     if(add.disabled)return;
     add.classList.add('cinematic-confirmed');
     const original='ADD TO CART';
-    add.textContent='YOU\'RE IN ★';
+    add.textContent='IN THE BAG ★';
     setTimeout(()=>{if(document.body.contains(add)){add.textContent=original;add.classList.remove('cinematic-confirmed')}},850);
   });
 }
