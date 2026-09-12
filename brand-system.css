@@ -1,0 +1,11 @@
+.brand-side-pill{display:inline-flex;align-items:center;gap:.35rem;width:max-content;margin:0 0 .7rem;padding:.42rem .72rem;border:1px solid rgba(255,255,255,.22);border-radius:999px;font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;background:rgba(0,0,0,.34);backdrop-filter:blur(10px)}
+.brand-side-pill[data-side="moon"]{border-color:rgba(255,255,255,.34)}
+.brand-side-pill[data-side="sun"]{border-color:rgba(255,255,255,.18)}
+.catalog-card[data-brand-side="moon"] .catalog-meta span::before{content:"☾ ";}
+.catalog-card[data-brand-side="sun"] .catalog-meta span::before{content:"☀ ";}
+.catalog-card[data-brand-side="joint"] .catalog-meta span::before{content:"☀☾ ";}
+.side-guide-note{max-width:740px;margin-top:1rem;opacity:.76;line-height:1.6}
+.side-guide .chapter-card{position:relative;overflow:hidden}
+.side-guide .chapter-card small{letter-spacing:.14em}
+.side-guide .chapter-card h3{max-width:14ch}
+@media(max-width:700px){.brand-side-pill{font-size:.66rem}.side-guide-note{font-size:.92rem}}
