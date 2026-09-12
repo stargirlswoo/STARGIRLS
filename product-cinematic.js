@@ -7,12 +7,12 @@ const $=(s,r=document)=>r.querySelector(s);
 let queued=false;
 function eraCopy(name=''){
   const n=String(name).toLowerCase();
-  if(/party\s*(?:till|til)\s*hell/.test(n))return{label:'MOON + SUN // PARTY TILL HELL',world:'We made it. Wear it however you want.'};
-  if(/hayati/.test(n))return{label:'MOON + SUN // HAYATI',world:'Yes, we put the song on something you can wear.'};
-  if(/anew/.test(n))return{label:'MOON + SUN // ANEW',world:'From ANEW. Still part of us.'};
-  if(/hoodie|pullover|sweatshirt|sweater/.test(n))return{label:'STARGIRLS // CORE',world:'The kind of thing you throw on and keep.'};
-  if(/hat|cap/.test(n))return{label:'STARGIRLS // CORE',world:'Put it on and go.'};
-  return{label:'MOON + SUN MADE THIS',world:'If it feels like you, take it.'};
+  if(/party\s*(?:till|til)\s*hell|\bpth\b/.test(n))return{label:'party till hell',world:'from PARTY TILL HELL.'};
+  if(/hayati/.test(n))return{label:'hayati',world:'from HAYATI.'};
+  if(/anew/.test(n))return{label:'anew',world:'from ANEW.'};
+  if(/hoodie|pullover|sweatshirt|sweater/.test(n))return{label:'moon + sun',world:'the easy layer.'};
+  if(/hat|cap/.test(n))return{label:'moon + sun',world:'put it on and go.'};
+  return{label:'we made this',world:'ours.'};
 }
 function decorateInfo(){
   const info=$('.product-info',app),title=$('.product-title',info||document),price=$('.price',info||document),desire=$('.product-desire-line',info||document);
@@ -40,16 +40,17 @@ function decorateInfo(){
   if(!world&&security){world=document.createElement('div');world.className='cinematic-era-line';security.insertAdjacentElement('afterend',world)}
   if(world&&world.textContent!==copy.world)world.textContent=copy.world;
   const summaries=info.querySelectorAll('.product-details summary');
-  if(summaries[0]&&summaries[0].textContent.trim()!=='FIT + DETAILS')summaries[0].textContent='FIT + DETAILS';
+  if(summaries[0]&&summaries[0].textContent.trim()!=='fit + details')summaries[0].textContent='fit + details';
+  if(summaries[1]&&summaries[1].textContent.trim()!=='shipping + returns')summaries[1].textContent='shipping + returns';
 }
 function decorateRelated(){
   const related=$('.related-products',app);
   if(!related)return;
   const eyebrow=$('.related-eyebrow',related),heading=$('.related-head h2',related);
-  if(eyebrow&&eyebrow.textContent!=='IF YOU WANT ANOTHER ONE')eyebrow.textContent='IF YOU WANT ANOTHER ONE';
-  if(heading&&heading.textContent!=='You might like these too.')heading.textContent='You might like these too.';
+  if(eyebrow&&eyebrow.textContent!=='more stuff')eyebrow.textContent='more stuff';
+  if(heading&&heading.textContent!=='also here.')heading.textContent='also here.';
   if(!$('.cinematic-world-invite',app)){
-    related.insertAdjacentHTML('afterend','<section class="cinematic-world-invite"><small>YOU DO NOT HAVE TO KEEP SHOPPING ★</small><h2>COME HANG OUT INSTEAD.</h2><p>The store is one part of STARGIRLS. The lives, music, jokes and group chat are the rest.</p><a href="https://discord.gg/yKSeYDfZxN" target="_blank" rel="noopener">GET IN THE GROUP CHAT ★</a></section>');
+    related.insertAdjacentHTML('afterend','<section class="cinematic-world-invite"><small>moon + sun</small><h2>we\'re usually live.</h2><p>youtube / twitch / kick / discord</p><a href="links/">everything else →</a></section>');
   }
 }
 function wireAdd(){
@@ -60,7 +61,7 @@ function wireAdd(){
     if(add.disabled)return;
     add.classList.add('cinematic-confirmed');
     const original='ADD TO CART';
-    add.textContent='IN THE BAG ★';
+    add.textContent='IN THE BAG';
     setTimeout(()=>{if(document.body.contains(add)){add.textContent=original;add.classList.remove('cinematic-confirmed')}},850);
   });
 }
