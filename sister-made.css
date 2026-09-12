@@ -1,0 +1,129 @@
+/* STARGIRLS — less campaign deck, more Moon + Sun made this themselves. */
+:root{
+  --sg-paper:#f6f0e8;
+  --sg-paper-2:#eee5db;
+  --sg-pencil:#181514;
+  --sg-purple-soft:#7458c9;
+  --sg-note:#fffaf2;
+}
+
+/* WORLD PAGES */
+.world-page{background:var(--sg-paper)!important;color:var(--sg-pencil)!important}
+.world-page:after{opacity:.025!important}
+.world-page .scene-bar{display:none!important}
+.world-page .site-header{
+  top:0!important;height:58px!important;min-height:58px!important;padding:0 20px!important;
+  background:rgba(246,240,232,.94)!important;color:#171311!important;
+  border-bottom:1px solid rgba(24,21,20,.12)!important;backdrop-filter:blur(10px)!important
+}
+.world-page .logo{font-family:var(--display)!important;font-size:24px!important;font-weight:400!important;letter-spacing:.015em!important;text-transform:none!important;color:#171311!important}
+.world-page .logo span{color:#171311!important;font-size:.72em!important;margin-left:2px}
+.world-page .desktop-nav{gap:22px!important;font-size:10px!important;font-weight:500!important;letter-spacing:0!important;text-transform:lowercase!important}
+.world-page .desktop-nav a{color:#5d5752!important}.world-page .desktop-nav a.active,.world-page .desktop-nav a:hover{color:#111!important;text-decoration:underline;text-underline-offset:4px}
+.world-page .header-shop{min-height:34px!important;border:0!important;border-bottom:1px solid #181514!important;border-radius:0!important;color:#181514!important;padding:0 2px!important;font-size:10px!important;font-weight:500!important;letter-spacing:0!important;text-transform:lowercase!important}
+.world-page .menu-toggle{color:#171311!important}.world-page .menu-toggle span{background:#171311!important}
+.world-page .mobile-menu{background:var(--sg-paper)!important;color:#171311!important}.world-page .mobile-menu a,.world-page .mobile-menu button{color:#171311!important}
+
+/* HERO = photo first, little note over it. */
+.cine-hero{min-height:88svh!important;align-items:flex-end!important;background:#171311!important}
+.cine-hero-bg{filter:saturate(1) contrast(1.01)!important}
+.cine-hero:before{background:linear-gradient(180deg,rgba(0,0,0,.02) 35%,rgba(0,0,0,.42) 100%)!important}
+.cine-hero-copy{
+  width:min(560px,88vw)!important;margin:0 0 5vw 4vw!important;padding:25px 27px 26px!important;
+  background:rgba(255,250,242,.93)!important;color:#181514!important;box-shadow:0 16px 45px rgba(0,0,0,.18)!important;
+  transform:rotate(-.7deg)!important
+}
+.cine-hero h1,.page-hero h1,.cine-section-head h2,.chapter-head h2,.scene-split-copy h2,.cine-afterparty h2,.duo-copy h3{
+  font-family:var(--display)!important;font-weight:400!important;letter-spacing:-.035em!important;text-transform:none!important
+}
+.cine-hero h1{font-size:clamp(58px,9vw,112px)!important;line-height:.78!important;margin:2px 0 16px!important}
+.cine-hero p:not(.scene-label){color:#3f3935!important;font-size:13px!important;line-height:1.55!important;font-weight:400!important}
+.scene-label{font-family:var(--display)!important;font-size:12px!important;font-weight:400!important;letter-spacing:.02em!important;text-transform:lowercase!important;color:#6b615b!important;margin-bottom:8px!important;font-style:italic}
+.hero-note{right:3.5vw!important;bottom:2.5vw!important;font-family:var(--display)!important;font-style:italic!important;font-size:13px!important;font-weight:400!important;letter-spacing:0!important;text-transform:lowercase!important;color:rgba(255,255,255,.8)!important;transform:rotate(2deg)}
+.cine-actions{gap:14px!important;margin-top:18px!important}
+.cine-btn{min-height:auto!important;padding:4px 0!important;border:0!important;border-radius:0!important;background:transparent!important;color:inherit!important;font-size:10px!important;font-weight:600!important;letter-spacing:0!important;text-transform:lowercase!important;border-bottom:1px solid currentColor!important}
+.cine-btn.purple,.cine-btn.dark{background:transparent!important;color:inherit!important;border:0!important;border-bottom:1px solid currentColor!important}
+.cine-btn:hover{transform:none!important;opacity:.55}
+
+.scene-marquee{background:var(--sg-paper)!important;color:#181514!important;border-color:rgba(24,21,20,.12)!important;padding:10px 0!important;font-family:var(--display)!important;font-size:12px!important;font-weight:400!important;letter-spacing:.01em!important;text-transform:lowercase!important}
+.scene-marquee span{padding-right:26px!important}
+
+/* No presentation-deck sections. */
+.cine-section,.chapter,.cine-duo{background:var(--sg-paper)!important;padding:64px 5vw!important}
+.cine-section-head{align-items:flex-start!important;margin-bottom:24px!important}
+.cine-section-head h2,.chapter-head h2{font-size:clamp(42px,6vw,78px)!important;line-height:.9!important}
+.cine-section-head p:not(.scene-label),.chapter-head p{color:#5d5752!important;font-size:12px!important;line-height:1.6!important;font-weight:400!important}
+.chapter-head{max-width:760px!important;margin-bottom:26px!important}
+.chapter-grid{gap:20px!important;align-items:start!important}
+.chapter-card{
+  position:relative!important;background:var(--sg-note)!important;color:#181514!important;padding:24px 24px 28px!important;min-height:190px!important;
+  box-shadow:0 12px 26px rgba(63,45,31,.08)!important;border:1px solid rgba(51,40,31,.06)!important
+}
+.chapter-card:nth-child(3n+1){transform:rotate(-.6deg)}.chapter-card:nth-child(3n+2){transform:translateY(8px) rotate(.45deg)}.chapter-card:nth-child(3n){transform:rotate(-.2deg)}
+.chapter-card small{font-family:var(--display)!important;font-style:italic!important;font-size:12px!important;font-weight:400!important;letter-spacing:0!important;text-transform:lowercase!important;color:#6a5d56!important}
+.chapter-card h3{font-family:var(--display)!important;font-size:clamp(28px,3vw,40px)!important;font-weight:400!important;letter-spacing:-.03em!important;text-transform:none!important;margin:10px 0!important}
+.chapter-card p{font-size:12px!important;line-height:1.6!important;color:#5d5752!important}
+.chapter.dark,.chapter.oxblood{background:var(--sg-paper-2)!important;color:#181514!important}
+.chapter.dark .chapter-card,.chapter.oxblood .chapter-card{background:var(--sg-note)!important;color:#181514!important}
+.chapter.dark .chapter-head p,.chapter.oxblood .chapter-head p,.chapter.dark .chapter-card p,.chapter.oxblood .chapter-card p{color:#5d5752!important}
+
+/* Split pages look like a photo sitting beside a note, not a trailer card. */
+.scene-split,.scene-split.reverse{grid-template-columns:1.15fr .85fr!important;min-height:620px!important;background:var(--sg-paper-2)!important;color:#181514!important;padding:28px!important;gap:28px!important}
+.scene-split.reverse{grid-template-columns:.85fr 1.15fr!important}
+.scene-split-media{min-height:560px!important;box-shadow:0 16px 36px rgba(38,28,20,.13)!important;transform:rotate(-.35deg)}
+.scene-split.reverse .scene-split-media{transform:rotate(.45deg)}
+.scene-split-copy{padding:55px 3vw!important;justify-content:center!important}
+.scene-split-copy h2{font-size:clamp(52px,7vw,96px)!important;line-height:.8!important;margin-bottom:18px!important}
+.scene-split-copy>p:not(.scene-label){color:#5d5752!important;font-size:13px!important;line-height:1.6!important}
+
+/* Duo = two prints on a bedroom floor, not two equal Netflix cards. */
+.duo-grid{gap:28px!important;align-items:start!important;max-width:1180px;margin:0 auto}
+.duo-card{min-height:620px!important;background:#fff!important;border:10px solid #fff!important;box-shadow:0 18px 42px rgba(42,31,23,.16)!important;color:#fff!important}
+.duo-card:first-child{transform:rotate(-1.2deg) translateY(8px)}.duo-card:last-child{transform:rotate(1deg) translateY(-5px)}
+.duo-photo{filter:saturate(1)!important}.duo-card:after{background:linear-gradient(180deg,transparent 52%,rgba(0,0,0,.7))!important}
+.duo-copy{left:18px!important;right:18px!important;bottom:18px!important}.duo-copy small{font-family:var(--display)!important;font-style:italic!important;font-size:13px!important;font-weight:400!important;letter-spacing:0!important;text-transform:lowercase!important;color:#fff!important}.duo-copy h3{font-size:clamp(42px,5vw,68px)!important;line-height:.84!important;margin:6px 0 9px!important}.duo-copy p{font-size:12px!important;line-height:1.5!important;color:#f4f0eb!important}
+
+/* Shop stays easy, just less department-store. */
+.world-page .shop-tabs{top:58px!important;padding:11px 5vw!important;background:rgba(246,240,232,.96)!important;border-bottom:1px solid rgba(24,21,20,.12)!important;gap:20px!important;font-size:10px!important;font-weight:500!important;letter-spacing:0!important;text-transform:lowercase!important}
+.world-page .shop-tabs a{color:#746b65!important}.world-page .shop-tabs a.active{color:#181514!important;border-bottom:1px solid #181514!important}
+.world-page .catalog-section{background:var(--sg-paper)!important;padding:38px 5vw 68px!important}
+.world-page .catalog-heading-row h2{font-family:var(--display)!important;font-weight:400!important;font-size:clamp(38px,5vw,64px)!important;letter-spacing:-.03em!important}
+.world-page .catalog-heading-row .shop-eyebrow{font-family:var(--display)!important;font-style:italic!important;font-size:12px!important;font-weight:400!important;letter-spacing:0!important;text-transform:lowercase!important}
+.world-page .catalog-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:28px 18px!important}
+.world-page .catalog-card{background:transparent!important;overflow:visible!important;box-shadow:none!important;transform:none!important}
+.world-page .catalog-card:hover{transform:translateY(-2px)!important;box-shadow:none!important}
+.world-page .catalog-card-image-wrap,.world-page .catalog-card-image{background:#fffaf2!important}
+.world-page .catalog-card-image-wrap{box-shadow:0 10px 24px rgba(40,30,22,.08)}
+.world-page .catalog-meta{padding:11px 2px 0!important}.world-page .catalog-meta strong{font-family:var(--display)!important;font-size:18px!important;font-weight:400!important;letter-spacing:-.015em!important}.world-page .catalog-meta span{font-size:9px!important;letter-spacing:0!important;text-transform:lowercase!important}.world-page .catalog-price{font-size:11px!important;font-weight:500!important}
+
+/* Page heroes are closer to a personal photo with a caption. */
+.page-hero{min-height:78svh!important;padding:0 4vw 4vw!important}
+.page-hero:after{background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,.55))!important}
+.page-hero-copy{max-width:580px!important;background:rgba(255,250,242,.93)!important;color:#181514!important;padding:23px 26px!important;transform:rotate(-.55deg)!important;box-shadow:0 14px 36px rgba(0,0,0,.16)!important}
+.page-hero h1{font-size:clamp(54px,9vw,108px)!important;line-height:.78!important;margin-bottom:15px!important}.page-hero p:not(.scene-label){color:#4f4843!important;font-size:13px!important;line-height:1.55!important}
+
+.cine-afterparty{min-height:420px!important;padding:64px 6vw!important;background:#dcd0f0!important;color:#181514!important}
+.cine-afterparty small{font-family:var(--display)!important;font-style:italic!important;font-size:13px!important;font-weight:400!important;letter-spacing:0!important;text-transform:lowercase!important;color:#51455e!important}.cine-afterparty h2{font-size:clamp(48px,8vw,104px)!important;line-height:.82!important;margin:8px 0 16px!important}.cine-afterparty p{color:#514b55!important;font-size:13px!important;line-height:1.55!important}
+
+.cine-footer{padding:38px 5vw 26px!important;background:var(--sg-paper)!important;color:#181514!important;border-top:1px solid rgba(24,21,20,.12)!important}.cine-footer-logo{font-family:var(--display)!important;font-size:clamp(38px,6vw,68px)!important;font-weight:400!important;letter-spacing:-.03em!important}.cine-footer-logo span{color:#181514!important}.cine-footer p{color:#746c66!important}.cine-footer-links a{color:#5e5752!important;font-weight:500!important;letter-spacing:0!important;text-transform:lowercase!important}.cine-footer small{color:#857c75!important}
+
+/* PRODUCT PAGE — keep buying boring, make the framing personal. */
+body:not(.world-page){background:var(--sg-paper)!important;color:#181514!important}
+.product-header{background:rgba(246,240,232,.96)!important;color:#181514!important;border-bottom:1px solid rgba(24,21,20,.12)!important}
+.product-header .product-wordmark{font-family:var(--display)!important;font-weight:400!important;letter-spacing:-.02em!important;color:#181514!important}.product-header .icon-button{color:#181514!important}.product-header .icon-button svg{stroke:#181514!important}
+.product-shell{background:var(--sg-paper)!important}.product-info{background:transparent!important}.product-title{font-family:var(--display)!important;font-weight:400!important;letter-spacing:-.035em!important;text-transform:none!important}.cinematic-kicker,.brand-side-pill{font-family:var(--display)!important;font-style:italic!important;font-weight:400!important;letter-spacing:0!important;text-transform:lowercase!important}
+.product-desire-line{font-family:var(--display)!important;font-size:17px!important;font-style:italic!important;font-weight:400!important}.choice{border-radius:0!important}.add{border-radius:0!important}.product-details{border-top-color:rgba(24,21,20,.12)!important}.related-products{background:var(--sg-paper-2)!important}.related-head h2{font-family:var(--display)!important;font-weight:400!important;letter-spacing:-.03em!important}.related-eyebrow{font-family:var(--display)!important;font-style:italic!important;letter-spacing:0!important;text-transform:lowercase!important;font-weight:400!important}
+
+@media(max-width:900px){
+  .world-page .desktop-nav{display:none!important}.cine-hero{min-height:82svh!important}.cine-hero-copy{margin:0 4vw 5vw!important;padding:21px 21px 22px!important}.hero-note{display:none!important}
+  .scene-split,.scene-split.reverse{grid-template-columns:1fr!important;padding:18px!important;gap:16px!important}.scene-split-media{min-height:62svh!important;order:0!important}.scene-split-copy{padding:30px 8px 36px!important;order:1!important}
+  .chapter-grid{grid-template-columns:1fr!important}.chapter-card:nth-child(n){transform:none!important}
+  .duo-grid{grid-template-columns:1fr!important;gap:24px!important}.duo-card{min-height:76svh!important}.duo-card:first-child,.duo-card:last-child{transform:rotate(0)!important}
+  .world-page .catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:24px 10px!important}
+  .page-hero{min-height:74svh!important;padding:0 4vw 4vw!important}.page-hero-copy{max-width:92vw!important;padding:20px!important}
+}
+@media(max-width:560px){
+  .world-page .site-header{padding:0 14px!important}.world-page .catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .world-page .catalog-meta{display:block!important}.world-page .catalog-price{margin-top:4px!important}.cine-section,.chapter,.cine-duo{padding:48px 5vw!important}
+  .cine-hero h1{font-size:58px!important}.page-hero h1{font-size:56px!important}.duo-copy h3{font-size:45px!important}
+}
