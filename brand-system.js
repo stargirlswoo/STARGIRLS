@@ -26,11 +26,7 @@ const rules=[
 ];
 
 function cleanTitle(name){
-  return norm(name)
-    .replace(/\bUnisex\b/gi,'')
-    .replace(/\s{2,}/g,' ')
-    .trim()
-    .toUpperCase();
+  return norm(name).replace(/\bUnisex\b/gi,'').replace(/\s{2,}/g,' ').trim().toUpperCase();
 }
 
 function productMeta(name){
@@ -40,21 +36,24 @@ function productMeta(name){
   let side='joint';
   if(/\b(?:HUNT|VENOM KISS)\b/i.test(raw))side='sun';
   else if(/\b(?:IVY|CROP|CROPPED)\b/i.test(raw))side='moon';
-  return{
-    raw,
-    title:cleanTitle(raw||'STARGIRLS PIECE'),
-    side,
-    label:sideLabel(side),
-    tagline:side==='moon'?'Moon Side. Pretty on purpose.':side==='sun'?'Sun Side. Built to get noticed.':'No side required.'
-  };
+  return{raw,title:cleanTitle(raw||'STARGIRLS PIECE'),side,label:sideLabel(side),tagline:side==='moon'?'Moon Side. Pretty on purpose.':side==='sun'?'Sun Side. Built to get noticed.':'No side required.'};
 }
 
 window.STARGIRLS_BRAND={productMeta,sideLabel};
 
 const app=document.getElementById('app');
 if(!app)return;
+const cartRoot=document.getElementById('cartItems');
 let scheduled=false;
 let waitTimer=null;
+
+function retitle(el){
+  if(!el)return;
+  const source=el.dataset.sgRawTitle||el.textContent.trim();
+  if(!el.dataset.sgRawTitle)el.dataset.sgRawTitle=source;
+  const next=productMeta(source).title;
+  if(el.textContent.trim()!==next)el.textContent=next;
+}
 
 function applyProductPage(){
   const title=app.querySelector('.product-title');
@@ -83,12 +82,8 @@ function applyProductPage(){
   const desire=app.querySelector('.product-desire-line');
   if(desire&&desire.textContent.trim()!==meta.tagline)desire.textContent=meta.tagline;
 
-  app.querySelectorAll('.related-copy strong').forEach(el=>{
-    const source=el.dataset.sgRawTitle||el.textContent.trim();
-    if(!el.dataset.sgRawTitle)el.dataset.sgRawTitle=source;
-    const next=productMeta(source).title;
-    if(el.textContent.trim()!==next)el.textContent=next;
-  });
+  app.querySelectorAll('.related-copy strong').forEach(retitle);
+  cartRoot?.querySelectorAll('.cart-line-copy strong').forEach(retitle);
 }
 
 function schedule(){
@@ -98,5 +93,6 @@ function schedule(){
 }
 
 new MutationObserver(schedule).observe(app,{childList:true,subtree:true});
+if(cartRoot)new MutationObserver(schedule).observe(cartRoot,{childList:true,subtree:true});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule);else schedule();
 })();
