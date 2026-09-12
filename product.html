@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>STARGIRLS — Product</title>
-<meta name="description" content="Something Moon + Sun made. Take it if it feels like you.">
-<meta name="theme-color" content="#000000">
+<meta name="description" content="Something Moon + Sun made.">
+<meta name="theme-color" content="#f6f0e8">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="product-speed.css?v=20260910a">
 <link rel="stylesheet" href="product-conversion.css?v=20260910d">
@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="product-cinematic.css?v=20260910a">
 <link rel="stylesheet" href="product-header-actions.css?v=20260910a">
 <link rel="stylesheet" href="brand-system.css?v=20260912b">
+<link rel="stylesheet" href="sister-made.css?v=20260912a">
 </head>
 <body>
 <header class="product-header">
@@ -20,42 +21,37 @@
     <button class="icon-button" type="button" id="productMenuOpen" aria-label="Open menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
     <button class="icon-button" type="button" id="productSearchOpen" aria-label="Search products"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 4.5 4.5"/></svg></button>
   </div>
-  <a class="product-wordmark" href="index.html">STARGIRLS<img class="mark" src="images/brand/stargirls-mark-white.svg" alt=""></a>
+  <a class="product-wordmark" href="index.html">stargirls<img class="mark" src="images/brand/stargirls-mark-white.svg" alt=""></a>
   <div class="product-header-right">
-    <button class="icon-button" type="button" id="productWorldOpen" aria-label="Open STARGIRLS shortcuts"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.2 5 5.3.5-4 3.6 1.2 5.2L12 15l-4.7 2.8 1.2-5.2-4-3.6 5.3-.5z"/></svg></button>
+    <button class="icon-button" type="button" id="productWorldOpen" aria-label="Open shortcuts"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.2 5 5.3.5-4 3.6 1.2 5.2L12 15l-4.7 2.8 1.2-5.2-4-3.6 5.3-.5z"/></svg></button>
     <button class="icon-button cart-button" type="button" id="cartOpen" aria-label="Open cart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h2l1.4 10h9.9l1.7-7H7"/><circle cx="9.5" cy="19" r="1"/><circle cx="17" cy="19" r="1"/></svg><span class="cart-badge" id="cartCount">0</span></button>
   </div>
 </header>
-
 <div class="product-header-backdrop" id="productHeaderBackdrop"></div>
 <aside class="product-header-panel product-nav-panel" id="productNavPanel" aria-label="Site menu">
-  <div class="product-panel-head"><strong>STARGIRLS ★</strong><button class="product-panel-close" type="button" data-product-panel-close aria-label="Close menu">×</button></div>
-  <p class="product-panel-kicker">MOON + SUN</p>
-  <h2 class="product-panel-title">WHERE<br>NEXT?</h2>
-  <nav class="product-panel-links"><a href="index.html">HOME</a><a href="shop.html">SHOP</a><a href="music.html">MUSIC</a><a href="about.html">MOON + SUN</a><a href="fragrance.html">JUNO</a><a href="shop.html#stardust">✨ STARDUST</a><a href="https://discord.gg/yKSeYDfZxN" target="_blank" rel="noopener">GROUP CHAT ↗</a></nav>
+  <div class="product-panel-head"><strong>stargirls ★</strong><button class="product-panel-close" type="button" data-product-panel-close aria-label="Close menu">×</button></div>
+  <p class="product-panel-kicker">moon + sun</p>
+  <h2 class="product-panel-title">where<br>next?</h2>
+  <nav class="product-panel-links"><a href="index.html">home</a><a href="shop.html">shop</a><a href="music.html">music</a><a href="about.html">moon + sun</a><a href="fragrance.html">juno</a><a href="shop.html#stardust">stardust ✨</a><a href="https://discord.gg/yKSeYDfZxN" target="_blank" rel="noopener">group chat ↗</a></nav>
 </aside>
-
 <section class="product-header-panel product-search-panel" id="productSearchPanel" aria-label="Search the shop">
-  <div class="product-panel-head"><strong>FIND SOMETHING</strong><button class="product-panel-close" type="button" data-product-panel-close aria-label="Close search">×</button></div>
-  <div class="product-search-box"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 4.5 4.5"/></svg><input id="productSearchInput" type="search" autocomplete="off" placeholder="Search STARGIRLS…" aria-label="Search products"></div>
-  <p class="product-search-hint">TEE · HOODIE · SWIM · MOON SIDE · SUN SIDE · JUNO</p>
-  <div class="product-search-results" id="productSearchResults"><div class="product-search-loading">Loading shop…</div></div>
+  <div class="product-panel-head"><strong>find something</strong><button class="product-panel-close" type="button" data-product-panel-close aria-label="Close search">×</button></div>
+  <div class="product-search-box"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 4.5 4.5"/></svg><input id="productSearchInput" type="search" autocomplete="off" placeholder="Search…" aria-label="Search products"></div>
+  <p class="product-search-hint">tee · hoodie · swim · moon · sun · juno</p>
+  <div class="product-search-results" id="productSearchResults"><div class="product-search-loading">loading…</div></div>
 </section>
-
 <aside class="product-header-panel product-world-panel" id="productWorldPanel" aria-label="STARGIRLS shortcuts">
-  <div class="product-panel-head"><strong>YOU'RE HERE ★</strong><button class="product-panel-close" type="button" data-product-panel-close aria-label="Close">×</button></div>
-  <p class="product-panel-kicker">YOUR SIDE + YOUR STARDUST</p>
-  <h2 class="product-panel-title">KEEP IT<br>WITH YOU.</h2>
-  <p class="product-panel-note">We're making one STARGIRLS ID so your side, Stardust, saved stuff and purchases can follow you between the site and group chat. We're building it for real, so until it works we won't pretend it already does.</p>
-  <nav class="product-panel-links"><a href="shop.html#stardust">SEE YOUR STARDUST ✨</a><a href="https://discord.gg/yKSeYDfZxN" target="_blank" rel="noopener">GET IN THE GROUP CHAT ↗</a><a href="shop.html">SEE WHAT WE MADE</a><a href="about.html">MOON + SUN</a><a href="help.html">HELP + ORDERS</a></nav>
-  <p class="product-panel-note">WEBSITE + DISCORD SYNC // IN DEVELOPMENT</p>
+  <div class="product-panel-head"><strong>stargirls ★</strong><button class="product-panel-close" type="button" data-product-panel-close aria-label="Close">×</button></div>
+  <p class="product-panel-kicker">stardust + discord</p>
+  <h2 class="product-panel-title">we're still<br>connecting it.</h2>
+  <p class="product-panel-note">The site and Discord Stardust balances are not automatically synced yet. We're building that properly instead of pretending it already works.</p>
+  <nav class="product-panel-links"><a href="shop.html#stardust">stardust ✨</a><a href="https://discord.gg/yKSeYDfZxN" target="_blank" rel="noopener">group chat ↗</a><a href="shop.html">shop</a><a href="help.html">help + orders</a></nav>
 </aside>
-
-<main id="app"><div class="loading"><div><h1>ONE SEC ★</h1><p>Opening it…</p></div></div></main>
+<main id="app"><div class="loading"><div><h1>one sec</h1><p>opening it…</p></div></div></main>
 <a class="floating-help" href="help.html" aria-label="Help">•••</a>
-<footer class="page-footer">© 2026 STARGIRLS · MOON + SUN + YOU</footer>
+<footer class="page-footer">© 2026 STARGIRLS · moon + sun</footer>
 <div class="cart-backdrop" id="cartBackdrop"></div>
-<aside class="cart" id="cart" aria-label="Shopping cart"><div class="cart-head"><strong>YOUR BAG</strong><button type="button" id="cartClose" aria-label="Close cart">×</button></div><div class="cart-items" id="cartItems"></div><div class="cart-foot"><div class="cart-total"><span>SUBTOTAL</span><span id="cartSubtotal">$0.00</span></div><button class="checkout" id="checkout">CHECKOUT →</button><div class="status" id="checkoutStatus">Taxes and shipping calculated at checkout.</div></div></aside>
+<aside class="cart" id="cart" aria-label="Shopping cart"><div class="cart-head"><strong>bag</strong><button type="button" id="cartClose" aria-label="Close cart">×</button></div><div class="cart-items" id="cartItems"></div><div class="cart-foot"><div class="cart-total"><span>subtotal</span><span id="cartSubtotal">$0.00</span></div><button class="checkout" id="checkout">checkout →</button><div class="status" id="checkoutStatus">Taxes and shipping calculated at checkout.</div></div></aside>
 <script src="product-speed.js?v=20260911a"></script>
 <script src="product-media-v2.js?v=20260911a"></script>
 <script src="brand-system.js?v=20260912e"></script>
