@@ -54,10 +54,16 @@ window.STARGIRLS_BRAND={productMeta,sideLabel};
 const app=document.getElementById('app');
 if(!app)return;
 let scheduled=false;
+let waitTimer=null;
 
 function applyProductPage(){
   const title=app.querySelector('.product-title');
   if(!title)return;
+  if(!window.STARGIRLS_PRODUCT_MEDIA){
+    clearTimeout(waitTimer);
+    waitTimer=setTimeout(schedule,80);
+    return;
+  }
   const raw=title.dataset.sgRawTitle||title.textContent.trim();
   if(!title.dataset.sgRawTitle)title.dataset.sgRawTitle=raw;
   const meta=productMeta(raw);
